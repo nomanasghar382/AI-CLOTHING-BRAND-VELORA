@@ -20,7 +20,13 @@ final class CatalogController extends Controller
 
     public function products(Request $request): JsonResponse
     {
-        $query = Product::query()->with(['brand', 'category', 'images', 'colors', 'sizes'])->where('status', 'published');
+        $query = Product::query()->with([
+            'brand',
+            'category',
+            'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
+            'colors',
+            'sizes',
+        ])->where('status', 'published');
         if ($request->filled('q')) { $term = $request->string('q')->toString(); $query->where(fn ($q) => $q->where('name', 'like', "%{$term}%")->orWhere('fabric', 'like', "%{$term}%")->orWhere('material', 'like', "%{$term}%")); }
         if ($request->filled('category')) $query->whereHas('category', fn ($q) => $q->where('slug', $request->string('category')));
         if ($request->filled('brand')) $query->whereHas('brand', fn ($q) => $q->where('slug', $request->string('brand')));

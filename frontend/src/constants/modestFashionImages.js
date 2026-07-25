@@ -1,6 +1,6 @@
 /** Demo imagery for VELORA — Islamic modest fashion for men and women. */
-const photo = (id, width = 900) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=80`
+const photo = (id, width = 480) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=${width <= 320 ? 65 : 72}`
 
 /** Women: niqab, mannequin, and back-facing abaya shots (no visible faces). */
 const WOMEN_PHOTO_IDS = [
@@ -30,8 +30,8 @@ export const WOMEN_MODEST_IMAGES = WOMEN_PHOTO_IDS.map((id) => photo(id))
 export const MEN_MODEST_IMAGES = MEN_PHOTO_IDS.map((id) => photo(id))
 export const MODEST_FASHION_IMAGES = [...WOMEN_MODEST_IMAGES, ...MEN_MODEST_IMAGES]
 
-export const womenModestImage = (index, width = 900) => photo(WOMEN_PHOTO_IDS[index % WOMEN_PHOTO_IDS.length], width)
-export const menModestImage = (index, width = 900) => photo(MEN_PHOTO_IDS[index % MEN_PHOTO_IDS.length], width)
+export const womenModestImage = (index, width = 480) => photo(WOMEN_PHOTO_IDS[index % WOMEN_PHOTO_IDS.length], width)
+export const menModestImage = (index, width = 480) => photo(MEN_PHOTO_IDS[index % MEN_PHOTO_IDS.length], width)
 
-export const modestFashionImage = (index, width = 900, gender = 'women') =>
+export const modestFashionImage = (index, width = 480, gender = 'women') =>
   photo(poolFor(gender)[index % poolFor(gender).length], width)

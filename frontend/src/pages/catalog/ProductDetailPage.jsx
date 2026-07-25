@@ -78,8 +78,8 @@ export default function ProductDetailPage() {
       <Breadcrumb items={[{ label: 'Catalog', to: '/catalog' }, { label: product.name }]} />
       <div className="row g-4">
         <div className="col-lg-7">
-          <div className="detail-image-wrap">{primary && <CloudinaryImage src={primary.url} alt={product.name} className="detail-image" width={960} />}</div>
-          <div className="d-flex gap-2 mt-3">{product.images?.slice(0, 5).map((image, index) => <img key={index} className="detail-thumbnail" src={image.thumbnail_url} alt={image.alt_text || `${product.name} view ${index + 1}`} loading="lazy" />)}</div>
+          <div className="detail-image-wrap">{primary && <CloudinaryImage src={primary.url} alt={product.name} className="detail-image" width={720} sizes="(max-width: 992px) 100vw, 60vw" fetchPriority="high" />}</div>
+          <div className="d-flex gap-2 mt-3">{product.images?.slice(0, 5).map((image, index) => <CloudinaryImage key={index} className="detail-thumbnail" src={image.thumbnail_url || image.url} alt={image.alt_text || `${product.name} view ${index + 1}`} width={120} sizes="80px" />)}</div>
         </div>
         <div className="col-lg-5">
           <p className="eyebrow">{product.brand?.name} / {product.category?.name}</p>

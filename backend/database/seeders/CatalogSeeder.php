@@ -9,27 +9,34 @@ use Illuminate\Support\Str;
 
 class CatalogSeeder extends Seeder
 {
-    /** @var list<string> Women — niqab, mannequin, and back-facing abaya imagery */
-    private const WOMEN_IMAGE_URLS = [
-        'https://images.unsplash.com/photo-1559730775-67f621597262?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1771162766051-c330f1d664ea?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1770367358711-b42cf1a6c2b1?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1588594509615-62de3570d696?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1750190321796-c749877df841?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1767766277273-a53443ab8639?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1752794674886-fb12817a5e96?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1560350530-a12ec1414cf5?auto=format&fit=crop&w=900&q=80',
+    /** @var list<string> */
+    private const WOMEN_PHOTO_IDS = [
+        'photo-1559730775-67f621597262',
+        'photo-1771162766051-c330f1d664ea',
+        'photo-1770367358711-b42cf1a6c2b1',
+        'photo-1588594509615-62de3570d696',
+        'photo-1750190321796-c749877df841',
+        'photo-1767766277273-a53443ab8639',
+        'photo-1752794674886-fb12817a5e96',
+        'photo-1560350530-a12ec1414cf5',
     ];
 
-    /** @var list<string> Men — thobe, kandura, and traditional Islamic attire */
-    private const MEN_IMAGE_URLS = [
-        'https://images.unsplash.com/photo-1564289851149-a9f8940f795c?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1578507435314-e39e7852eddd?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1756412066323-a336d2becc10?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1761475048588-e00acbdce66f?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1774424420923-6936309c3c5e?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1757143137159-316220046829?auto=format&fit=crop&w=900&q=80',
+    /** @var list<string> */
+    private const MEN_PHOTO_IDS = [
+        'photo-1564289851149-a9f8940f795c',
+        'photo-1578507435314-e39e7852eddd',
+        'photo-1756412066323-a336d2becc10',
+        'photo-1761475048588-e00acbdce66f',
+        'photo-1774424420923-6936309c3c5e',
+        'photo-1757143137159-316220046829',
     ];
+
+    private static function imageUrl(string $photoId, int $width): string
+    {
+        $quality = $width <= 320 ? 65 : 72;
+
+        return "https://images.unsplash.com/{$photoId}?auto=format&fit=crop&w={$width}&q={$quality}";
+    }
 
     /**
      * Run the database seeds.
@@ -68,7 +75,7 @@ class CatalogSeeder extends Seeder
             $prefix = $gender === 'men' ? "Men's {$familyName}" : $familyName;
             $name = "Velora {$prefix} {$i}";
             $price = 40 + ($i % 20) * 8;
-            $imageUrls = $gender === 'men' ? self::MEN_IMAGE_URLS : self::WOMEN_IMAGE_URLS;
+            $photoIds = $gender === 'men' ? self::MEN_PHOTO_IDS : self::WOMEN_PHOTO_IDS;
             $coverage = $gender === 'women' ? 'Full' : ['Full', 'Modest', 'Layered'][$i % 3];
 
             $product = Product::query()->updateOrCreate(['slug' => Str::slug($name)], [
@@ -105,8 +112,10 @@ class CatalogSeeder extends Seeder
             $product->sizes()->sync($selectedSizes->pluck('id'));
 
             foreach (range(0, 4) as $j) {
-                $url = $imageUrls[($i + $j) % count($imageUrls)];
-                ProductImage::query()->updateOrCreate(['product_id' => $product->id, 'sort_order' => $j], ['url' => $url, 'thumbnail_url' => $url, 'alt_text' => $name, 'is_primary' => $j === 0]);
+                $photoId = $photoIds[($i + $j) % count($photoIds)];
+                $url = self::imageUrl($photoId, 720);
+                $thumbnailUrl = self::imageUrl($photoId, 320);
+                ProductImage::query()->updateOrCreate(['product_id' => $product->id, 'sort_order' => $j], ['url' => $url, 'thumbnail_url' => $thumbnailUrl, 'alt_text' => $name, 'is_primary' => $j === 0]);
                 $variant = ProductVariant::query()->updateOrCreate(['sku' => "VLR-{$i}-{$j}"], ['product_id' => $product->id, 'color_id' => $selectedColors[$j % 2]->id, 'size_id' => $selectedSizes[$j % 3]->id, 'stock_quantity' => 5 + $i % 30, 'status' => 'active']);
                 Inventory::query()->updateOrCreate(['product_id' => $product->id, 'product_variant_id' => $variant->id, 'location' => 'primary'], ['current_stock' => $variant->stock_quantity, 'reserved_stock' => 0, 'minimum_stock' => 5]);
             }

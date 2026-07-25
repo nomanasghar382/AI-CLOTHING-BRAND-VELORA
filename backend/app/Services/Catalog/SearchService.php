@@ -21,7 +21,11 @@ final class SearchService
     }
 
     $builder = Product::query()
-      ->with(['brand', 'category', 'images'])
+      ->with([
+        'brand',
+        'category',
+        'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
+      ])
       ->where('status', 'published');
 
     if ($query !== '') {
