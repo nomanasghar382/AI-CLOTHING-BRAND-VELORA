@@ -4,6 +4,33 @@ namespace App\Support;
 
 final class FreeCatalogPhotoPool
 {
+    /** @var list<string> */
+    private const MEN_BRAND_MODEL_NAMES = [
+        'brand-model.jpg',
+        'brand-model.jpeg',
+        'brand-model.png',
+        'brand-model.webp',
+        'noman-asghar.jpg',
+        'noman-asghar.jpeg',
+        'noman-asghar.png',
+    ];
+
+    public static function menBrandModelPath(): ?string
+    {
+        foreach (self::MEN_BRAND_MODEL_NAMES as $name) {
+            if (is_file(public_path("free-catalog/men/{$name}"))) {
+                return '/free-catalog/men/'.$name;
+            }
+        }
+
+        return null;
+    }
+
+    public static function usesMenBrandModel(): bool
+    {
+        return self::menBrandModelPath() !== null;
+    }
+
     /** @return list<array{type: string, id?: string, path?: string}> */
     public static function forGender(string $gender): array
     {
@@ -66,6 +93,16 @@ final class FreeCatalogPhotoPool
         return "https://{$host}/{$photoId}?auto=format&fit=crop&w={$width}&h=".($width <= 540 ? 900 : 1350)."&q={$quality}&dpr=2{$crop}";
     }
 
+    /** Garment detail shots shown alongside your brand-model photo. */
+    public static function menGarmentPhoto(int $ordinal, int $galleryIndex): string
+    {
+        $catalog = require database_path('data/GenZCuratedCatalog.php');
+        $pool = array_merge($catalog['men_editorial'], $catalog['men_product']);
+        $index = $ordinal + ($galleryIndex * 13);
+
+        return $pool[$index % count($pool)];
+    }
+
     public static function counts(): array
     {
         return [
@@ -73,6 +110,7 @@ final class FreeCatalogPhotoPool
             'men_local' => count(self::localPhotos('men')),
             'women_total' => count(self::forGender('women')),
             'men_total' => count(self::forGender('men')),
+            'men_brand_model' => self::usesMenBrandModel(),
         ];
     }
 }

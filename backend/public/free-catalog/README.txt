@@ -1,10 +1,26 @@
-Place your FREE phone photos here (JPG, PNG, WEBP).
+FREE PHOTOS — NO PAYMENT NEEDED
+================================
 
-Women's photos -> backend/public/free-catalog/women/
-Men's photos   -> backend/public/free-catalog/men/
+USE YOUR PHOTO ON ALL MEN'S CLOTHING
+------------------------------------
+1. Save your portrait as:
+   backend/public/free-catalog/men/brand-model.jpg
 
-Then run:
-  php artisan catalog:free-photos
-  php artisan db:seed --class=CatalogSeeder
+   (Also accepts: noman-asghar.jpg, brand-model.png)
 
-Your photos are used FIRST on every product — no payment needed.
+2. Run:
+   php artisan catalog:free-photos
+   php artisan db:seed --class=CatalogSeeder
+
+3. Hard refresh browser: Ctrl+Shift+R
+
+Every men's product (thobe, kurta, shalwar, jubba, etc.) will use YOUR photo
+as the main image. Garment detail shots fill the product gallery.
+
+Windows path example:
+C:\Users\EHSAN computer\OneDrive - Higher Education Commission\Desktop\VELORA\backend\public\free-catalog\men\brand-model.jpg
+
+WOMEN'S PHOTOS
+--------------
+Drop extra JPG/PNG files into:
+  backend/public/free-catalog/women/

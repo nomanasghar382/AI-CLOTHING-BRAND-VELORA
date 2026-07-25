@@ -28,6 +28,14 @@ class CatalogSeeder extends Seeder
     /** @return array{type: string, id?: string, path?: string} */
     private function entryFor(string $gender, int $ordinal, int $galleryIndex): array
     {
+        if ($gender === 'men' && $galleryIndex === 0 && ($brand = FreeCatalogPhotoPool::menBrandModelPath())) {
+            return ['type' => 'local', 'path' => $brand];
+        }
+
+        if ($gender === 'men' && $galleryIndex > 0 && FreeCatalogPhotoPool::usesMenBrandModel()) {
+            return ['type' => 'unsplash', 'id' => FreeCatalogPhotoPool::menGarmentPhoto($ordinal, $galleryIndex)];
+        }
+
         $pool = $gender === 'men' ? $this->menPool : $this->womenPool;
         $index = $ordinal + ($galleryIndex * 97);
 
@@ -49,6 +57,11 @@ class CatalogSeeder extends Seeder
     {
         $counts = FreeCatalogPhotoPool::counts();
         $this->command?->info("Free photos: {$counts['women_local']} women + {$counts['men_local']} men from your phone. Pool totals: {$counts['women_total']} women, {$counts['men_total']} men.");
+        if ($counts['men_brand_model']) {
+            $this->command?->info('Men brand model detected — your photo will be used on ALL men\'s products.');
+        } else {
+            $this->command?->warn('Tip: save your photo as backend/public/free-catalog/men/brand-model.jpg for all men\'s products.');
+        }
 
         $colors = collect(['Black'=>'#111827','Ivory'=>'#FFFFF0','Emerald'=>'#047857','Plum'=>'#7E2253','Navy'=>'#1E3A8A','Sand'=>'#D6C5A2','Rose'=>'#E9A0B5','Olive'=>'#556B2F','Taupe'=>'#8B7D6B','Cocoa'=>'#6F4E37','Sky'=>'#87CEEB','Lilac'=>'#C8A2C8','Stone'=>'#78716C','Sage'=>'#9CAF88','Burgundy'=>'#800020','Teal'=>'#0F766E','Mocha'=>'#967969','Coral'=>'#FF7F50','Silver'=>'#C0C0C0','Gold'=>'#D4AF37'])->map(fn ($hex, $name) => Color::query()->updateOrCreate(['slug'=>Str::slug($name)], ['name'=>$name,'hex_code'=>$hex,'status'=>'active']))->values();
         $sizes = collect(['XS','S','M','L','XL','XXL','EU 34','EU 36','EU 38','EU 40','UK 8','UK 10','US 4','US 6','One Size'])->map(fn ($name,$i) => Size::query()->updateOrCreate(['slug'=>Str::slug($name)], ['name'=>$name,'international_size'=>$name,'sort_order'=>$i,'status'=>'active']))->values();
@@ -101,11 +114,14 @@ class CatalogSeeder extends Seeder
             $categoryPool = $isMen ? $menCategories : $womenCategories;
             $coverage = $gender === 'women' ? 'Full' : ['Full', 'Modest', 'Layered'][$i % 3];
 
+            $modeledBy = $gender === 'men' && FreeCatalogPhotoPool::usesMenBrandModel() ? ' Modeled by Noman Asghar.' : '';
             $product = Product::query()->updateOrCreate(['sku' => "VLR-{$i}"], [
                 'slug' => Str::slug($name.'-'.$i),
                 'name' => $name,
-                'short_description' => '100% free photos — your pics or Unsplash stock.',
-                'description' => "Built for ages 16–35. The {$name} uses free catalog imagery — add your own phone photos to public/free-catalog/ for a unique Gen Z look without paying for shoots.",
+                'short_description' => $gender === 'men' && FreeCatalogPhotoPool::usesMenBrandModel()
+                    ? "Worn by Noman Asghar — {$familyName} edit."
+                    : '100% free photos — your pics or Unsplash stock.',
+                'description' => "Built for ages 16–35. The {$name} is styled for campus, Jummah, and weekend fits.{$modeledBy}",
                 'barcode' => '890'.str_pad((string) $i, 9, '0', STR_PAD_LEFT),
                 'brand_id' => $brands[$i % 100]->id,
                 'category_id' => $categoryPool[$familyIndex]->id,

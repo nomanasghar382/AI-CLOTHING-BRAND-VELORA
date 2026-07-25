@@ -5,11 +5,12 @@ import CloudinaryImage from '../common/CloudinaryImage'
 
 function ProductCard({ product }) {
   const image = product.images?.find((item) => item.is_primary)?.thumbnail_url || product.images?.[0]?.thumbnail_url
+  const isBrandModel = product.gender === 'men' && image?.includes('/free-catalog/men/brand-model')
   return (
     <Card className="product-card h-100 overflow-hidden">
       <Link to={`/catalog/${product.slug}`} className="product-image-wrap">
         {image ? <CloudinaryImage src={image} alt={product.name} className="product-image" width={540} sizes="(max-width: 768px) 50vw, 25vw" /> : <div className="product-image product-image-fallback" aria-hidden="true" />}
-        {product.is_new_arrival && <span className="badge icon-badge">New drop</span>}
+        {isBrandModel && <span className="badge icon-badge">Noman Asghar</span>}
         {product.discount_percent > 0 && <span className="badge product-badge">-{product.discount_percent}%</span>}
       </Link>
       <div className="p-3">
