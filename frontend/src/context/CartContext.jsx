@@ -8,11 +8,12 @@ const emptyCart = { items: [], subtotal: '0.00', currency: 'USD' }
 export function CartProvider({ children }) {
   const { isAuthenticated } = useAuth()
   const [cart, setCart] = useState(emptyCart)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const refreshCart = useCallback(async () => {
     if (!isAuthenticated) {
       setCart(emptyCart)
+      setIsLoading(false)
       return emptyCart
     }
     setIsLoading(true)

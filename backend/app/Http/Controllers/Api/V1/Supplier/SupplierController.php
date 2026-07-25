@@ -16,6 +16,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 final class SupplierController extends Controller
 {
@@ -147,7 +149,7 @@ final class SupplierController extends Controller
             return $this->success($id ? $query->where('id', $id)->first() : $query->latest()->paginate(50));
         }
         abort_unless(in_array($resource, ['purchase-orders', 'shipments', 'returns', 'settlements', 'payments'], true), 405);
-        $data = $request->validate(['status' => ['sometimes', 'string', 'max:50'], 'items' => ['nullable', 'array'], 'total' => ['nullable', 'numeric', 'min:0'], 'currency' => ['nullable', 'string', 'size:3'], 'purchase_order_id' => ['nullable', 'exists:purchase_orders,id'], 'tracking_number' => ['nullable', 'string', 'max:100'], 'carrier' => ['nullable', 'string', 'max:100'], 'reason' => ['nullable', 'string', 'max:2000'], 'amount' => ['nullable', 'numeric', 'min:0'], 'gross_amount' => ['nullable', 'numeric', 'min:0'], 'fee_amount' => ['nullable', 'numeric', 'min:0'], 'net_amount' => ['nullable', 'numeric', 'min:0'], 'supplier_settlement_id' => ['nullable', 'exists:supplier_settlements,id'], 'method' => ['nullable', 'string', 'max:100']]);
+        $data = $request->validate(['status' => ['sometimes', 'string', 'max:50'], 'items' => ['nullable', 'array'], 'total' => ['nullable', 'numeric', 'min:0'], 'currency' => ['nullable', 'string', 'size:3'], 'purchase_order_id' => ['nullable', 'integer', Rule::exists('purchase_orders', 'id')->where(fn ($q) => $q->where('supplier_profile_id', $supplier->id))], 'tracking_number' => ['nullable', 'string', 'max:100'], 'carrier' => ['nullable', 'string', 'max:100'], 'reason' => ['nullable', 'string', 'max:2000'], 'amount' => ['nullable', 'numeric', 'min:0'], 'gross_amount' => ['nullable', 'numeric', 'min:0'], 'fee_amount' => ['nullable', 'numeric', 'min:0'], 'net_amount' => ['nullable', 'numeric', 'min:0'], 'supplier_settlement_id' => ['nullable', 'integer', Rule::exists('supplier_settlements', 'id')->where(fn ($q) => $q->where('supplier_profile_id', $supplier->id))], 'method' => ['nullable', 'string', 'max:100']]);
         if (isset($data['items'])) {
             $data['items'] = json_encode($data['items']);
         }
@@ -172,8 +174,16 @@ final class SupplierController extends Controller
 
     public function token(Request $request): JsonResponse
     {
-        $data = $request->validate(['name' => ['required', 'string', 'max:100'], 'abilities' => ['nullable', 'array']]);
-        $token = $request->user()->createToken($data['name'], $data['abilities'] ?? ['supplier:read', 'supplier:write']);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'abilities' => ['sometimes', 'array'],
+            'abilities.*' => ['string', Rule::in(['supplier:read', 'supplier:write'])],
+        ]);
+        $abilities = $data['abilities'] ?? ['supplier:read', 'supplier:write'];
+        if ($abilities === []) {
+            $abilities = ['supplier:read', 'supplier:write'];
+        }
+        $token = $request->user()->createToken($data['name'], $abilities);
 
         return $this->success(['id' => $token->accessToken->id, 'token' => $token->plainTextToken], 'API token created.', 201);
     }

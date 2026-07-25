@@ -28,8 +28,9 @@ final class NotificationController extends Controller
 
     public function update(Request $request, string $notification): JsonResponse
     {
+        $data = $request->validate(['read' => ['required', 'boolean']]);
         $record = $request->user()->notifications()->whereKey($notification)->firstOrFail();
-        if ($request->boolean('read') && ! $record->read_at) {
+        if ($data['read'] && ! $record->read_at) {
             $record->markAsRead();
         }
 

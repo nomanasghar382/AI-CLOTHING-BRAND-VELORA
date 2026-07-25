@@ -206,11 +206,14 @@ final class AdminController extends Controller
 
     public function showCustomer(User $customer): JsonResponse
     {
+        abort_unless($customer->hasRole('customer'), 404);
+
         return $this->success($customer->load('roles'));
     }
 
     public function updateCustomer(Request $request, User $customer): JsonResponse
     {
+        abort_unless($customer->hasRole('customer'), 404);
         $data = $request->validate(['is_active' => ['sometimes', 'boolean'], 'locale' => ['sometimes', 'string', 'max:10'], 'timezone' => ['sometimes', 'string', 'max:100']]);
         $customer->update($data);
         $this->activity->log($request, 'customers.updated', $customer, $data);

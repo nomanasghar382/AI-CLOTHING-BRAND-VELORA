@@ -40,8 +40,10 @@ export default function CommunityPage() {
   const { posts, addPost } = useCommunity()
   const [draft, setDraft] = useState('')
   const [page, setPage] = useState(1)
+  const pageSize = 4
   const submit = (event) => { event.preventDefault(); addPost(draft); setDraft('') }
-  const display = [...posts, ...posts.slice(0, Math.max(0, page - 1))]
+  const display = posts.slice(0, page * pageSize)
+  const hasMore = display.length < posts.length
 
   return (
     <section className="container py-5 feature-page">
@@ -56,8 +58,8 @@ export default function CommunityPage() {
             <input value={draft} onChange={(event) => setDraft(event.target.value)} className="form-control velora-input" placeholder="Share a styling thought..." aria-label="Write a community post" />
             <button className="btn btn-velora-primary" type="submit" disabled={!draft.trim()}>Post</button>
           </form>
-          <div className="d-grid gap-3">{display.map((post, index) => <Post post={post} key={`${post.id}-${index}`} />)}</div>
-          <button className="btn btn-velora-secondary w-100 mt-4" type="button" onClick={() => setPage((current) => current + 1)}>Load more looks</button>
+          <div className="d-grid gap-3">{display.map((post) => <Post post={post} key={post.id} />)}</div>
+          {hasMore && <button className="btn btn-velora-secondary w-100 mt-4" type="button" onClick={() => setPage((current) => current + 1)}>Load more looks</button>}
         </div>
         <aside className="col-lg-4">
           <div className="velora-card p-4 feed-aside">

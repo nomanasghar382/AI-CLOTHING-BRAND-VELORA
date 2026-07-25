@@ -28,6 +28,12 @@ class ProductResource extends JsonResource
             'images' => $this->whenLoaded('images', fn () => $this->images->map(fn ($image) => ['url' => $image->url, 'thumbnail_url' => $image->thumbnail_url, 'alt_text' => $image->alt_text, 'is_primary' => $image->is_primary])),
             'colors' => $this->whenLoaded('colors', fn () => $this->colors->map(fn ($color) => ['name' => $color->name, 'hex_code' => $color->hex_code])),
             'sizes' => $this->whenLoaded('sizes', fn () => $this->sizes->map(fn ($size) => ['name' => $size->name, 'international_size' => $size->international_size])),
+            'variants' => $this->whenLoaded('variants', fn () => $this->variants->map(fn ($variant) => [
+                'id' => $variant->id,
+                'sku' => $variant->sku,
+                'size' => $variant->size?->name,
+                'color' => $variant->color?->name,
+            ])),
         ];
     }
 }

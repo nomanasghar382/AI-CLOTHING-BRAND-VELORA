@@ -10,10 +10,10 @@ const dataOf = (response) => response?.data?.data ?? response?.data ?? null
 export function LoyaltyProvider({ children }) {
   const { isAuthenticated } = useAuth()
   const [state, setState] = useState(emptyState)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const refresh = useCallback(async () => {
-    if (!isAuthenticated) { setState(emptyState); return }
+    if (!isAuthenticated) { setState(emptyState); setIsLoading(false); return }
     setIsLoading(true)
     const requests = await Promise.allSettled([
       loyaltyService.overview(), loyaltyService.rewards(), loyaltyService.wallet(),

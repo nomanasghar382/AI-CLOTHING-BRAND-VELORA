@@ -8,11 +8,12 @@ const emptyWishlist = { items: [] }
 export function WishlistProvider({ children }) {
   const { isAuthenticated } = useAuth()
   const [wishlist, setWishlist] = useState(emptyWishlist)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const refreshWishlist = useCallback(async () => {
     if (!isAuthenticated) {
       setWishlist(emptyWishlist)
+      setIsLoading(false)
       return emptyWishlist
     }
     setIsLoading(true)

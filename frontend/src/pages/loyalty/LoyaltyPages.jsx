@@ -1,14 +1,16 @@
 import { useState } from 'react'
-import { FiAward, FiBell, FiCheck, FiCopy, FiCreditCard, FiGift, FiHeart, FiLoader, FiShare2, FiStar, FiTag, FiTrendingUp } from 'react-icons/fi'
+import { FiAward, FiBell, FiCheck, FiCopy, FiCreditCard, FiGift, FiHeart, FiShare2, FiStar, FiTag, FiTrendingUp } from 'react-icons/fi'
+import Loader from '../../components/feedback/Loader'
 import useLoyalty from '../../hooks/useLoyalty'
 import { loyaltyService } from '../../services/loyaltyService'
 
 const points = (value) => new Intl.NumberFormat('en-US').format(Number(value || 0))
 const Page = ({ eyebrow, title, children }) => <section className="container py-5 loyalty-page"><p className="eyebrow">{eyebrow}</p><h1 className="display-6 mb-4">{title}</h1>{children}</section>
-const Empty = ({ children }) => <div className="velora-card loyalty-empty text-center p-4"><FiLoader className="feature-icon mb-2" /><p className="mb-0 text-slate-300">{children}</p></div>
+const Empty = ({ children }) => <div className="velora-card loyalty-empty text-center p-4"><p className="mb-0 text-slate-300">{children}</p></div>
 
 export function RewardsPage() {
   const { overview, rewards, isLoading } = useLoyalty()
+  if (isLoading) return <section className="container py-5 loyalty-page"><Loader label="Loading rewards..." /></section>
   return <Page eyebrow="VELORA CIRCLE" title="Rewards, made personal."><div className="loyalty-hero velora-card p-4 p-md-5 mb-4"><div><p className="eyebrow">YOUR MEMBERSHIP</p><h2>{overview?.tier || 'Velora Circle'}</h2><p className="text-slate-300 mb-0">Earn points for every considered purchase, review and referral.</p></div><strong>{points(overview?.points_balance)} <small>points</small></strong></div><div className="row g-3">{rewards.map((reward) => <div className="col-md-6 col-lg-4" key={reward.id}><article className="velora-card loyalty-reward p-4 h-100"><FiGift /><p className="eyebrow mt-3">{points(reward.points_cost)} POINTS</p><h3>{reward.name}</h3><p className="text-slate-300">{reward.description}</p><button className="btn btn-velora-secondary" type="button">Redeem reward</button></article></div>)}</div>{!isLoading && !rewards.length && <Empty>Rewards will appear here when your membership is available.</Empty>}</Page>
 }
 
@@ -25,7 +27,8 @@ export function ReferralPage() {
 }
 
 export function WalletPage() {
-  const { wallet } = useLoyalty()
+  const { wallet, isLoading } = useLoyalty()
+  if (isLoading) return <section className="container py-5 loyalty-page"><Loader label="Loading wallet..." /></section>
   return <Page eyebrow="ACCOUNT CREDIT" title="Your Velora wallet."><article className="velora-card wallet-card p-4 p-md-5"><FiCreditCard /><p className="eyebrow mt-4">AVAILABLE BALANCE</p><strong>${Number(wallet?.balance || 0).toFixed(2)}</strong><p className="text-slate-300 mb-0">Wallet credit and eligible refunds will be available at checkout.</p></article></Page>
 }
 
@@ -36,7 +39,8 @@ export function GiftCardsPage() {
 }
 
 export function AchievementsPage() {
-  const { achievements } = useLoyalty()
+  const { achievements, isLoading } = useLoyalty()
+  if (isLoading) return <section className="container py-5 loyalty-page"><Loader label="Loading achievements..." /></section>
   return <Page eyebrow="MILESTONES" title="Your style story."><div className="row g-3">{achievements.map((item) => <div className="col-md-6 col-lg-4" key={item.id}><article className="velora-card p-4 h-100"><FiAward className="feature-icon" /><h3 className="mt-3">{item.name}</h3><p className="text-slate-300">{item.description}</p>{item.earned_at ? <span className="status-pill"><FiCheck /> Earned</span> : <small className="text-slate-300">{item.progress || 0}% complete</small>}</article></div>)}</div>{!achievements.length && <Empty>Achievements unlock as you explore Velora.</Empty>}</Page>
 }
 

@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import { FiBell } from 'react-icons/fi'
 import useAuth from '../../hooks/useAuth'
 import useLoyalty from '../../hooks/useLoyalty'
-import { useNotifications } from '../../context/NotificationContext'
+import { useNotifications } from '../../hooks/useNotifications'
 import { notificationService } from '../../services/notificationService'
+
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 function groupNotifications(items) {
   return items.reduce((groups, item) => {
@@ -20,15 +22,42 @@ export default function NotificationCenter() {
   const { pushToast } = useNotifications()
   const [open, setOpen] = useState(false)
   const panelRef = useRef(null)
+  const triggerRef = useRef(null)
   const unread = useMemo(() => notifications.filter((item) => !item.read).length, [notifications])
 
   useEffect(() => {
+    if (!open) return undefined
     const onClick = (event) => {
       if (!panelRef.current?.contains(event.target)) setOpen(false)
     }
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setOpen(false)
+        triggerRef.current?.focus()
+        return
+      }
+      if (event.key !== 'Tab' || !panelRef.current) return
+      const focusable = [...panelRef.current.querySelectorAll(FOCUSABLE)].filter((el) => !el.disabled)
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
     document.addEventListener('mousedown', onClick)
-    return () => document.removeEventListener('mousedown', onClick)
-  }, [])
+    window.addEventListener('keydown', onKeyDown)
+    const timer = window.setTimeout(() => panelRef.current?.querySelector(FOCUSABLE)?.focus(), 0)
+    return () => {
+      document.removeEventListener('mousedown', onClick)
+      window.removeEventListener('keydown', onKeyDown)
+      window.clearTimeout(timer)
+    }
+  }, [open])
 
   if (!isAuthenticated) return null
 
@@ -46,12 +75,21 @@ export default function NotificationCenter() {
 
   return (
     <div className="notification-center" ref={panelRef}>
-      <button type="button" className="nav-icon-link" aria-expanded={open} aria-haspopup="true" aria-label={`Notifications, ${unread} unread`} onClick={() => setOpen((value) => !value)}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="nav-icon-link"
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-controls="notification-panel"
+        aria-label={`Notifications, ${unread} unread`}
+        onClick={() => setOpen((value) => !value)}
+      >
         <FiBell />
         {unread > 0 && <span className="nav-counter">{unread}</span>}
       </button>
       {open && (
-        <div className="notification-panel" role="dialog" aria-label="Notification center">
+        <div className="notification-panel" id="notification-panel" role="dialog" aria-modal="true" aria-label="Notification center">
           <div className="notification-panel-head">
             <strong>Notifications</strong>
             <button type="button" className="btn btn-link p-0" onClick={markAll}>Mark all read</button>

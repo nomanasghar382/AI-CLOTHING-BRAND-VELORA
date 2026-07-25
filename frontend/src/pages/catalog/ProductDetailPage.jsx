@@ -65,7 +65,12 @@ export default function ProductDetailPage() {
     }
     await run(action)
   }
-  const item = { product_id: product.id, quantity: 1 }
+  const selectedVariant = product.variants?.find((variant) => variant.size === selectedSize) || product.variants?.[0]
+  const item = {
+    product_id: product.id,
+    quantity: 1,
+    ...(selectedVariant?.id ? { product_variant_id: selectedVariant.id } : {}),
+  }
 
   return (
     <section className="container py-4 py-lg-5">
@@ -74,7 +79,7 @@ export default function ProductDetailPage() {
       <div className="row g-4">
         <div className="col-lg-7">
           <div className="detail-image-wrap">{primary && <CloudinaryImage src={primary.url} alt={product.name} className="detail-image" width={960} />}</div>
-          <div className="d-flex gap-2 mt-3">{product.images?.slice(0, 5).map((image, index) => <img key={index} className="detail-thumbnail" src={image.thumbnail_url} alt="" loading="lazy" />)}</div>
+          <div className="d-flex gap-2 mt-3">{product.images?.slice(0, 5).map((image, index) => <img key={index} className="detail-thumbnail" src={image.thumbnail_url} alt={image.alt_text || `${product.name} view ${index + 1}`} loading="lazy" />)}</div>
         </div>
         <div className="col-lg-5">
           <p className="eyebrow">{product.brand?.name} / {product.category?.name}</p>

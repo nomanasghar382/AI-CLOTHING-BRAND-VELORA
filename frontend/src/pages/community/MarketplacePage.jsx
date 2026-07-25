@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiArrowRight, FiBarChart2, FiCheck, FiUsers } from 'react-icons/fi'
+import Loader from '../../components/feedback/Loader'
+import ErrorState from '../../components/feedback/ErrorState'
 import { communityService } from '../../services/communityService'
 import useCommunity from '../../hooks/useCommunity'
 import LookCard from '../../components/community/LookCard'
@@ -19,11 +21,27 @@ export function AnalyticsPage() {
 }
 
 export default function MarketplacePage({ profile = false }) {
-  const [creators, setCreators] = useState([]); const [looks, setLooks] = useState([])
+  const [creators, setCreators] = useState([])
+  const [looks, setLooks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const { following, toggleFollow } = useCommunity()
   const [saved, setSaved] = useState([])
-  useEffect(() => { communityService.creators().then(setCreators); communityService.looks().then(setLooks) }, [])
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    Promise.all([communityService.creators(), communityService.looks()])
+      .then(([creatorData, lookData]) => { setCreators(creatorData); setLooks(lookData) })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(() => { load() }, [])
+
   const lead = creators[0]
-  if (profile && lead) return <section className="container py-5 feature-page"><div className="creator-profile velora-card p-4 p-md-5"><img src={lead.image} alt="" /><div><p className="eyebrow">CREATOR PROFILE</p><h1>{lead.name} <FiCheck className="verified" /></h1><p className="text-slate-300">{lead.bio}</p><div className="d-flex gap-4 mb-3"><strong>{lead.followers} <small>followers</small></strong><strong>42 <small>looks</small></strong></div><button className="btn btn-velora-primary" onClick={() => toggleFollow(lead.id)}>{following.includes(lead.id) ? 'Following' : 'Follow creator'}</button></div></div><h2 className="h3 mt-5 mb-3">Amara’s latest looks</h2><div className="look-grid">{looks.map((look) => <LookCard key={look.id} look={look} saved={saved.includes(look.id)} onSave={(id) => setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])} />)}</div></section>
-  return <section className="feature-page"><div className="marketplace-hero"><div className="container py-5 py-lg-6"><p className="eyebrow">THE CREATOR MARKETPLACE</p><h1 className="display-hero">Follow taste,<br /><em>not trends.</em></h1><p className="hero-copy">A living marketplace of independent style voices, shoppable edits, and ideas worth saving.</p><Link to="/community" className="btn btn-velora-primary">Explore community <FiArrowRight /></Link></div></div><div className="container py-5"><div className="d-flex justify-content-between align-items-end mb-4"><div><p className="eyebrow">CURATED VOICES</p><h2 className="h2 mb-0">Creators shaping the edit.</h2></div><Link to="/followers">Your following <FiUsers /></Link></div><div className="row g-3">{creators.map((creator) => <div className="col-md-4" key={creator.id}><article className="creator-card velora-card p-3"><img src={creator.image} alt="" /><p className="eyebrow mt-3 mb-1">{creator.specialty}</p><h3 className="h5 mb-1">{creator.name}</h3><p className="text-slate-300 small">{creator.followers} followers · {creator.handle}</p><button className="btn btn-velora-secondary w-100" onClick={() => toggleFollow(creator.id)}>{following.includes(creator.id) ? 'Following' : 'Follow'}</button></article></div>)}</div></div></section>
+  if (loading) return <section className="container py-5 feature-page"><Loader label="Loading creators..." /></section>
+  if (error) return <section className="container py-5 feature-page"><ErrorState title="Creators are unavailable right now." onRetry={load} /></section>
+  if (profile && lead) return <section className="container py-5 feature-page"><div className="creator-profile velora-card p-4 p-md-5"><img src={lead.image} alt={lead.name} /><div><p className="eyebrow">CREATOR PROFILE</p><h1>{lead.name} <FiCheck className="verified" /></h1><p className="text-slate-300">{lead.bio}</p><div className="d-flex gap-4 mb-3"><strong>{lead.followers} <small>followers</small></strong><strong>42 <small>looks</small></strong></div><button className="btn btn-velora-primary" onClick={() => toggleFollow(lead.id)}>{following.includes(lead.id) ? 'Following' : 'Follow creator'}</button></div></div><h2 className="h3 mt-5 mb-3">Amara’s latest looks</h2><div className="look-grid">{looks.map((look) => <LookCard key={look.id} look={look} saved={saved.includes(look.id)} onSave={(id) => setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])} />)}</div></section>
+  return <section className="feature-page"><div className="marketplace-hero"><div className="container py-5 py-lg-6"><p className="eyebrow">THE CREATOR MARKETPLACE</p><h1 className="display-hero">Follow taste,<br /><em>not trends.</em></h1><p className="hero-copy">A living marketplace of independent style voices, shoppable edits, and ideas worth saving.</p><Link to="/community" className="btn btn-velora-primary">Explore community <FiArrowRight /></Link></div></div><div className="container py-5"><div className="d-flex justify-content-between align-items-end mb-4"><div><p className="eyebrow">CURATED VOICES</p><h2 className="h2 mb-0">Creators shaping the edit.</h2></div><Link to="/followers">Your following <FiUsers /></Link></div><div className="row g-3">{creators.map((creator) => <div className="col-md-4" key={creator.id}><article className="creator-card velora-card p-3"><img src={creator.image} alt={creator.name} /><p className="eyebrow mt-3 mb-1">{creator.specialty}</p><h3 className="h5 mb-1">{creator.name}</h3><p className="text-slate-300 small">{creator.followers} followers · {creator.handle}</p><button className="btn btn-velora-secondary w-100" onClick={() => toggleFollow(creator.id)}>{following.includes(creator.id) ? 'Following' : 'Follow'}</button></article></div>)}</div></div></section>
 }

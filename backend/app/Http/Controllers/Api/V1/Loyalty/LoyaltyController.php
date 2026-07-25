@@ -93,7 +93,14 @@ final class LoyaltyController extends Controller
 
     public function alerts(Request $request): JsonResponse
     {
-        return $this->success(ProductAlert::query()->where('user_id', $request->user()->id)->with('product')->latest()->get());
+        return $this->success(
+            ProductAlert::query()
+                ->where('user_id', $request->user()->id)
+                ->with(['product:id,name,slug,price,sale_price'])
+                ->latest()
+                ->limit(50)
+                ->get()
+        );
     }
 
     public function storeAlert(ProductAlertRequest $request): JsonResponse
@@ -136,7 +143,22 @@ final class LoyaltyController extends Controller
     public function giftCard(Request $request): JsonResponse
     {
         $data = $request->validate(['amount' => ['required', 'numeric', 'min:1', 'max:10000'], 'recipient_id' => ['nullable', 'exists:users,id'], 'expires_at' => ['nullable', 'date', 'after:now']]);
-        $gift = GiftCard::query()->create(['code' => strtoupper(Str::random(20)), 'initial_balance' => $data['amount'], 'balance' => $data['amount'], 'purchaser_id' => $request->user()->id, 'recipient_id' => $data['recipient_id'] ?? null, 'expires_at' => $data['expires_at'] ?? null]);
+        $gift = DB::transaction(function () use ($request, $data) {
+            $wallet = $this->loyalty->wallet($request->user());
+            if ((float) $wallet->store_credit_balance < (float) $data['amount']) {
+                throw ValidationException::withMessages(['amount' => ['Insufficient wallet balance to purchase this gift card.']]);
+            }
+            $wallet->decrement('store_credit_balance', $data['amount']);
+
+            return GiftCard::query()->create([
+                'code' => strtoupper(Str::random(20)),
+                'initial_balance' => $data['amount'],
+                'balance' => $data['amount'],
+                'purchaser_id' => $request->user()->id,
+                'recipient_id' => $data['recipient_id'] ?? null,
+                'expires_at' => $data['expires_at'] ?? null,
+            ]);
+        });
 
         return $this->success($gift, 'Gift card created.', 201);
     }

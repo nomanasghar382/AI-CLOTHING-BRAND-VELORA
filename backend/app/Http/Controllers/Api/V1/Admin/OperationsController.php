@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Jobs\RunDatabaseBackupJob;
 use App\Models\AuditLog;
-use App\Models\BackupRun;
 use App\Models\FeatureFlag;
 use App\Models\IncomingWebhookEvent;
 use App\Models\ScheduledTaskRun;

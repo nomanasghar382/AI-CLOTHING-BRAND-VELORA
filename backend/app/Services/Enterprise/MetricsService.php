@@ -5,7 +5,6 @@ namespace App\Services\Enterprise;
 use App\Models\ApplicationMetric;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Queue;
 
 final class MetricsService
 {

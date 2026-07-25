@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiBox, FiCompass, FiMapPin, FiMaximize, FiPackage, FiTruck } from 'react-icons/fi'
 import useInternational from '../../hooks/useInternational'
+import { usePageMotionProps } from '../../hooks/useMotionConfig'
 import { internationalService } from '../../services/internationalService'
 
 const localShipping = { US: 12, GB: 14, AE: 18, SA: 18, FR: 15 }
@@ -11,6 +12,7 @@ function Result({ children }) { return <div className="international-result mt-3
 
 export default function InternationalPage() {
   const { country, currency, market } = useInternational()
+  const introMotion = usePageMotionProps()
   const [shipping, setShipping] = useState({ value: '', weight: '1', result: null })
   const [duty, setDuty] = useState({ value: '', result: null })
   const [tracking, setTracking] = useState({ reference: '', result: null })
@@ -34,7 +36,7 @@ export default function InternationalPage() {
     try { const { data } = await internationalService.availability({ country, currency, locale: 'en' }); setWarehouse({ name: data.data.warehouse?.name || 'Regional warehouse', status: 'Available to ship', dispatch: `Estimated delivery: ${data.data.delivery_days.min}–${data.data.delivery_days.max} business days` }) } catch { setWarehouse({ name: country === 'US' ? 'New York' : country === 'AE' || country === 'SA' ? 'Dubai' : 'Amsterdam', status: 'Available to ship', dispatch: 'Dispatches within 1–2 business days' }) }
   }
   return <section className="container py-5 py-lg-6 international-page">
-    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="international-intro">
+    <motion.div {...introMotion} className="international-intro">
       <p className="eyebrow">GLOBAL CLIENT SERVICES</p><h1>Considered delivery,<br /><em>wherever you are.</em></h1><p>Prices, delivery, sizing and import guidance tailored to {market?.label}.</p>
     </motion.div>
     <div className="row g-4">

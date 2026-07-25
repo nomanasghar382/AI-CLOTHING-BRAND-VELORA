@@ -1,4 +1,4 @@
-import { useNotifications } from '../../context/NotificationContext'
+import { useNotifications } from '../../hooks/useNotifications'
 
 const variants = {
   info: 'alert-info',

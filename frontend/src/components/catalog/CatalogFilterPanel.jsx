@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react'
 import { readSavedFilters, saveFilterPreset } from '../../utils/offlineStore'
-import { useNotifications } from '../../context/NotificationContext'
+import { useNotifications } from '../../hooks/useNotifications'
 
 function toggleValue(list, value) {
   return list.includes(value) ? list.filter((item) => item !== value) : [...list, value]
