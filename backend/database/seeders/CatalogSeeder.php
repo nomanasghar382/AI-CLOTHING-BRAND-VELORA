@@ -9,6 +9,22 @@ use Illuminate\Support\Str;
 
 class CatalogSeeder extends Seeder
 {
+    /** @var list<string> */
+    private const DEMO_IMAGE_URLS = [
+        'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1506629905607-d405b7a30db6?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1483985988355-763728e3685b?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80',
+    ];
+
     /**
      * Run the database seeds.
      */
@@ -24,7 +40,9 @@ class CatalogSeeder extends Seeder
             $name = "Velora ".$families[($i-1)%10]." {$i}"; $price = 40 + ($i % 20)*8;
             $product = Product::query()->updateOrCreate(['slug'=>Str::slug($name)], ['name'=>$name,'short_description'=>"A refined {$name} for every day.",'description'=>"Made for movement and confidence, this {$name} balances contemporary lines with comfortable coverage.",'sku'=>"VLR-{$i}",'barcode'=>'890'.str_pad((string)$i,9,'0',STR_PAD_LEFT),'brand_id'=>$brands[$i%100]->id,'category_id'=>$categories[$i%50]->id,'supplier_id'=>$supplierId,'price'=>$price,'sale_price'=>$i%4===0?$price*.8:null,'cost_price'=>$price*.4,'stock_quantity'=>10+$i%75,'minimum_stock'=>5,'status'=>'published','is_featured'=>$i<=24,'is_trending'=>$i%9===0,'is_new_arrival'=>$i<=48,'fabric'=>['Linen','Cotton','Jersey','Satin','Viscose'][$i%5],'material'=>['Organic Cotton','Premium Viscose','Woven Linen','Soft Crepe'][$i%4],'fit_type'=>['Relaxed','Tailored','Flowing'][$i%3],'coverage_level'=>['Full','Modest','Layered'][$i%3],'care_instructions'=>'Machine wash cold. Dry flat. Warm iron if needed.','gender'=>'women','season'=>['Spring','Summer','Autumn','Winter'][$i%4],'published_at'=>now()->subDays($i%120)]);
             $selectedColors = $colors->slice($i%10,2)->values(); $selectedSizes=$sizes->slice($i%10,3)->values(); $product->colors()->sync($selectedColors->pluck('id')); $product->sizes()->sync($selectedSizes->pluck('id'));
-            foreach(range(0,4) as $j) { $url="https://images.unsplash.com/photo-".(1500000000000+$i*10+$j)."?auto=format&fit=crop&w=900&q=80"; ProductImage::query()->updateOrCreate(['product_id'=>$product->id,'sort_order'=>$j],['url'=>$url,'thumbnail_url'=>$url,'alt_text'=>$name,'is_primary'=>$j===0]); $variant=ProductVariant::query()->updateOrCreate(['sku'=>"VLR-{$i}-{$j}"],['product_id'=>$product->id,'color_id'=>$selectedColors[$j%2]->id,'size_id'=>$selectedSizes[$j%3]->id,'stock_quantity'=>5+$i%30,'status'=>'active']); Inventory::query()->updateOrCreate(['product_id'=>$product->id,'product_variant_id'=>$variant->id,'location'=>'primary'],['current_stock'=>$variant->stock_quantity,'reserved_stock'=>0,'minimum_stock'=>5]); }
+            foreach (range(0, 4) as $j) {
+                $url = self::DEMO_IMAGE_URLS[($i + $j) % count(self::DEMO_IMAGE_URLS)];
+                ProductImage::query()->updateOrCreate(['product_id' => $product->id, 'sort_order' => $j], ['url' => $url, 'thumbnail_url' => $url, 'alt_text' => $name, 'is_primary' => $j === 0]); $variant=ProductVariant::query()->updateOrCreate(['sku'=>"VLR-{$i}-{$j}"],['product_id'=>$product->id,'color_id'=>$selectedColors[$j%2]->id,'size_id'=>$selectedSizes[$j%3]->id,'stock_quantity'=>5+$i%30,'status'=>'active']); Inventory::query()->updateOrCreate(['product_id'=>$product->id,'product_variant_id'=>$variant->id,'location'=>'primary'],['current_stock'=>$variant->stock_quantity,'reserved_stock'=>0,'minimum_stock'=>5]); }
         }
     }
 }
