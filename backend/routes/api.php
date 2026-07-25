@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\AdminController;
+use App\Http\Controllers\Api\V1\Admin\BusinessIntelligenceController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Catalog\AdminCatalogController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Api\V1\Shopping\InternationalCommerceController;
 use App\Http\Controllers\Api\V1\Shopping\OrderController;
 use App\Http\Controllers\Api\V1\Shopping\WishlistController;
 use App\Http\Controllers\Api\V1\Style\StyleController;
+use App\Http\Controllers\Api\V1\Supplier\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -86,6 +88,12 @@ Route::prefix('v1')->group(function (): void {
         Route::get('analytics', [AdminController::class, 'analytics']);
     });
 
+    Route::middleware(['auth:sanctum', 'role:super-admin,admin', 'permission:bi.view'])->prefix('admin/bi')->group(function (): void {
+        Route::get('dashboard', [BusinessIntelligenceController::class, 'dashboard']);
+        Route::get('analytics/{type}', [BusinessIntelligenceController::class, 'analytics']);
+        Route::get('forecasts/{type}', [BusinessIntelligenceController::class, 'forecast']);
+    });
+
     Route::middleware(['auth:sanctum', 'permission:reports.export'])->get('admin/reports/{report}/csv', [AdminController::class, 'exportReport'])
         ->whereIn('report', ['orders', 'customers', 'products']);
 
@@ -125,6 +133,20 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware(['auth:sanctum', 'permission:activity.view'])->get('admin/activity-logs', [AdminController::class, 'activity']);
 
     Route::middleware('auth:sanctum')->group(function (): void {
+        Route::post('analytics/events', [BusinessIntelligenceController::class, 'event']);
+        Route::middleware('role:super-admin,admin,supplier')->prefix('supplier')->group(function (): void {
+            Route::get('profile', [SupplierController::class, 'profile']);
+            Route::put('profile', [SupplierController::class, 'updateProfile']);
+            Route::get('{resource}', [SupplierController::class, 'read'])->whereIn('resource', ['addresses', 'documents', 'certifications', 'messages', 'webhooks', 'purchase-orders', 'shipments', 'returns', 'settlements', 'payments', 'performance', 'sync-jobs']);
+            Route::post('{resource}', [SupplierController::class, 'create'])->whereIn('resource', ['addresses', 'documents', 'certifications', 'messages', 'webhooks', 'purchase-orders', 'shipments', 'returns', 'settlements', 'payments']);
+            Route::patch('{resource}/{id}', [SupplierController::class, 'nested'])->whereIn('resource', ['addresses', 'documents', 'certifications', 'messages', 'webhooks']);
+            Route::get('inventory', [SupplierController::class, 'inventory']);
+            Route::post('inventory/sync', [SupplierController::class, 'sync']);
+            Route::post('inventory/{inventory}/adjustments', [SupplierController::class, 'adjustment']);
+            Route::post('inventory/{inventory}/reservations', [SupplierController::class, 'reserve']);
+            Route::get('{resource}/{id}', [SupplierController::class, 'operations'])->whereIn('resource', ['purchase-orders', 'shipments', 'returns', 'settlements', 'payments', 'performance', 'sync-jobs']);
+            Route::post('api-tokens', [SupplierController::class, 'token']);
+        });
         Route::get('international/countries', [InternationalCommerceController::class, 'countries']);
         Route::get('international/countries/{country}/states', [InternationalCommerceController::class, 'states']);
         Route::get('international/countries/{country}/cities', [InternationalCommerceController::class, 'cities']);

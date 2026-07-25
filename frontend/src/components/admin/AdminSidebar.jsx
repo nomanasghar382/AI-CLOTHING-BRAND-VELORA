@@ -6,7 +6,7 @@ import {
 
 const items = [
   ['Dashboard', '', FiHome], ['Products', 'products', FiBox], ['Orders', 'orders', FiShoppingBag],
-  ['Customers', 'customers', FiUsers], ['Analytics', 'analytics', FiBarChart2], ['Reports', 'reports', FiActivity],
+  ['Customers', 'customers', FiUsers], ['Analytics', 'analytics', FiBarChart2], ['Trend forecasting', 'forecasting', FiActivity], ['Reports', 'reports', FiActivity],
   ['Coupons', 'coupons', FiGift], ['Support', 'support', FiHelpCircle], ['Reviews', 'reviews', FiStar],
   ['Suppliers', 'suppliers', FiTruck], ['Creators', 'creators', FiUsers], ['Notifications', 'notifications', FiBell],
   ['Loyalty & VIP', 'loyalty', FiStar], ['Gift cards', 'gift-cards', FiGift], ['Product alerts', 'alerts', FiBell],

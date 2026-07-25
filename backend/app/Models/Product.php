@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -20,6 +21,11 @@ class Product extends Model
     protected function casts(): array
     {
         return ['dimensions' => 'array', 'is_featured' => 'boolean', 'is_trending' => 'boolean', 'is_new_arrival' => 'boolean', 'published_at' => 'datetime', 'price' => 'decimal:2', 'sale_price' => 'decimal:2'];
+    }
+
+    public function supplierProfile(): BelongsTo
+    {
+        return $this->belongsTo(SupplierProfile::class);
     }
 
     public function brand(): BelongsTo
@@ -72,7 +78,7 @@ class Product extends Model
         return $this->hasMany(Inventory::class);
     }
 
-    public function ethicalPassport(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function ethicalPassport(): HasOne
     {
         return $this->hasOne(EthicalPassport::class);
     }

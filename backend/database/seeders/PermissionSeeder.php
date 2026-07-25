@@ -17,6 +17,7 @@ class PermissionSeeder extends Seeder
             'notifications.view', 'notifications.manage', 'activity.view',
             'catalog.manage', 'orders.manage', 'coupons.manage', 'shipping.manage',
             'taxes.manage', 'payments.manage', 'returns.manage', 'loyalty.manage', 'passports.manage',
+            'supplier.view', 'supplier.manage', 'inventory.manage', 'bi.view',
         ];
 
         foreach ($permissions as $slug) {
@@ -32,7 +33,7 @@ class PermissionSeeder extends Seeder
         );
 
         Role::query()->where('slug', 'supplier')->each(fn (Role $role) => $role->permissions()->syncWithoutDetaching(
-            Permission::query()->whereIn('slug', ['catalog.manage', 'orders.manage'])->pluck('id')
+            Permission::query()->whereIn('slug', ['catalog.manage', 'orders.manage', 'supplier.view', 'inventory.manage'])->pluck('id')
         ));
     }
 }

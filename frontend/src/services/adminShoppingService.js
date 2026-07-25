@@ -1,6 +1,9 @@
 import apiClient from './apiClient'
 
 export const adminShoppingService = {
+  dashboard: () => apiClient.get('/admin/dashboard'),
+  analytics: (params) => apiClient.get('/admin/analytics', { params }),
+  reportCsv: (report, params) => apiClient.get(`/admin/reports/${report}/csv`, { params, responseType: 'blob' }),
   products: (params) => apiClient.get('/admin/products', { params }),
   product: (id) => apiClient.get(`/admin/products/${id}`),
   saveProduct: (product) => product.id ? apiClient.put(`/admin/products/${product.id}`, product) : apiClient.post('/admin/products', product),

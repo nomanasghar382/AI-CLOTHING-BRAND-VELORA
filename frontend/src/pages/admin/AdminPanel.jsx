@@ -10,10 +10,11 @@ import AdminTopbar from '../../components/admin/AdminTopbar'
 import Loader from '../../components/feedback/Loader'
 import { adminShoppingService as api } from '../../services/adminShoppingService'
 import { catalogService } from '../../services/catalogService'
+import { PortalBars, PortalExport, PortalFilters, PortalTable } from '../../components/portal/PortalPrimitives'
 
 const money = (value, currency = 'USD') => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(Number(value || 0))
 const statusClass = (status) => `admin-status admin-status-${String(status || '').replaceAll('_', '-')}`
-const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', loyalty: 'Loyalty & VIP', 'gift-cards': 'Gift cards', alerts: 'Product alerts', activity: 'Activity logs', settings: 'Settings', international: 'International commerce' }
+const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', forecasting: 'Trend forecasting', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', loyalty: 'Loyalty & VIP', 'gift-cards': 'Gift cards', alerts: 'Product alerts', activity: 'Activity logs', settings: 'Settings', international: 'International commerce' }
 
 function extract(response) {
   const payload = response?.data?.data
@@ -91,14 +92,29 @@ function CouponsPage({ coupons }) {
   return <section className="admin-panel"><div className="admin-panel-head"><div><p className="admin-kicker">COUPONS API</p><h2>Promotional offers</h2></div><AdminExportButton rows={coupons} columns={columns} filename="velora-coupons" /></div><AdminDataTable columns={columns} rows={coupons} emptyMessage="No coupon records have been returned by the API." /></section>
 }
 
-function AnalyticsPage({ orders, products, payments }) {
+function AnalyticsPage({ orders, analytics }) {
+  const summary = analytics?.summary || {}; const daily = analytics?.daily || []
   const revenue = orders.reduce((sum, row) => sum + Number(row.grand_total || 0), 0)
-  return <><section className="admin-metrics"><Metric icon={FiDollarSign} label="Order value" value={money(revenue / Math.max(orders.length, 1))} tone="violet" /><Metric icon={FiPackage} label="Units ordered" value={orders.reduce((sum, row) => sum + (row.items?.length || 0), 0)} tone="gold" /><Metric icon={FiBox} label="Products tracked" value={products.length} tone="blue" /><Metric icon={FiCheckCircle} label="Payment records" value={payments.length} tone="green" /></section><RevenueChart orders={orders} /></>
+  return <><section className="admin-metrics"><Metric icon={FiDollarSign} label="Paid revenue" value={money(summary.paid_revenue ?? revenue)} tone="violet" /><Metric icon={FiPackage} label="Orders" value={summary.orders ?? orders.length} tone="gold" /><Metric icon={FiBox} label="New customers" value={summary.new_customers ?? '—'} tone="blue" /><Metric icon={FiCheckCircle} label="Avg. order value" value={money(summary.average_order_value)} tone="green" /></section>{daily.length ? <PortalBars points={daily.map((row) => ({ label: new Date(row.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), value: row.revenue }))} label={`Revenue trend · ${analytics.range?.from || ''} — ${analytics.range?.to || ''}`} /> : <RevenueChart orders={orders} />}</>
 }
 
-function ReportsPage({ orders, payments, products }) {
-  const reports = [{ report: 'Order register', records: orders.length, source: 'Orders API' }, { report: 'Payment reconciliation', records: payments.length, source: 'Payments API' }, { report: 'Inventory catalog', records: products.length, source: 'Products API' }]
-  return <section className="admin-panel"><div className="admin-panel-head"><div><p className="admin-kicker">LIVE DATA EXPORTS</p><h2>Reports</h2></div><AdminExportButton rows={reports} columns={[{ label: 'Report', key: 'report' }, { label: 'Records', key: 'records' }, { label: 'Source', key: 'source' }]} filename="velora-report-index" /></div><AdminDataTable columns={[{ label: 'Report', key: 'report' }, { label: 'Available records', key: 'records' }, { label: 'Data source', key: 'source' }]} rows={reports} /></section>
+function ForecastingPage({ analytics, products }) {
+  const [search, setSearch] = useState('')
+  const daily = analytics?.daily || []
+  const average = daily.reduce((sum, row) => sum + Number(row.revenue || 0), 0) / Math.max(daily.length, 1)
+  const rows = daily.map((row) => ({ ...row, forecast: Number(row.revenue || 0) + average })).filter((row) => row.date.includes(search))
+  const columns = [{ label: 'Date', key: 'date' }, { label: 'Recorded revenue', render: (row) => money(row.revenue) }, { label: 'Trend baseline', render: () => money(average) }, { label: 'Projected signal', render: (row) => money(row.forecast) }]
+  return <><section className="admin-panel"><div className="admin-panel-head"><div><p className="admin-kicker">EXPLAINABLE FORECAST</p><h2>Revenue trend forecast</h2></div><PortalExport rows={rows} columns={columns} filename="velora-trend-forecast" /></div><p className="admin-settings-copy">Projected signal is a transparent rolling baseline derived from the selected live analytics range; it is not a server-side predictive model.</p><PortalFilters search={search} onSearch={setSearch} /><PortalTable columns={columns} rows={rows} empty="No daily analytics are available for this range." /></section><section className="admin-panel mt-4"><p className="admin-kicker">INVENTORY WATCH</p><h2>Catalog tracked in trend planning</h2><p className="admin-settings-copy">{products.length} live catalog records are available for replenishment review.</p></section></>
+}
+
+function ReportsPage({ orders, products, analytics }) {
+  const reports = [{ report: 'Order register', export: 'orders', records: orders.length, source: 'Orders API' }, { report: 'Customer register', export: 'customers', records: analytics?.summary?.new_customers ?? '—', source: 'Analytics API' }, { report: 'Inventory catalog', export: 'products', records: products.length, source: 'Products API' }]
+  const download = async (report) => {
+    const response = await api.reportCsv(report)
+    const url = URL.createObjectURL(response.data); const anchor = document.createElement('a')
+    anchor.href = url; anchor.download = `velora-${report}.csv`; anchor.click(); URL.revokeObjectURL(url)
+  }
+  return <section className="admin-panel"><div className="admin-panel-head"><div><p className="admin-kicker">LIVE DATA EXPORTS</p><h2>Reports</h2></div><AdminExportButton rows={reports} columns={[{ label: 'Report', key: 'report' }, { label: 'Records', key: 'records' }, { label: 'Source', key: 'source' }]} filename="velora-report-index" /></div><AdminDataTable columns={[{ label: 'Report', key: 'report' }, { label: 'Available records', key: 'records' }, { label: 'Data source', key: 'source' }, { label: 'Server export', render: (row) => <button className="admin-text-button" onClick={() => download(row.export)}>Download CSV</button> }]} rows={reports} /></section>
 }
 
 function SettingsPage() {
@@ -116,14 +132,15 @@ function InternationalPage() {
 export default function AdminPanel() {
   const location = useLocation(); const slug = location.pathname.replace('/admin', '').replace(/^\//, '')
   const [open, setOpen] = useState(false); const [loading, setLoading] = useState(true); const [error, setError] = useState('')
-  const [data, setData] = useState({ orders: [], products: [], coupons: [], payments: [], categories: [] })
+  const [data, setData] = useState({ orders: [], products: [], coupons: [], payments: [], categories: [], analytics: null })
   const load = async () => {
     setLoading(true); setError('')
-    const results = await Promise.allSettled([api.orders({ per_page: 20 }), api.products({ per_page: 20 }), api.coupons({ per_page: 20 }), api.payments({ per_page: 20 }), catalogService.categories()])
+    const results = await Promise.allSettled([api.orders({ per_page: 20 }), api.products({ per_page: 20 }), api.coupons({ per_page: 20 }), api.payments({ per_page: 20 }), catalogService.categories(), api.analytics()])
     const [orders, products, coupons, payments] = results.map((result) => result.status === 'fulfilled' ? extract(result.value) : { data: [] })
     if (results.some((result, index) => index < 4 && result.status === 'rejected')) setError('Some live operational records could not be loaded. Check the current role and API connection.')
     const categoryResult = results[4]?.status === 'fulfilled' ? extract(results[4].value) : { data: [] }
-    setData({ orders: orders.data, products: products.data, coupons: coupons.data, payments: payments.data, categories: categoryResult.data }); setLoading(false)
+    const analytics = results[5]?.status === 'fulfilled' ? results[5].value.data.data : null
+    setData({ orders: orders.data, products: products.data, coupons: coupons.data, payments: payments.data, categories: categoryResult.data, analytics }); setLoading(false)
   }
   useEffect(() => { load() }, [])
   const title = pageNames[slug] || 'Administration'
@@ -132,6 +149,7 @@ export default function AdminPanel() {
     if (slug === 'orders') return <OrdersPage orders={data.orders} />
     if (slug === 'coupons') return <CouponsPage coupons={data.coupons} />
     if (slug === 'analytics') return <AnalyticsPage {...data} />
+    if (slug === 'forecasting') return <ForecastingPage {...data} />
     if (slug === 'reports') return <ReportsPage {...data} />
     if (slug === 'settings') return <SettingsPage />
     if (slug === 'international') return <InternationalPage />

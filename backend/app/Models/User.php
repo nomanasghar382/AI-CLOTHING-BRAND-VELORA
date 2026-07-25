@@ -155,4 +155,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(NotificationPreference::class);
     }
+
+    public function supplierProfile(): HasOne
+    {
+        return $this->hasOne(SupplierProfile::class);
+    }
 }

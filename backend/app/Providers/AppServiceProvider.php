@@ -9,6 +9,8 @@ use App\Contracts\Repositories\LoyaltyWalletRepositoryInterface;
 use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Repositories\WishlistRepositoryInterface;
+use App\Events\SupplierInventorySynced;
+use App\Listeners\RecordSupplierInventorySync;
 use App\Models\Product;
 use App\Observers\ProductObserver;
 use App\Repositories\Eloquent\EloquentCartRepository;
@@ -20,6 +22,7 @@ use App\Repositories\Eloquent\EloquentWishlistRepository;
 use App\Services\Shopping\EnvShippingProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -46,5 +49,6 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('auth', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
         Product::observe(ProductObserver::class);
+        Event::listen(SupplierInventorySynced::class, RecordSupplierInventorySync::class);
     }
 }
