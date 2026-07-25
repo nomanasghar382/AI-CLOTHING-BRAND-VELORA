@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\{Brand, Category, Color, Inventory, Product, ProductImage, ProductVariant, Size, User};
+use App\Support\FreeCatalogPhotoPool;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -11,38 +12,26 @@ class CatalogSeeder extends Seeder
     /** @var array<string, mixed> */
     private array $catalog;
 
+    /** @var list<array{type: string, id?: string, path?: string}>} */
+    private array $womenPool = [];
+
+    /** @var list<array{type: string, id?: string, path?: string}>} */
+    private array $menPool = [];
+
     public function __construct()
     {
         $this->catalog = require database_path('data/GenZCuratedCatalog.php');
+        $this->womenPool = FreeCatalogPhotoPool::forGender('women');
+        $this->menPool = FreeCatalogPhotoPool::forGender('men');
     }
 
-    private static function imageUrl(string $photoId, int $width, int $variant = 0): string
+    /** @return array{type: string, id?: string, path?: string} */
+    private function entryFor(string $gender, int $ordinal, int $galleryIndex): array
     {
-        $quality = $width <= 480 ? 82 : 85;
-        $host = str_starts_with($photoId, 'premium_photo') ? 'plus.unsplash.com' : 'images.unsplash.com';
-        $library = require database_path('data/GenZCuratedCatalog.php');
-        $crop = $library['crop_variants'][$variant] ?? '';
+        $pool = $gender === 'men' ? $this->menPool : $this->womenPool;
+        $index = $ordinal + ($galleryIndex * 97);
 
-        return "https://{$host}/{$photoId}?auto=format&fit=crop&w={$width}&h=".($width <= 540 ? 900 : 1350)."&q={$quality}&dpr=2{$crop}";
-    }
-
-  /** @return array{photo: string, unique_face: bool} */
-    private function assignPhoto(string $gender, int $ordinal, int $galleryIndex): array
-    {
-        $editorial = $gender === 'men' ? $this->catalog['men_editorial'] : $this->catalog['women_editorial'];
-        $product = $gender === 'men' ? $this->catalog['men_product'] : $this->catalog['women_product'];
-
-        if ($galleryIndex === 0) {
-            if ($ordinal < count($editorial)) {
-                return ['photo' => $editorial[$ordinal], 'unique_face' => true];
-            }
-
-            return ['photo' => $product[($ordinal - count($editorial)) % count($product)], 'unique_face' => false];
-        }
-
-        $base = $ordinal < count($editorial) ? $editorial[$ordinal] : $product[($ordinal - count($editorial)) % count($product)];
-
-        return ['photo' => $base, 'unique_face' => $ordinal < count($editorial)];
+        return $pool[$index % count($pool)];
     }
 
     private function genZProductName(string $familyName, int $productIndex, string $gender): string
@@ -58,6 +47,9 @@ class CatalogSeeder extends Seeder
 
     public function run(): void
     {
+        $counts = FreeCatalogPhotoPool::counts();
+        $this->command?->info("Free photos: {$counts['women_local']} women + {$counts['men_local']} men from your phone. Pool totals: {$counts['women_total']} women, {$counts['men_total']} men.");
+
         $colors = collect(['Black'=>'#111827','Ivory'=>'#FFFFF0','Emerald'=>'#047857','Plum'=>'#7E2253','Navy'=>'#1E3A8A','Sand'=>'#D6C5A2','Rose'=>'#E9A0B5','Olive'=>'#556B2F','Taupe'=>'#8B7D6B','Cocoa'=>'#6F4E37','Sky'=>'#87CEEB','Lilac'=>'#C8A2C8','Stone'=>'#78716C','Sage'=>'#9CAF88','Burgundy'=>'#800020','Teal'=>'#0F766E','Mocha'=>'#967969','Coral'=>'#FF7F50','Silver'=>'#C0C0C0','Gold'=>'#D4AF37'])->map(fn ($hex, $name) => Color::query()->updateOrCreate(['slug'=>Str::slug($name)], ['name'=>$name,'hex_code'=>$hex,'status'=>'active']))->values();
         $sizes = collect(['XS','S','M','L','XL','XXL','EU 34','EU 36','EU 38','EU 40','UK 8','UK 10','US 4','US 6','One Size'])->map(fn ($name,$i) => Size::query()->updateOrCreate(['slug'=>Str::slug($name)], ['name'=>$name,'international_size'=>$name,'sort_order'=>$i,'status'=>'active']))->values();
 
@@ -112,8 +104,8 @@ class CatalogSeeder extends Seeder
             $product = Product::query()->updateOrCreate(['sku' => "VLR-{$i}"], [
                 'slug' => Str::slug($name.'-'.$i),
                 'name' => $name,
-                'short_description' => 'Gen Z modest fit — young editorial campaign styling.',
-                'description' => "Built for ages 16–35. The {$name} is styled like a modern modest fashion drop — premium fabric, relaxed tailoring, and coverage made for campus, Jummah, and weekend edits.",
+                'short_description' => '100% free photos — your pics or Unsplash stock.',
+                'description' => "Built for ages 16–35. The {$name} uses free catalog imagery — add your own phone photos to public/free-catalog/ for a unique Gen Z look without paying for shoots.",
                 'barcode' => '890'.str_pad((string) $i, 9, '0', STR_PAD_LEFT),
                 'brand_id' => $brands[$i % 100]->id,
                 'category_id' => $categoryPool[$familyIndex]->id,
@@ -136,7 +128,7 @@ class CatalogSeeder extends Seeder
                 'season' => ['All season', 'Summer', 'Winter', 'Eid edit'][$i % 4],
                 'meta_title' => "{$name} | Velora",
                 'meta_description' => "Gen Z {$familyName} — modest fashion for ages 16–35.",
-                'keywords' => "gen-z, {$familyName}, modest-fashion, velora",
+                'keywords' => "free-photos, {$familyName}, modest-fashion, velora",
                 'published_at' => now()->subDays($i % 120),
             ]);
 
@@ -146,10 +138,10 @@ class CatalogSeeder extends Seeder
             $product->sizes()->sync($selectedSizes->pluck('id'));
 
             foreach (range(0, 4) as $j) {
-                $assignment = $this->assignPhoto($gender, $ordinal, $j === 0 ? 0 : 1);
-                $variant = $j === 0 ? 0 : $j - 1;
-                $url = self::imageUrl($assignment['photo'], 1080, $variant);
-                $thumbnailUrl = self::imageUrl($assignment['photo'], 540, $variant);
+                $entry = $this->entryFor($gender, $ordinal, $j);
+                $variant = $entry['type'] === 'local' ? 0 : $j;
+                $url = FreeCatalogPhotoPool::urlFor($entry, 1080, $variant);
+                $thumbnailUrl = FreeCatalogPhotoPool::urlFor($entry, 540, $variant);
                 ProductImage::query()->updateOrCreate(
                     ['product_id' => $product->id, 'sort_order' => $j],
                     [

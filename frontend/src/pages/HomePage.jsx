@@ -18,7 +18,7 @@ export default function HomePage() {
             Young modest fashion<br /><em>that actually sells.</em>
           </motion.h1>
           <motion.p className="hero-copy" {...motionProps} transition={{ ...motionProps.transition, delay: 0.16 }}>
-            Editorial campaign photos. Young models. Hijab, abaya, niqab, kurta, thobe & shalwar — styled for ages 16–35.
+            100% free photos — use your phone, free Unsplash stock, or both. No paid shoots needed to start.
           </motion.p>
           <motion.div className="d-flex flex-wrap gap-2" {...motionProps} transition={{ ...motionProps.transition, delay: 0.24 }}>
             <Link className="btn btn-velora-primary" to="/catalog?gender=women">Shop women <FiArrowUpRight /></Link>
