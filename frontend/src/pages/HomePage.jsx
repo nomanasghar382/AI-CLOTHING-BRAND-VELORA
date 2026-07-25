@@ -22,10 +22,14 @@ export default function HomePage() {
             Fashion infrastructure<br /><em>with intention.</em>
           </motion.h1>
           <motion.p className="hero-copy" {...motionProps} transition={{ ...motionProps.transition, delay: 0.16 }}>
-            A refined, secure starting point for the next generation of global modest fashion.
+            Modest fashion built for Gen Z — niqab, hijab, abaya, thobe, kurta, shalwar kameez, jubba, trousers & more.
           </motion.p>
-          <motion.div {...motionProps} transition={{ ...motionProps.transition, delay: 0.24 }}>
-            <Link className="btn btn-velora-primary" to="/about">Explore the foundation <FiArrowUpRight /></Link>
+          <motion.div className="d-flex flex-wrap gap-2" {...motionProps} transition={{ ...motionProps.transition, delay: 0.24 }}>
+            <Link className="btn btn-velora-primary" to="/catalog?gender=women">Shop women <FiArrowUpRight /></Link>
+            <Link className="btn btn-velora-secondary" to="/catalog?gender=men">Shop men <FiArrowUpRight /></Link>
+          </motion.div>
+          <motion.div className="mt-3" {...motionProps} transition={{ ...motionProps.transition, delay: 0.3 }}>
+            <Link className="nav-link-velora" to="/about">Explore the foundation <FiArrowUpRight /></Link>
           </motion.div>
         </div>
       </section>

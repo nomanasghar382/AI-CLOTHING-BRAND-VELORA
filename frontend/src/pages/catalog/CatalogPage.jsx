@@ -61,7 +61,11 @@ function CatalogPage() {
     setParams(next)
   }, [params, setParams])
 
-  const heading = activeGender === 'men' ? 'Islamic menswear.' : activeGender === 'women' ? 'Modest womenswear.' : 'Discover your next expression.'
+  const heading = activeGender === 'men'
+    ? 'Gen Z Islamic menswear.'
+    : activeGender === 'women'
+      ? 'Gen Z modest womenswear — fully covered.'
+      : 'Modest fashion for Gen Z.'
 
   return (
     <>

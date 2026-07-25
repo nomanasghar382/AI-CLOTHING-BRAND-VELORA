@@ -4,26 +4,27 @@ function unsplashUrl(url, width, quality) {
   parsed.searchParams.set('fit', 'crop')
   parsed.searchParams.set('w', String(width))
   parsed.searchParams.set('q', String(quality))
+  parsed.searchParams.set('dpr', '2')
 
   return parsed.toString()
 }
 
-export function buildCloudinarySrc(url, width = 640) {
+export function buildCloudinarySrc(url, width = 720) {
   if (!url) return url
 
   if (url.includes('res.cloudinary.com')) {
-    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_fill/`)
+    return url.replace('/upload/', `/upload/f_auto,q_auto:good,w_${width},c_fill,dpr_2.0/`)
   }
 
   if (url.includes('images.unsplash.com')) {
-    const quality = width <= 240 ? 60 : width <= 400 ? 65 : 72
+    const quality = width <= 400 ? 80 : width <= 720 ? 82 : 85
     return unsplashUrl(url, width, quality)
   }
 
   return url
 }
 
-export function buildCloudinarySrcSet(url, widths = [240, 360, 480, 640]) {
+export function buildCloudinarySrcSet(url, widths = [360, 540, 720, 1080]) {
   if (!url) return undefined
 
   if (url.includes('res.cloudinary.com') || url.includes('images.unsplash.com')) {
