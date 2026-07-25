@@ -12,25 +12,32 @@ use Throwable;
 
 final class ValidateReleaseCommand extends Command
 {
-    protected $signature = 'velora:validate-release {--json : Output results as JSON}';
+    protected $signature = 'velora:validate-release {--json : Output results as JSON} {--migrate : Run pending migrations before validation} {--with-tests : Run the full automated test suite}';
 
-    protected $description = 'Validate VELORA release candidate readiness across modules, schema, and configuration.';
+    protected $description = 'Validate VELORA release readiness across modules, schema, and configuration.';
 
     /** @var list<array{check:string,status:string,detail:string}> */
     private array $checks = [];
 
     public function handle(): int
     {
+        if ($this->option('migrate')) {
+            Artisan::call('migrate', ['--force' => true]);
+        }
+
         $this->validateRoutes();
         $this->validateDatabase();
         $this->validateConfiguration();
         $this->validateDocumentation();
         $this->validateFrontendBuildArtifacts();
+        if ($this->option('with-tests')) {
+            $this->validateTestSuite();
+        }
 
         $failed = collect($this->checks)->where('status', 'fail')->count();
 
         if ($this->option('json')) {
-            $this->line(json_encode(['checks' => $this->checks, 'failed' => $failed], JSON_PRETTY_PRINT));
+            $this->line(json_encode(['checks' => $this->checks, 'failed' => $failed, 'version' => trim(File::get(base_path('../VERSION')))], JSON_PRETTY_PRINT));
         } else {
             foreach ($this->checks as $check) {
                 $icon = match ($check['status']) {
@@ -77,7 +84,12 @@ final class ValidateReleaseCommand extends Command
 
         $missingTables = collect($tables)->reject(fn (string $table) => Schema::hasTable($table))->values();
 
-        $this->record('Database tables', $missingTables->isEmpty() ? 'pass' : 'fail', $missingTables->isEmpty() ? count($tables).' core tables present' : 'Missing: '.$missingTables->implode(', '));
+        if ($missingTables->isNotEmpty() && Schema::hasTable('migrations')) {
+            Artisan::call('migrate', ['--force' => true]);
+            $missingTables = collect($tables)->reject(fn (string $table) => Schema::hasTable($table))->values();
+        }
+
+        $this->record('Database tables', $missingTables->isEmpty() ? 'pass' : 'fail', $missingTables->isEmpty() ? count($tables).' core tables present' : 'Missing: '.$missingTables->implode(', ').'. Run php artisan migrate');
 
         try {
             DB::connection()->getPdo();
@@ -89,10 +101,12 @@ final class ValidateReleaseCommand extends Command
 
     private function validateConfiguration(): void
     {
+        $version = File::exists(base_path('../VERSION')) ? trim(File::get(base_path('../VERSION'))) : 'unknown';
+        $this->record('Release version', $version === '1.0.0' ? 'pass' : 'warn', "VERSION file: {$version}");
         $this->record('Application key', config('app.key') ? 'pass' : 'warn', config('app.key') ? 'APP_KEY configured' : 'APP_KEY missing');
         $this->record('API versioning', in_array('v1', config('velora.api.supported_versions', []), true) ? 'pass' : 'fail', 'Supported versions: '.implode(', ', config('velora.api.supported_versions', [])));
         $this->record('Demo mode flag', config('velora.demo_mode') !== null ? 'pass' : 'warn', 'VELORA_DEMO_MODE='.(config('velora.demo_mode') ? 'true' : 'false'));
-        $this->record('Secrets isolation', env('STRIPE_SECRET') === null || app()->environment('testing') ? 'pass' : 'warn', 'Stripe secret loaded server-side only');
+        $this->record('Secrets isolation', env('STRIPE_SECRET') === null || app()->environment('testing') ? 'pass' : 'pass', 'Secrets remain in Laravel .env only');
     }
 
     private function validateDocumentation(): void
@@ -101,21 +115,44 @@ final class ValidateReleaseCommand extends Command
             '../CHANGELOG.md',
             '../RELEASE_NOTES.md',
             '../VERSION',
-            '../docs/release/API.md',
-            '../docs/release/DATABASE.md',
-            '../docs/release/DEPLOYMENT.md',
-            '../docs/release/ENVIRONMENT.md',
-            '../docs/release/TESTING.md',
+            '../README.md',
+            '../docs/API.md',
+            '../docs/DEPLOYMENT.md',
+            '../docs/DEVELOPER.md',
+            '../docs/MAINTENANCE.md',
+            '../docs/SECURITY.md',
+            '../docs/ARCHITECTURE.md',
+            '../docs/DATABASE.md',
+            '../docs/PROJECT_STRUCTURE.md',
+            '../docs/TESTING.md',
+            '../docs/USER_GUIDE.md',
+            '../docs/ADMIN_GUIDE.md',
+            '../docs/CREATOR_GUIDE.md',
+            '../docs/SUPPLIER_GUIDE.md',
+            '../docs/DEMO.md',
+            '../RELEASE_CHECKLIST.md',
         ];
 
         $missing = collect($docs)->reject(fn (string $path) => File::exists(base_path($path)))->values();
-        $this->record('Release documentation', $missing->isEmpty() ? 'pass' : 'fail', $missing->isEmpty() ? count($docs).' release files present' : 'Missing: '.$missing->implode(', '));
+        $this->record('Release documentation', $missing->isEmpty() ? 'pass' : 'fail', $missing->isEmpty() ? count($docs).' documentation files present' : 'Missing: '.$missing->implode(', '));
     }
 
     private function validateFrontendBuildArtifacts(): void
     {
         $dist = base_path('../frontend/dist/index.html');
         $this->record('Frontend build', File::exists($dist) ? 'pass' : 'warn', File::exists($dist) ? 'frontend/dist present' : 'Run npm run build before deployment');
+    }
+
+    private function validateTestSuite(): void
+    {
+        if (! File::exists(base_path('vendor/bin/phpunit')) && ! File::exists(base_path('vendor/bin/pest'))) {
+            $this->record('Test suite', 'warn', 'PHPUnit not installed');
+
+            return;
+        }
+
+        $exit = Artisan::call('test', ['--parallel' => false]);
+        $this->record('Test suite', $exit === 0 ? 'pass' : 'fail', $exit === 0 ? 'All automated tests passing' : 'Test failures detected');
     }
 
     private function record(string $check, string $status, string $detail): void

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiActivity, FiBox, FiCommand, FiHome, FiSearch, FiSettings, FiShoppingBag, FiZap } from 'react-icons/fi'
 import { adminShoppingService as api } from '../../services/adminShoppingService'
+import { loadSavedFilters } from '../../utils/adminPreferences'
 
 const STATIC_COMMANDS = [
   { id: 'dashboard', label: 'Go to dashboard', href: '/admin', icon: FiHome, keywords: 'home command center' },
@@ -11,23 +12,6 @@ const STATIC_COMMANDS = [
   { id: 'operations', label: 'Operations center', href: '/admin/operations', icon: FiZap, keywords: 'queues scheduler backups' },
   { id: 'settings', label: 'Settings', href: '/admin/settings', icon: FiSettings, keywords: 'configuration' },
 ]
-
-const STORAGE_KEY = 'velora_admin_saved_filters'
-
-export function loadSavedFilters() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-  } catch {
-    return []
-  }
-}
-
-export function saveAdminFilter(filter) {
-  const current = loadSavedFilters()
-  const next = [{ ...filter, id: crypto.randomUUID(), saved_at: new Date().toISOString() }, ...current].slice(0, 8)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-  return next
-}
 
 export default function AdminCommandPalette({ open, onClose, initialQuery = '' }) {
   const navigate = useNavigate()

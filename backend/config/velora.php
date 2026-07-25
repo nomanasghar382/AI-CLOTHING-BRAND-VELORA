@@ -3,7 +3,7 @@
 return [
     'demo_mode' => (bool) env('VELORA_DEMO_MODE', false),
     'release' => [
-        'version' => env('VELORA_RELEASE_VERSION', '1.0.0-rc.1'),
+        'version' => env('VELORA_RELEASE_VERSION', '1.0.0'),
         'codename' => 'Release Candidate',
     ],
     'security' => [

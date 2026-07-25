@@ -1,12 +1,28 @@
-# VELORA 1.0.0-rc.1 Release Notes
+# VELORA 1.0.0 Release Notes
 
-## Release Candidate Overview
+## VELORA v1.0.0 — Production Release
 
-VELORA 1.0.0-rc.1 is the first release candidate of the full-stack modest fashion commerce platform. This build integrates authentication, catalog, shopping, AI styling, creator commerce, community, wardrobe, visual search, international commerce, loyalty, ethical passports, supplier operations, business intelligence, admin tooling, PWA support, and enterprise infrastructure.
+VELORA is a production-ready, AI-powered global modest fashion commerce platform.
+
+## Platform Modules
+
+- Authentication and role-based access (customer, creator, supplier, admin)
+- Product catalog with instant search, advanced filters, and SEO
+- Shopping (cart, wishlist, checkout, orders, coupons, returns)
+- AI fashion engine (quiz, stylist chat, recommendations, occasion styling)
+- AI wardrobe and visual search
+- Creator commerce (collections, lookboards, commissions)
+- Community platform (posts, likes, comments, bookmarks)
+- International commerce (multi-currency, shipping estimates, size guide)
+- Ethical fashion passport (verified sustainability claims)
+- Loyalty platform (points, VIP tiers, rewards, gift cards, referrals)
+- Supplier platform (inventory, operations, certifications)
+- Business intelligence and AI trend forecasting
+- Enterprise admin (command palette, global search, operations center)
+- PWA with offline support and install prompt
+- Enterprise infrastructure (security, audit, observability, queues, Docker, CI/CD)
 
 ## Demo Environment
-
-Enable demo data with:
 
 ```bash
 VELORA_DEMO_MODE=true
@@ -22,29 +38,35 @@ php artisan migrate:fresh --seed
 | Creator | creator@velora.test | VeloraDemo!2026 |
 | Supplier | supplier@velora.test | VeloraDemo!2026 |
 
-Demo data includes orders, payments, community posts, wardrobes, lookboards, loyalty transactions, support tickets, supplier inventory, analytics events, forecasts, and notifications.
-
-## Admin Enhancements
-
-- **Command palette**: Press `⌘K` / `Ctrl+K` in the admin panel
-- **Global search**: Products, orders, customers, creators, suppliers, community, support
-- **Quick actions**: Dashboard shortcuts for common operations
-- **Recent activity**: Live activity log feed on the command center
+See [docs/DEMO.md](docs/DEMO.md) for complete demonstration workflows.
 
 ## Validation
 
 ```bash
-cd backend && php artisan velora:validate-release
-cd backend && php artisan test
+cd backend && php artisan test                    # 47 tests
+cd backend && php artisan velora:validate-release --migrate
 cd frontend && npm run lint && npm run build
 ```
 
-## Upgrade Notes
-
-- Set `VELORA_DEMO_MODE=false` in production
-- Configure Stripe, Cloudinary, and OpenAI keys in Laravel `.env` only
-- Run queue worker and scheduler in production
-
 ## Documentation
 
-See `docs/release/` for API reference, database schema, deployment, environment variables, testing, and role-specific manuals.
+| Guide | Path |
+|-------|------|
+| User Guide | [docs/USER_GUIDE.md](docs/USER_GUIDE.md) |
+| Admin Guide | [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) |
+| Creator Guide | [docs/CREATOR_GUIDE.md](docs/CREATOR_GUIDE.md) |
+| Supplier Guide | [docs/SUPPLIER_GUIDE.md](docs/SUPPLIER_GUIDE.md) |
+| API Reference | [docs/API.md](docs/API.md) |
+| Architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| Database | [docs/DATABASE.md](docs/DATABASE.md) |
+| Security | [docs/SECURITY.md](docs/SECURITY.md) |
+| Deployment | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| Testing | [docs/TESTING.md](docs/TESTING.md) |
+| Demo Package | [docs/DEMO.md](docs/DEMO.md) |
+
+## Production Deployment
+
+- Set `VELORA_DEMO_MODE=false`
+- Configure Stripe, Cloudinary, and OpenAI in `backend/.env` only
+- Run queue worker and scheduler in production
+- See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) and [docs/release/PRODUCTION_CHECKLIST.md](docs/release/PRODUCTION_CHECKLIST.md)

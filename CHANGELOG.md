@@ -2,6 +2,18 @@
 
 All notable changes to VELORA are documented in this file.
 
+## [1.0.0] - 2026-07-25
+
+### Release
+- VELORA v1.0.0 — production release of the full-stack modest fashion commerce platform
+- Complete documentation suite (17 guides + release checklists)
+- Release validation command with migration support (`velora:validate-release --migrate`)
+- Demo package with `VELORA_DEMO_MODE` for semester presentation
+
+### Fixed
+- Release validation auto-migrates pending schema when migrations table exists
+- Admin command palette utility exports moved to `adminPreferences.js`
+
 ## [1.0.0-rc.2] - 2026-07-25
 
 ### Fixed

@@ -1,6 +1,8 @@
 # VELORA
 
-**Style, Intelligently Yours.** Production-ready AI-powered global modest-fashion marketplace.
+**Style, Intelligently Yours.** — Production release v1.0.0
+
+AI-powered global modest fashion commerce platform with enterprise admin, creator commerce, community, loyalty, and ethical fashion passport.
 
 ## Stack
 
@@ -12,27 +14,7 @@
 | Media | Cloudinary (server-side only) |
 | Cache / Queue | Redis-ready (file/database drivers supported locally) |
 
-## Platform modules
-
-- Authentication and role-based access (customer, creator, supplier, admin)
-- Product catalog with instant search, advanced filters and SEO
-- Shopping (cart, wishlist, checkout, orders, coupons, returns)
-- AI fashion engine (quiz, stylist chat, recommendations)
-- Enterprise admin, supplier portal, creator commerce
-- Community, wardrobe, visual search
-- International commerce, loyalty, ethical passport
-- Business intelligence and trend forecasting
-- Production optimization (PWA, performance, accessibility, notifications)
-- Enterprise infrastructure (security, audit, observability, queues, Docker, CI/CD)
-
-## Prerequisites
-
-- Node.js 22+
-- PHP 8.2+
-- Composer 2+
-- MySQL 8+
-
-## Installation
+## Quick Start
 
 ### Backend
 
@@ -45,13 +27,10 @@ php artisan migrate --seed
 php artisan serve
 ```
 
-Create a MySQL database named `velora` and configure `DB_*` in `backend/.env`.
-
 ### Frontend
 
 ```bash
 cd frontend
-cp .env.example .env
 npm install
 npm run dev
 ```
@@ -59,76 +38,50 @@ npm run dev
 Frontend: `http://localhost:5173`  
 API: `http://localhost:8000/api/v1`
 
-## Demo accounts
+## Demo Presentation
 
-Password: `VeloraDemo!2026`
+```bash
+# In backend/.env set VELORA_DEMO_MODE=true
+php artisan migrate:fresh --seed
+```
 
-| Email | Role |
-| --- | --- |
-| admin@velora.test | Super Admin |
-| customer@velora.test | Customer |
-| creator@velora.test | Creator |
-| supplier@velora.test | Supplier |
+| Email | Role | Password |
+| --- | --- | --- |
+| admin@velora.test | Super Admin | VeloraDemo!2026 |
+| customer@velora.test | Customer | VeloraDemo!2026 |
+| creator@velora.test | Creator | VeloraDemo!2026 |
+| supplier@velora.test | Supplier | VeloraDemo!2026 |
 
-## Validation
+See [Demo Package Guide](docs/DEMO.md) for demonstration workflows.
+
+## Release Certification
 
 ```bash
 cd backend && php artisan test
+cd backend && php artisan velora:validate-release --migrate
 cd frontend && npm run lint && npm run build
 ```
 
-## Environment variables
-
-All external credentials are read from `backend/.env` only. Never expose secrets to React.
-
-Key backend variables:
-
-| Variable | Purpose |
-| --- | --- |
-| `APP_URL` | Laravel application URL |
-| `FRONTEND_URL` | React app URL for emails and redirects |
-| `DB_*` | MySQL connection |
-| `CACHE_STORE` | `file` locally, `redis` in production |
-| `QUEUE_CONNECTION` | `database` locally, `redis` in production |
-| `OPENAI_API_KEY` | AI stylist (optional) |
-| `STRIPE_*` | Payments (test mode) |
-| `CLOUDINARY_*` | Media uploads |
-
-Frontend only needs:
-
-| Variable | Purpose |
-| --- | --- |
-| `VITE_API_BASE_URL` | Laravel API base URL |
-
 ## Documentation
 
-- [Developer Guide](docs/DEVELOPER.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
-- [API Overview](docs/API.md)
-- [Enterprise Infrastructure](docs/ENTERPRISE.md)
-- [Maintenance Guide](docs/MAINTENANCE.md)
-
-## Architecture
-
-```text
-frontend/  React SPA + PWA service worker
-     ↓ REST / JSON (Sanctum bearer tokens)
-backend/   Laravel API (controllers → services → repositories)
-     ↓
-MySQL (+ Redis recommended in production)
-```
-
-## Production features
-
-- Progressive Web App with offline fallback, install prompt and app shortcuts
-- Instant search with debouncing, synonyms, analytics and suggestions
-- Advanced catalog filters with saved presets (device-local)
-- Toast notifications and notification center with unread counter
-- WCAG-oriented accessibility (skip links, focus states, reduced motion)
-- Dynamic SEO meta tags, Open Graph, Twitter cards and Schema.org product data
-- Admin system health dashboard with cache management
-- Professional email templates for lifecycle messaging
-- API performance logging with `X-Response-Time` header
+| Guide | Description |
+| --- | --- |
+| [User Guide](docs/USER_GUIDE.md) | Customer-facing features |
+| [Admin Guide](docs/ADMIN_GUIDE.md) | Enterprise admin panel |
+| [Creator Guide](docs/CREATOR_GUIDE.md) | Creator commerce tools |
+| [Supplier Guide](docs/SUPPLIER_GUIDE.md) | Supplier operations portal |
+| [API Reference](docs/API.md) | REST API endpoints |
+| [Architecture](docs/ARCHITECTURE.md) | System design |
+| [Database](docs/DATABASE.md) | Schema and seeding |
+| [Security](docs/SECURITY.md) | Security practices |
+| [Deployment](docs/DEPLOYMENT.md) | Production deployment |
+| [Developer Guide](docs/DEVELOPER.md) | Development setup |
+| [Testing](docs/TESTING.md) | Test suites and validation |
+| [Maintenance](docs/MAINTENANCE.md) | Operations and maintenance |
+| [Project Structure](docs/PROJECT_STRUCTURE.md) | Codebase layout |
+| [Enterprise](docs/ENTERPRISE.md) | Enterprise infrastructure |
+| [Release Notes](RELEASE_NOTES.md) | v1.0.0 release notes |
+| [Changelog](CHANGELOG.md) | Version history |
 
 ## License
 
