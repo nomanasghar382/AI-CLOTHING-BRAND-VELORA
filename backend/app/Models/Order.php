@@ -12,7 +12,7 @@ class Order extends Model
 
     protected function casts(): array
     {
-        return ['subtotal' => 'decimal:2', 'discount_total' => 'decimal:2', 'shipping_total' => 'decimal:2', 'tax_total' => 'decimal:2', 'grand_total' => 'decimal:2'];
+        return ['subtotal' => 'decimal:2', 'discount_total' => 'decimal:2', 'shipping_total' => 'decimal:2', 'tax_total' => 'decimal:2', 'duty_total' => 'decimal:2', 'exchange_rate' => 'decimal:8', 'grand_total' => 'decimal:2'];
     }
 
     public function user(): BelongsTo

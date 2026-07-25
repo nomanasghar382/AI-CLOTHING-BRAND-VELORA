@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { FiArrowUpRight, FiBox, FiCheckCircle, FiDollarSign, FiFileText, FiPackage, FiPlus, FiShoppingBag } from 'react-icons/fi'
+import { FiArrowUpRight, FiBox, FiCheckCircle, FiDollarSign, FiFileText, FiGlobe, FiPackage, FiPlus, FiShoppingBag } from 'react-icons/fi'
 import AdminDataTable from '../../components/admin/AdminDataTable'
 import AdminExportButton from '../../components/admin/AdminExportButton'
 import AdminFilters from '../../components/admin/AdminFilters'
@@ -13,7 +13,7 @@ import { catalogService } from '../../services/catalogService'
 
 const money = (value, currency = 'USD') => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(Number(value || 0))
 const statusClass = (status) => `admin-status admin-status-${String(status || '').replaceAll('_', '-')}`
-const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', activity: 'Activity logs', settings: 'Settings' }
+const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', activity: 'Activity logs', settings: 'Settings', international: 'International commerce' }
 
 function extract(response) {
   const payload = response?.data?.data
@@ -104,8 +104,13 @@ function ReportsPage({ orders, payments, products }) {
 function SettingsPage() {
   return <section className="admin-panel"><div className="admin-panel-head"><div><p className="admin-kicker">COMMERCE CONFIGURATION</p><h2>Operations settings</h2></div></div>
     <p className="admin-settings-copy">These settings use the existing protected admin operations endpoints.</p>
-    <div className="admin-settings-links"><a href="/admin/shipping"><FiPackage /><span><strong>Shipping methods</strong><small>Manage available methods and rates</small></span><FiArrowUpRight /></a><a href="/admin/taxes"><FiDollarSign /><span><strong>Tax rules</strong><small>Configure regional tax calculations</small></span><FiArrowUpRight /></a><a href="/admin/payments"><FiCheckCircle /><span><strong>Payments & refunds</strong><small>Review captures and refund actions</small></span><FiArrowUpRight /></a><a href="/admin/returns"><FiShoppingBag /><span><strong>Return requests</strong><small>Process submitted merchandise returns</small></span><FiArrowUpRight /></a></div>
+    <div className="admin-settings-links"><a href="/admin/shipping"><FiPackage /><span><strong>Shipping methods</strong><small>Manage available methods and rates</small></span><FiArrowUpRight /></a><a href="/admin/taxes"><FiDollarSign /><span><strong>Tax rules</strong><small>Configure regional tax calculations</small></span><FiArrowUpRight /></a><a href="/admin/payments"><FiCheckCircle /><span><strong>Payments & refunds</strong><small>Review captures and refund actions</small></span><FiArrowUpRight /></a><a href="/admin/returns"><FiShoppingBag /><span><strong>Return requests</strong><small>Process submitted merchandise returns</small></span><FiArrowUpRight /></a><a href="/admin/international"><FiGlobe /><span><strong>International commerce</strong><small>Review regional readiness and fulfillment</small></span><FiArrowUpRight /></a></div>
   </section>
+}
+
+function InternationalPage() {
+  const regions = [{ market: 'United States', currency: 'USD', tax: 'Existing tax rules' }, { market: 'United Kingdom', currency: 'GBP', tax: 'Configure tax rule' }, { market: 'Gulf region', currency: 'AED / SAR', tax: 'Configure tax rule' }, { market: 'European Union', currency: 'EUR', tax: 'Configure tax rule' }]
+  return <section className="admin-panel international-admin"><div className="admin-panel-head"><div><p className="admin-kicker">GLOBAL OPERATIONS</p><h2>International commerce</h2></div><FiGlobe /></div><p className="admin-settings-copy">Regional shipping and tax configuration uses the existing protected operations APIs. Tracking, duty and warehouse inventory endpoints are not yet exposed by the backend, so this view does not fabricate operational data.</p><AdminDataTable columns={[{ label: 'Market', key: 'market' }, { label: 'Settlement currency', key: 'currency' }, { label: 'Tax readiness', key: 'tax' }, { label: 'Next action', render: () => <a href="/admin/taxes">Configure tax rules</a> }]} rows={regions} /><div className="international-admin-note"><FiPackage /><span><strong>Carrier tracking & warehouse allocation</strong><small>Frontend ready; connect international API endpoints to enable live operational records.</small></span></div></section>
 }
 
 export default function AdminPanel() {
@@ -129,6 +134,7 @@ export default function AdminPanel() {
     if (slug === 'analytics') return <AnalyticsPage {...data} />
     if (slug === 'reports') return <ReportsPage {...data} />
     if (slug === 'settings') return <SettingsPage />
+    if (slug === 'international') return <InternationalPage />
     if (!slug) return <Dashboard {...data} />
     return <UnavailablePage title={title} capability={title.toLowerCase()} />
   })()

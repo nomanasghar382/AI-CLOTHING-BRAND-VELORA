@@ -4,6 +4,7 @@ namespace App\Services\Shopping;
 
 use App\Models\BillingAddress;
 use App\Models\CartItem;
+use App\Models\Country;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\Inventory;
@@ -26,6 +27,8 @@ use Illuminate\Validation\ValidationException;
 
 final class CheckoutService
 {
+    public function __construct(private readonly InternationalCommerceService $international) {}
+
     public function checkout(User $user, array $attributes): Order
     {
         return DB::transaction(function () use ($user, $attributes): Order {
@@ -45,14 +48,25 @@ final class CheckoutService
             [$coupon, $discount] = $this->discount($attributes['coupon_code'] ?? null, $subtotal);
             [$methodId, $shippingTotal] = $this->shipping($attributes['shipping_rate_id'] ?? null, $shipping->country, $subtotal);
             $taxTotal = $this->tax($shipping, $subtotal - $discount);
-            $total = round($subtotal - $discount + $shippingTotal + $taxTotal, 2);
+            $international = null;
+            if (Country::query()->where('code', strtoupper($shipping->country))->where('is_active', true)->exists()) {
+                $international = $this->international->estimate([
+                    'country' => $shipping->country, 'currency' => $attributes['currency'] ?? $cart->currency, 'locale' => $attributes['locale'] ?? null,
+                ], $subtotal - $discount, $lines->pluck('product'));
+                $shippingTotal = ($attributes['shipping_rate_id'] ?? null) ? $shippingTotal : $international['shipping_total'];
+                $taxTotal = $international['tax_total'];
+            }
+            $dutyTotal = $international['duty_total'] ?? 0.0;
+            $total = round($subtotal - $discount + $shippingTotal + $taxTotal + $dutyTotal, 2);
 
             $order = Order::query()->create([
                 'number' => 'VEL-'.now()->format('YmdHis').'-'.Str::upper(Str::random(6)),
                 'user_id' => $user->id, 'shipping_address_id' => $shipping->id, 'billing_address_id' => $billing->id,
                 'shipping_method_id' => $methodId, 'coupon_id' => $coupon?->id, 'status' => 'pending',
-                'payment_status' => 'pending', 'currency' => $cart->currency, 'subtotal' => $subtotal,
-                'discount_total' => $discount, 'shipping_total' => $shippingTotal, 'tax_total' => $taxTotal, 'grand_total' => $total,
+                'payment_status' => 'pending', 'currency' => $international['currency'] ?? $cart->currency, 'locale' => $international['language'] ?? null,
+                'exchange_rate' => $international['exchange_rate'] ?? 1, 'warehouse_id' => ($international['warehouse'] ?? null)?->id,
+                'shipping_carrier_id' => ($international['carrier'] ?? null)?->id, 'subtotal' => $subtotal,
+                'discount_total' => $discount, 'shipping_total' => $shippingTotal, 'tax_total' => $taxTotal, 'duty_total' => $dutyTotal, 'grand_total' => $total,
                 'notes' => $attributes['notes'] ?? null,
             ]);
             foreach ($lines as $line) {
@@ -68,6 +82,9 @@ final class CheckoutService
                 CouponUsage::query()->create(['coupon_id' => $coupon->id, 'order_id' => $order->id, 'user_id' => $user->id, 'discount_amount' => $discount]);
             }
             Payment::query()->create(['order_id' => $order->id, 'provider' => $attributes['payment_provider'], 'status' => 'pending', 'amount' => $total, 'currency' => $cart->currency]);
+            if ($international) {
+                $this->international->persistEstimate($international, $order->id);
+            }
             OrderStatusHistory::query()->create(['order_id' => $order->id, 'user_id' => $user->id, 'to_status' => 'pending', 'note' => 'Order created.']);
             CartItem::query()->where('shopping_cart_id', $cart->id)->delete();
             DB::afterCommit(fn () => $user->notify(new OrderStatusNotification($order, 'order')));

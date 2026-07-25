@@ -4,8 +4,9 @@ import { FiHeart, FiMenu, FiShoppingBag, FiUser, FiX } from 'react-icons/fi'
 import useAuth from '../../hooks/useAuth'
 import useCart from '../../hooks/useCart'
 import useWishlist from '../../hooks/useWishlist'
+import MarketSelector from '../international/MarketSelector'
 
-const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Marketplace', to: '/marketplace' }, { label: 'Community', to: '/community' }, { label: 'Catalog', to: '/catalog' }, { label: 'Our Vision', to: '/about' }]
+const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Marketplace', to: '/marketplace' }, { label: 'Community', to: '/community' }, { label: 'Catalog', to: '/catalog' }, { label: 'Global services', to: '/international' }, { label: 'Our Vision', to: '/about' }]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -21,6 +22,7 @@ export default function Navbar() {
           {navItems.map((item) => <NavLink key={item.to} className="nav-link-velora" to={item.to}>{item.label}</NavLink>)}
         </div>
         <div className="d-none d-lg-flex align-items-center gap-3">
+          <MarketSelector />
           <Link className="nav-icon-link" to="/wishlist" aria-label={`Wishlist, ${wishlistCount} items`}><FiHeart />{wishlistCount > 0 && <span className="nav-counter">{wishlistCount}</span>}</Link>
           <Link className="nav-icon-link" to="/cart" aria-label={`Shopping bag, ${cartCount} items`}><FiShoppingBag />{cartCount > 0 && <span className="nav-counter">{cartCount}</span>}</Link>
           {isAuthenticated ? (
@@ -37,6 +39,7 @@ export default function Navbar() {
         </button>
       </nav>
       {open && <div className="container pb-3 d-lg-none mobile-nav">
+        <div className="py-2"><MarketSelector /></div>
         {navItems.map((item) => <NavLink key={item.to} className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={item.to}>{item.label}</NavLink>)}
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/wishlist">Wishlist{wishlistCount ? ` (${wishlistCount})` : ''}</NavLink>
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/cart">Shopping bag{cartCount ? ` (${cartCount})` : ''}</NavLink>

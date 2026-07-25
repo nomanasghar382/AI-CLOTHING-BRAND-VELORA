@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Contracts\InternationalShippingProviderInterface;
 use App\Contracts\Repositories\CartRepositoryInterface;
 use App\Contracts\Repositories\CreatorProfileRepositoryInterface;
 use App\Contracts\Repositories\ProductRepositoryInterface;
@@ -12,6 +13,7 @@ use App\Repositories\Eloquent\EloquentCreatorProfileRepository;
 use App\Repositories\Eloquent\EloquentProductRepository;
 use App\Repositories\Eloquent\EloquentUserRepository;
 use App\Repositories\Eloquent\EloquentWishlistRepository;
+use App\Services\Shopping\EnvShippingProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -29,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CartRepositoryInterface::class, EloquentCartRepository::class);
         $this->app->bind(WishlistRepositoryInterface::class, EloquentWishlistRepository::class);
         $this->app->bind(CreatorProfileRepositoryInterface::class, EloquentCreatorProfileRepository::class);
+        $this->app->bind(InternationalShippingProviderInterface::class, EnvShippingProvider::class);
     }
 
     /**

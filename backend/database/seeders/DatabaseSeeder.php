@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CatalogSeeder::class,
             FashionTrendSeeder::class,
             AdminDomainSeeder::class,
+            InternationalCommerceSeeder::class,
         ]);
     }
 }

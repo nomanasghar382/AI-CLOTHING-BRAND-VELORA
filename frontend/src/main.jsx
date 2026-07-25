@@ -9,6 +9,7 @@ import { CartProvider } from './context/CartContext.jsx'
 import { WishlistProvider } from './context/WishlistContext.jsx'
 import { AiStylistProvider } from './context/AiStylistContext.jsx'
 import { CommunityProvider } from './context/CommunityContext.jsx'
+import { InternationalProvider } from './context/InternationalContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -17,9 +18,11 @@ createRoot(document.getElementById('root')).render(
         <CartProvider>
           <WishlistProvider>
             <CommunityProvider>
-              <AiStylistProvider>
-                <App />
-              </AiStylistProvider>
+              <InternationalProvider>
+                <AiStylistProvider>
+                  <App />
+                </AiStylistProvider>
+              </InternationalProvider>
             </CommunityProvider>
           </WishlistProvider>
         </CartProvider>

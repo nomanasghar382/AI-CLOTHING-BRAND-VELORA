@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Community\CommunityController;
 use App\Http\Controllers\Api\V1\Creator\CreatorController;
 use App\Http\Controllers\Api\V1\Shopping\AdminShoppingController;
 use App\Http\Controllers\Api\V1\Shopping\CartController;
+use App\Http\Controllers\Api\V1\Shopping\InternationalCommerceController;
 use App\Http\Controllers\Api\V1\Shopping\OrderController;
 use App\Http\Controllers\Api\V1\Shopping\WishlistController;
 use App\Http\Controllers\Api\V1\Style\StyleController;
@@ -69,6 +70,10 @@ Route::prefix('v1')->group(function (): void {
         Route::post('payments/{payment}/refund', [AdminShoppingController::class, 'refundPayment']);
         Route::get('returns', [AdminShoppingController::class, 'returns']);
         Route::patch('returns/{returnRequest}', [AdminShoppingController::class, 'updateReturn']);
+        Route::get('international/{resource}', [InternationalCommerceController::class, 'adminIndex']);
+        Route::post('international/{resource}', [InternationalCommerceController::class, 'adminStore']);
+        Route::put('international/{resource}/{id}', [InternationalCommerceController::class, 'adminUpdate']);
+        Route::delete('international/{resource}/{id}', [InternationalCommerceController::class, 'adminDestroy']);
     });
 
     Route::middleware(['auth:sanctum', 'permission:dashboard.view'])->prefix('admin')->group(function (): void {
@@ -115,6 +120,13 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware(['auth:sanctum', 'permission:activity.view'])->get('admin/activity-logs', [AdminController::class, 'activity']);
 
     Route::middleware('auth:sanctum')->group(function (): void {
+        Route::get('international/countries', [InternationalCommerceController::class, 'countries']);
+        Route::get('international/countries/{country}/states', [InternationalCommerceController::class, 'states']);
+        Route::get('international/countries/{country}/cities', [InternationalCommerceController::class, 'cities']);
+        Route::get('international/currencies', [InternationalCommerceController::class, 'currencies']);
+        Route::get('international/locale', [InternationalCommerceController::class, 'locale']);
+        Route::post('international/shipping-estimates', [InternationalCommerceController::class, 'estimate']);
+        Route::get('international/tracking/{tracking}', [InternationalCommerceController::class, 'tracking']);
         Route::get('creators/{handle}', [CreatorController::class, 'show']);
         Route::get('creators/{creator}/collections', [CreatorController::class, 'collections']);
         Route::post('creators/{creator}/follow', [CreatorController::class, 'follow']);

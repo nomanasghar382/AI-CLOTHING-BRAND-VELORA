@@ -68,4 +68,11 @@ return [
         'cache_minutes' => env('VISUAL_SEARCH_CACHE_MINUTES', 60),
     ],
 
+    'international_shipping' => [
+        'enabled' => env('INTERNATIONAL_SHIPPING_PROVIDER_ENABLED', false),
+        'provider' => env('INTERNATIONAL_SHIPPING_PROVIDER', 'none'),
+        'api_key' => env('INTERNATIONAL_SHIPPING_API_KEY'),
+        'timeout' => env('INTERNATIONAL_SHIPPING_TIMEOUT', 10),
+    ],
+
 ];

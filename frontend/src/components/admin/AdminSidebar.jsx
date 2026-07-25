@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   FiActivity, FiBarChart2, FiBell, FiBox, FiCreditCard, FiGift, FiHelpCircle,
-  FiHome, FiSettings, FiShoppingBag, FiStar, FiTruck, FiUsers,
+  FiGlobe, FiHome, FiSettings, FiShoppingBag, FiStar, FiTruck, FiUsers,
 } from 'react-icons/fi'
 
 const items = [
@@ -9,7 +9,7 @@ const items = [
   ['Customers', 'customers', FiUsers], ['Analytics', 'analytics', FiBarChart2], ['Reports', 'reports', FiActivity],
   ['Coupons', 'coupons', FiGift], ['Support', 'support', FiHelpCircle], ['Reviews', 'reviews', FiStar],
   ['Suppliers', 'suppliers', FiTruck], ['Creators', 'creators', FiUsers], ['Notifications', 'notifications', FiBell],
-  ['Activity logs', 'activity', FiActivity], ['Settings', 'settings', FiSettings],
+  ['Activity logs', 'activity', FiActivity], ['International', 'international', FiGlobe], ['Settings', 'settings', FiSettings],
 ]
 
 export default function AdminSidebar() {
