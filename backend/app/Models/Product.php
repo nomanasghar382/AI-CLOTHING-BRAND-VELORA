@@ -18,7 +18,7 @@ class Product extends Model
     public function subcategory(): BelongsTo { return $this->belongsTo(Category::class, 'subcategory_id'); }
     public function images(): HasMany { return $this->hasMany(ProductImage::class)->orderBy('sort_order'); }
     public function variants(): HasMany { return $this->hasMany(ProductVariant::class); }
-    public function colors(): BelongsToMany { return $this->belongsToMany(Color::class); }
-    public function sizes(): BelongsToMany { return $this->belongsToMany(Size::class); }
+    public function colors(): BelongsToMany { return $this->belongsToMany(Color::class, 'product_colors'); }
+    public function sizes(): BelongsToMany { return $this->belongsToMany(Size::class, 'product_sizes'); }
     public function tags(): BelongsToMany { return $this->belongsToMany(Tag::class); }
 }
