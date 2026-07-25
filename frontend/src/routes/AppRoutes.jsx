@@ -109,6 +109,7 @@ export default function AppRoutes() {
             <Route path="admin/alerts" element={<LazyPanel><AdminPanel /></LazyPanel>} />
             <Route path="admin/activity" element={<LazyPanel><AdminPanel /></LazyPanel>} />
             <Route path="admin/system" element={<LazyPanel><AdminPanel /></LazyPanel>} />
+            <Route path="admin/operations" element={<LazyPanel><AdminPanel /></LazyPanel>} />
             <Route path="admin/settings" element={<LazyPanel><AdminPanel /></LazyPanel>} />
             <Route path="admin/international" element={<LazyPanel><AdminPanel /></LazyPanel>} />
             <Route path="admin/shipping" element={<OperationsPage />} />

@@ -10,7 +10,7 @@ const items = [
   ['Coupons', 'coupons', FiGift], ['Support', 'support', FiHelpCircle], ['Reviews', 'reviews', FiStar],
   ['Suppliers', 'suppliers', FiTruck], ['Creators', 'creators', FiUsers], ['Notifications', 'notifications', FiBell],
   ['Loyalty & VIP', 'loyalty', FiStar], ['Gift cards', 'gift-cards', FiGift], ['Product alerts', 'alerts', FiBell],
-  ['Activity logs', 'activity', FiActivity], ['System health', 'system', FiActivity], ['International', 'international', FiGlobe], ['Settings', 'settings', FiSettings],
+  ['Activity logs', 'activity', FiActivity], ['System health', 'system', FiActivity], ['Operations center', 'operations', FiActivity], ['International', 'international', FiGlobe], ['Settings', 'settings', FiSettings],
 ]
 
 export default function AdminSidebar() {

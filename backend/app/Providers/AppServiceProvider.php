@@ -10,6 +10,7 @@ use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Repositories\WishlistRepositoryInterface;
 use App\Events\SupplierInventorySynced;
+use App\Listeners\RecordSecurityAudit;
 use App\Listeners\RecordSupplierInventorySync;
 use App\Models\Product;
 use App\Observers\ProductObserver;
@@ -48,7 +49,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('auth', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('uploads', fn (Request $request) => Limit::perMinute(20)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('webhooks', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
         Product::observe(ProductObserver::class);
         Event::listen(SupplierInventorySynced::class, RecordSupplierInventorySync::class);
+        Event::subscribe(RecordSecurityAudit::class);
     }
 }

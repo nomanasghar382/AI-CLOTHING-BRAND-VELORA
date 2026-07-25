@@ -14,7 +14,7 @@ import { PortalBars, PortalExport, PortalFilters, PortalTable } from '../../comp
 
 const money = (value, currency = 'USD') => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(Number(value || 0))
 const statusClass = (status) => `admin-status admin-status-${String(status || '').replaceAll('_', '-')}`
-const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', forecasting: 'Trend forecasting', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', loyalty: 'Loyalty & VIP', 'gift-cards': 'Gift cards', alerts: 'Product alerts', activity: 'Activity logs', settings: 'Settings', international: 'International commerce', system: 'System health' }
+const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', forecasting: 'Trend forecasting', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', loyalty: 'Loyalty & VIP', 'gift-cards': 'Gift cards', alerts: 'Product alerts', activity: 'Activity logs', settings: 'Settings', international: 'International commerce', system: 'System health', operations: 'Operations center' }
 
 function extract(response) {
   const payload = response?.data?.data
@@ -126,13 +126,14 @@ function SettingsPage() {
 
 function SystemHealthPage({ health, onRefresh, onClearCache, clearing }) {
   if (!health) return <UnavailablePage title="System health" capability="system health monitoring" />
+  const metrics = health.metrics || {}
   return (
     <>
       <section className="admin-metrics">
-        <Metric icon={FiCheckCircle} label="Database" value={health.database?.connected ? 'Connected' : 'Unavailable'} tone={health.database?.connected ? 'green' : 'gold'} />
-        <Metric icon={FiActivity} label="Cache driver" value={health.cache?.driver || '—'} change={health.cache?.healthy ? 'Healthy' : 'Check cache'} tone="blue" />
-        <Metric icon={FiPackage} label="Pending jobs" value={health.queue?.pending_jobs ?? 0} change={`${health.queue?.failed_jobs ?? 0} failed`} tone="violet" />
-        <Metric icon={FiDollarSign} label="Free storage" value={`${health.storage?.disk_free_mb ?? 0} MB`} change={health.application?.environment} tone="gold" />
+        <Metric icon={FiCheckCircle} label="Database" value={metrics.database?.connected ? 'Connected' : 'Unavailable'} tone={metrics.database?.connected ? 'green' : 'gold'} />
+        <Metric icon={FiActivity} label="Cache driver" value={metrics.cache?.driver || '—'} change={metrics.cache?.healthy ? 'Healthy' : 'Check cache'} tone="blue" />
+        <Metric icon={FiPackage} label="Pending jobs" value={metrics.queue?.pending_jobs ?? 0} change={`${metrics.queue?.failed_jobs ?? 0} failed`} tone="violet" />
+        <Metric icon={FiDollarSign} label="Memory" value={`${metrics.memory?.usage_mb ?? 0} MB`} change={`Peak ${metrics.memory?.peak_mb ?? 0} MB`} tone="gold" />
       </section>
       <section className="admin-panel">
         <div className="admin-panel-head">
@@ -150,14 +151,29 @@ function SystemHealthPage({ health, onRefresh, onClearCache, clearing }) {
           ]}
           rows={[
             { component: 'Laravel', status: health.application?.laravel || '—', details: `Debug ${health.application?.debug ? 'on' : 'off'}` },
-            { component: 'Queue connection', status: health.queue?.connection || '—', details: `${health.queue?.pending_jobs ?? 0} pending` },
-            { component: 'Public storage', status: health.storage?.public_writable ? 'Writable' : 'Read only', details: `${health.storage?.disk_free_mb ?? 0} MB free` },
-            { component: 'Logs', status: health.storage?.logs_writable ? 'Writable' : 'Read only', details: 'Application logs' },
+            { component: 'Queue connection', status: metrics.queue?.connection || '—', details: `${metrics.queue?.pending_jobs ?? 0} pending` },
+            { component: 'Storage free', status: `${metrics.storage?.disk_free_mb ?? 0} MB`, details: health.application?.environment },
+            { component: 'Maintenance', status: health.application?.maintenance_mode ? 'Enabled' : 'Disabled', details: 'Application mode' },
           ]}
         />
       </section>
     </>
   )
+}
+function OperationsPage({ operations, onRunBackup, onToggleFlag }) {
+  if (!operations) return <UnavailablePage title="Operations center" capability="enterprise operations monitoring" />
+  const { metrics, queues, scheduler, backups, flags, webhooks } = operations
+  return <>
+    <section className="admin-metrics">
+      <Metric icon={FiActivity} label="Pending jobs" value={queues?.pending_jobs ?? 0} change={`${queues?.failed_jobs ?? 0} failed`} tone="violet" />
+      <Metric icon={FiPackage} label="Memory usage" value={`${metrics?.snapshot?.memory?.usage_mb ?? 0} MB`} tone="blue" />
+      <Metric icon={FiCheckCircle} label="Backups" value={backups?.length ?? 0} change="Retention managed" tone="green" />
+      <Metric icon={FiDollarSign} label="Webhooks" value={webhooks?.length ?? 0} change="Recent events" tone="gold" />
+    </section>
+    <section className="admin-panel"><div className="admin-panel-head"><div><p className="admin-kicker">QUEUE DASHBOARD</p><h2>Background processing</h2></div><button className="admin-button admin-button-primary" type="button" onClick={onRunBackup}>Queue backup</button></div><AdminDataTable columns={[{ label: 'Connection', render: () => queues?.connection }, { label: 'Pending', render: () => queues?.pending_jobs }, { label: 'Failed', render: () => queues?.failed_jobs }]} rows={[queues || {}]} emptyMessage="Queue metrics unavailable." /></section>
+    <section className="admin-panel mt-4"><div className="admin-panel-head"><div><p className="admin-kicker">SCHEDULER</p><h2>Recent task runs</h2></div></div><AdminDataTable columns={[{ label: 'Command', key: 'command' }, { label: 'Status', key: 'status' }, { label: 'Duration', render: (row) => `${row.duration_ms || 0} ms` }, { label: 'Finished', render: (row) => row.finished_at ? new Date(row.finished_at).toLocaleString() : '—' }]} rows={scheduler || []} emptyMessage="No scheduler runs recorded yet." /></section>
+    <section className="admin-panel mt-4"><div className="admin-panel-head"><div><p className="admin-kicker">FEATURE FLAGS</p><h2>Runtime controls</h2></div></div><AdminDataTable columns={[{ label: 'Flag', key: 'key' }, { label: 'Name', key: 'name' }, { label: 'Enabled', render: (row) => <button className="admin-text-button" type="button" onClick={() => onToggleFlag(row)}>{row.enabled ? 'On' : 'Off'}</button> }]} rows={flags || []} /></section>
+  </>
 }
 function InternationalPage() {
   const regions = [{ market: 'United States', currency: 'USD', tax: 'Existing tax rules' }, { market: 'United Kingdom', currency: 'GBP', tax: 'Configure tax rule' }, { market: 'Gulf region', currency: 'AED / SAR', tax: 'Configure tax rule' }, { market: 'European Union', currency: 'EUR', tax: 'Configure tax rule' }]
@@ -168,17 +184,27 @@ export default function AdminPanel() {
   const location = useLocation(); const slug = location.pathname.replace('/admin', '').replace(/^\//, '')
   const [open, setOpen] = useState(false); const [loading, setLoading] = useState(true); const [error, setError] = useState('')
   const [clearing, setClearing] = useState(false)
-  const [data, setData] = useState({ orders: [], products: [], coupons: [], payments: [], categories: [], analytics: null, health: null })
+  const [data, setData] = useState({ orders: [], products: [], coupons: [], payments: [], categories: [], analytics: null, health: null, operations: null })
   const load = async () => {
     setLoading(true); setError('')
-    const results = await Promise.allSettled([api.orders({ per_page: 20 }), api.products({ per_page: 20 }), api.coupons({ per_page: 20 }), api.payments({ per_page: 20 }), catalogService.categories(), api.analytics(), api.systemHealth()])
+    const results = await Promise.allSettled([api.orders({ per_page: 20 }), api.products({ per_page: 20 }), api.coupons({ per_page: 20 }), api.payments({ per_page: 20 }), catalogService.categories(), api.analytics(), api.systemHealth(), api.operationsMetrics(), api.operationsQueues(), api.operationsScheduler(), api.operationsBackups(), api.featureFlags(), api.operationsWebhooks()])
     const [orders, products, coupons, payments] = results.map((result) => result.status === 'fulfilled' ? extract(result.value) : { data: [] })
     if (results.some((result, index) => index < 4 && result.status === 'rejected')) setError('Some live operational records could not be loaded. Check the current role and API connection.')
     const categoryResult = results[4]?.status === 'fulfilled' ? extract(results[4].value) : { data: [] }
     const analytics = results[5]?.status === 'fulfilled' ? results[5].value.data.data : null
     const health = results[6]?.status === 'fulfilled' ? results[6].value.data.data : null
-    setData({ orders: orders.data, products: products.data, coupons: coupons.data, payments: payments.data, categories: categoryResult.data, analytics, health }); setLoading(false)
+    const operations = {
+      metrics: results[7]?.status === 'fulfilled' ? results[7].value.data.data : null,
+      queues: results[8]?.status === 'fulfilled' ? results[8].value.data.data : null,
+      scheduler: results[9]?.status === 'fulfilled' ? results[9].value.data.data : null,
+      backups: results[10]?.status === 'fulfilled' ? results[10].value.data.data : null,
+      flags: results[11]?.status === 'fulfilled' ? results[11].value.data.data : null,
+      webhooks: results[12]?.status === 'fulfilled' ? results[12].value.data.data : null,
+    }
+    setData({ orders: orders.data, products: products.data, coupons: coupons.data, payments: payments.data, categories: categoryResult.data, analytics, health, operations }); setLoading(false)
   }
+  const runBackup = async () => { await api.runBackup(); await load() }
+  const toggleFlag = async (flag) => { await api.updateFeatureFlag(flag.id, !flag.enabled); await load() }
   const clearCache = async () => {
     setClearing(true)
     try { await api.clearCache(); await load() } finally { setClearing(false) }
@@ -195,6 +221,7 @@ export default function AdminPanel() {
     if (slug === 'settings') return <SettingsPage />
     if (slug === 'international') return <InternationalPage />
     if (slug === 'system') return <SystemHealthPage health={data.health} onRefresh={load} onClearCache={clearCache} clearing={clearing} />
+    if (slug === 'operations') return <OperationsPage operations={data.operations} onRunBackup={runBackup} onToggleFlag={toggleFlag} />
     if (!slug) return <Dashboard {...data} />
     return <UnavailablePage title={title} capability={title.toLowerCase()} />
   })()

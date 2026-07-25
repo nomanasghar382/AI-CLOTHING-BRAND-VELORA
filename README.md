@@ -23,6 +23,7 @@
 - International commerce, loyalty, ethical passport
 - Business intelligence and trend forecasting
 - Production optimization (PWA, performance, accessibility, notifications)
+- Enterprise infrastructure (security, audit, observability, queues, Docker, CI/CD)
 
 ## Prerequisites
 
@@ -104,6 +105,7 @@ Frontend only needs:
 - [Developer Guide](docs/DEVELOPER.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
 - [API Overview](docs/API.md)
+- [Enterprise Infrastructure](docs/ENTERPRISE.md)
 - [Maintenance Guide](docs/MAINTENANCE.md)
 
 ## Architecture

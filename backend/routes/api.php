@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\AdminController;
+use App\Http\Controllers\Api\V1\Admin\OperationsController;
 use App\Http\Controllers\Api\V1\Admin\SystemHealthController;
 use App\Http\Controllers\Api\V1\Admin\BusinessIntelligenceController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\V1\Auth\SecurityController;
 use App\Http\Controllers\Api\V1\Catalog\AdminCatalogController;
 use App\Http\Controllers\Api\V1\Catalog\CatalogController;
 use App\Http\Controllers\Api\V1\Catalog\SearchController;
@@ -19,9 +21,10 @@ use App\Http\Controllers\Api\V1\Shopping\OrderController;
 use App\Http\Controllers\Api\V1\Shopping\WishlistController;
 use App\Http\Controllers\Api\V1\Style\StyleController;
 use App\Http\Controllers\Api\V1\Supplier\SupplierController;
+use App\Http\Controllers\Api\V1\WebhookController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function (): void {
+Route::prefix('v1')->middleware(['api.version:v1', 'throttle:api'])->group(function (): void {
     Route::get('products', [CatalogController::class, 'products'])->name('products.index');
     Route::get('products/{product:slug}', [CatalogController::class, 'show'])->name('products.show');
     Route::get('categories', [CatalogController::class, 'categories']);
@@ -46,6 +49,10 @@ Route::prefix('v1')->group(function (): void {
             ->name('verification.verify');
         Route::post('email/verification-notification', [EmailVerificationController::class, 'resend'])
             ->middleware('throttle:6,1');
+        Route::get('security/activity', [SecurityController::class, 'activity']);
+        Route::get('security/devices', [SecurityController::class, 'devices']);
+        Route::post('security/devices/{device}/trust', [SecurityController::class, 'trustDevice']);
+        Route::delete('security/devices/{device}', [SecurityController::class, 'revokeDevice']);
     });
 
     Route::middleware('auth:sanctum')->prefix('admin')->group(function (): void {
@@ -138,6 +145,20 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware(['auth:sanctum', 'permission:activity.view'])->get('admin/activity-logs', [AdminController::class, 'activity']);
     Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->get('admin/system/health', [SystemHealthController::class, 'index']);
     Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->post('admin/system/cache/clear', [SystemHealthController::class, 'clearCache']);
+    Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->prefix('admin/operations')->group(function (): void {
+        Route::get('metrics', [OperationsController::class, 'metrics']);
+        Route::get('queues', [OperationsController::class, 'queues']);
+        Route::get('scheduler', [OperationsController::class, 'scheduler']);
+        Route::get('audits', [OperationsController::class, 'audits']);
+        Route::get('security-events', [OperationsController::class, 'securityEvents']);
+        Route::get('backups', [OperationsController::class, 'backups']);
+        Route::post('backups/run', [OperationsController::class, 'runBackup']);
+        Route::get('feature-flags', [OperationsController::class, 'featureFlags']);
+        Route::patch('feature-flags/{featureFlag}', [OperationsController::class, 'updateFeatureFlag']);
+        Route::get('webhooks', [OperationsController::class, 'webhooks']);
+        Route::match(['get', 'post'], 'maintenance', [OperationsController::class, 'maintenance']);
+        Route::match(['get', 'post'], 'cache', [OperationsController::class, 'cache']);
+    });
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('analytics/events', [BusinessIntelligenceController::class, 'event']);
@@ -181,7 +202,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('wardrobe/recommendations', [CreatorController::class, 'wardrobeRecommendations']);
         Route::put('wardrobe/{item}', [CreatorController::class, 'updateWardrobe']);
         Route::delete('wardrobe/{item}', [CreatorController::class, 'destroyWardrobe']);
-        Route::post('media/images', [CreatorController::class, 'upload']);
+        Route::post('media/images', [CreatorController::class, 'upload'])->middleware('throttle:uploads');
         Route::post('visual-searches', [CreatorController::class, 'visualSearch']);
         Route::get('visual-searches', [CreatorController::class, 'visualHistory']);
         Route::get('community/posts', [CommunityController::class, 'index']);
@@ -243,4 +264,10 @@ Route::prefix('v1')->group(function (): void {
         Route::patch('notifications/{notification}', [NotificationController::class, 'update']);
         Route::post('notifications/read-all', [NotificationController::class, 'markAllRead']);
     });
+});
+
+Route::prefix('v1/webhooks')->middleware('throttle:webhooks')->group(function (): void {
+    Route::post('stripe', [WebhookController::class, 'stripe']);
+    Route::post('cloudinary', [WebhookController::class, 'cloudinary']);
+    Route::post('shipping', [WebhookController::class, 'shipping']);
 });

@@ -2,15 +2,23 @@
 
 namespace App\Services\Media;
 
+use App\Services\Enterprise\FileManagementService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 final class CloudinaryUploadService
 {
-    /** @return array{url:string,public_id:string} */
-    public function upload(UploadedFile $file, string $folder): array
+    public function __construct(private readonly FileManagementService $files)
     {
+    }
+
+    /** @return array{url:string,public_id:string} */
+    public function upload(UploadedFile $file, string $folder, ?int $userId = null): array
+    {
+        $this->files->validateUpload($file);
+        $this->files->virusScanHook($file);
+
         $config = config('services.cloudinary');
         if (empty($config['cloud_name']) || empty($config['api_key']) || empty($config['api_secret'])) {
             throw new RuntimeException('Cloudinary uploads are not configured.');
@@ -23,6 +31,15 @@ final class CloudinaryUploadService
             throw new RuntimeException('Cloudinary upload failed.');
         }
 
-        return ['url' => $response->json('secure_url'), 'public_id' => $response->json('public_id')];
+        $result = ['url' => $response->json('secure_url'), 'public_id' => $response->json('public_id')];
+        if ($userId) {
+            $this->files->registerAsset($userId, $result['url'], $result['public_id'], $file, [
+                'folder' => $folder,
+                'bytes' => $response->json('bytes'),
+                'format' => $response->json('format'),
+            ]);
+        }
+
+        return $result;
     }
 }

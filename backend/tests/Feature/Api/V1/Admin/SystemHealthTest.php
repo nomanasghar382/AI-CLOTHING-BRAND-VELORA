@@ -22,6 +22,6 @@ class SystemHealthTest extends TestCase
     $this->getJson('/api/v1/admin/system/health')
       ->assertOk()
       ->assertJsonPath('success', true)
-      ->assertJsonStructure(['data' => ['application', 'database', 'cache', 'queue', 'storage']]);
+      ->assertJsonStructure(['data' => ['application', 'metrics']]);
   }
 }

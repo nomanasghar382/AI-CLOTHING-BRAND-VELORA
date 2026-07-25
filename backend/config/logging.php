@@ -127,6 +127,19 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'auth' => ['driver' => 'daily', 'path' => storage_path('logs/auth.log'), 'level' => 'info', 'days' => 14, 'replace_placeholders' => true],
+        'payments' => ['driver' => 'daily', 'path' => storage_path('logs/payments.log'), 'level' => 'info', 'days' => 30, 'replace_placeholders' => true],
+        'orders' => ['driver' => 'daily', 'path' => storage_path('logs/orders.log'), 'level' => 'info', 'days' => 30, 'replace_placeholders' => true],
+        'ai' => ['driver' => 'daily', 'path' => storage_path('logs/ai.log'), 'level' => 'info', 'days' => 14, 'replace_placeholders' => true],
+        'security' => ['driver' => 'daily', 'path' => storage_path('logs/security.log'), 'level' => 'warning', 'days' => 30, 'replace_placeholders' => true],
+        'uploads' => ['driver' => 'daily', 'path' => storage_path('logs/uploads.log'), 'level' => 'info', 'days' => 14, 'replace_placeholders' => true],
+        'notifications' => ['driver' => 'daily', 'path' => storage_path('logs/notifications.log'), 'level' => 'info', 'days' => 14, 'replace_placeholders' => true],
+        'email' => ['driver' => 'daily', 'path' => storage_path('logs/email.log'), 'level' => 'info', 'days' => 14, 'replace_placeholders' => true],
+        'queues' => ['driver' => 'daily', 'path' => storage_path('logs/queues.log'), 'level' => 'info', 'days' => 14, 'replace_placeholders' => true],
+        'scheduler' => ['driver' => 'daily', 'path' => storage_path('logs/scheduler.log'), 'level' => 'info', 'days' => 14, 'replace_placeholders' => true],
+        'webhooks' => ['driver' => 'daily', 'path' => storage_path('logs/webhooks.log'), 'level' => 'info', 'days' => 30, 'replace_placeholders' => true],
+        'performance' => ['driver' => 'daily', 'path' => storage_path('logs/performance.log'), 'level' => 'warning', 'days' => 14, 'replace_placeholders' => true],
+
     ],
 
 ];

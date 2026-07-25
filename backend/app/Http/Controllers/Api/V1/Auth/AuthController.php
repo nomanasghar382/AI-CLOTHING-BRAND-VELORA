@@ -34,7 +34,7 @@ final class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $result = $this->authentication->login($request->validated());
+        $result = $this->authentication->login($request->validated(), $request);
 
         return $this->success([
             'user' => new UserResource($result['user']),
@@ -66,7 +66,7 @@ final class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $this->authentication->logout($request->user());
+        $this->authentication->logout($request->user(), $request);
 
         return $this->success(null, 'Logout successful.');
     }
@@ -85,8 +85,7 @@ final class AuthController extends Controller
 
     public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
-        $request->user()->update(['password' => Hash::make($request->string('password')->toString())]);
-        $request->user()->tokens()->delete();
+        $this->authentication->rotatePassword($request->user(), $request->string('password')->toString());
 
         return $this->success(null, 'Password changed. Please sign in again.');
     }
