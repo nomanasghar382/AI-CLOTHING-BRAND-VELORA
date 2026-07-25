@@ -4,6 +4,7 @@ import useCart from '../../hooks/useCart'
 import useCommunity from '../../hooks/useCommunity'
 import { communityService } from '../../services/communityService'
 import LookCard from '../../components/community/LookCard'
+import { modestFashionImage } from '../../constants/modestFashionImages'
 
 export function ShopTheLookPage() {
   const [products, setProducts] = useState([]); const [notice, setNotice] = useState('')
@@ -16,7 +17,7 @@ export function ShopTheLookPage() {
     for (const product of products) { try { await addItem({ product_id: product.id, quantity: 1 }) } catch { setNotice('Sign in to add the look to your bag.'); return } }
     setNotice('The complete look is in your bag.')
   }
-  return <section className="container py-5 feature-page"><div className="row g-4"><div className="col-lg-5"><img className="shop-look-image" src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1000&q=80" alt="After-hours linen look" /></div><div className="col-lg-7"><p className="eyebrow">SHOP THE LOOK</p><h1>After-hours linen</h1><p className="text-slate-300">A study in relaxed structure from Amara’s summer edit. Pick individual pieces or add the full look.</p>{notice && <div className="ai-server-notice">{notice}</div>}<div className="d-grid gap-2 my-4">{products.map((product) => <div className="look-product velora-card p-2" key={product.id}><img src={product.image} alt={product.name} /><div><p className="eyebrow mb-1">{product.brand}</p><strong>{product.name}</strong><small>${product.price}</small></div><button className="btn btn-velora-secondary" onClick={() => add(product)}>Add</button></div>)}</div><button className="btn btn-velora-primary w-100" onClick={addAll}><FiShoppingBag /> Add complete look · $316</button></div></div></section>
+  return <section className="container py-5 feature-page"><div className="row g-4"><div className="col-lg-5"><img className="shop-look-image" src={modestFashionImage(0, 1000)} alt="Modest layered look" /></div><div className="col-lg-7"><p className="eyebrow">SHOP THE LOOK</p><h1>After-hours linen</h1><p className="text-slate-300">A study in relaxed structure from Amara’s summer edit. Pick individual pieces or add the full look.</p>{notice && <div className="ai-server-notice">{notice}</div>}<div className="d-grid gap-2 my-4">{products.map((product) => <div className="look-product velora-card p-2" key={product.id}><img src={product.image} alt={product.name} /><div><p className="eyebrow mb-1">{product.brand}</p><strong>{product.name}</strong><small>${product.price}</small></div><button className="btn btn-velora-secondary" onClick={() => add(product)}>Add</button></div>)}</div><button className="btn btn-velora-primary w-100" onClick={addAll}><FiShoppingBag /> Add complete look · $316</button></div></div></section>
 }
 
 export function SavedLooksPage() {

@@ -9,20 +9,20 @@ use Illuminate\Support\Str;
 
 class CatalogSeeder extends Seeder
 {
-    /** @var list<string> */
+    /** @var list<string> Modest / Islamic fashion — fully covered models and apparel */
     private const DEMO_IMAGE_URLS = [
-        'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1506629905607-d405b7a30db6?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1483985988355-763728e3685b?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=900&q=80',
-        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1770964211782-013475eacc3f?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1561442748-c50715dc32f6?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1770367358711-b42cf1a6c2b1?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1750190321796-c749877df841?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1560350530-a12ec1414cf5?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1752794674886-fb12817a5e96?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1630735988694-12186aedd73d?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1588594509615-62de3570d696?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1771162766051-c330f1d664ea?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1545266241-3516e2a6e016?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1585728748176-455ac5eed962?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1542380841-5eef57349ca1?auto=format&fit=crop&w=900&q=80',
     ];
 
     /**
