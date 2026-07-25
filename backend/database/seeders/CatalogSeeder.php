@@ -80,7 +80,8 @@ class CatalogSeeder extends Seeder
             $categoryPool = $isMen ? $menCategories : $womenCategories;
             $coverage = $gender === 'women' ? 'Full' : ['Full', 'Modest', 'Layered'][$i % 3];
 
-            $product = Product::query()->updateOrCreate(['slug' => Str::slug($name)], [
+            $product = Product::query()->updateOrCreate(['sku' => "VLR-{$i}"], [
+                'slug' => Str::slug($name),
                 'name' => $name,
                 'short_description' => "A refined {$prefix} for every day.",
                 'description' => "Made for comfort and confidence, this {$prefix} offers complete modest coverage with contemporary Islamic styling.",
