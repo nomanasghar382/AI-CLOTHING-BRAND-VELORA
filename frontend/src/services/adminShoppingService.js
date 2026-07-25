@@ -2,6 +2,8 @@ import apiClient from './apiClient'
 
 export const adminShoppingService = {
   dashboard: () => apiClient.get('/admin/dashboard'),
+  workspace: () => apiClient.get('/admin/workspace'),
+  globalSearch: (q, params) => apiClient.get('/admin/search', { params: { q, ...params } }),
   analytics: (params) => apiClient.get('/admin/analytics', { params }),
   reportCsv: (report, params) => apiClient.get(`/admin/reports/${report}/csv`, { params, responseType: 'blob' }),
   products: (params) => apiClient.get('/admin/products', { params }),

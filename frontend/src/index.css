@@ -127,3 +127,18 @@ h1,h2,h3,h4,h5,h6,.display-hero,.display-ai,.admin-topbar h1,.admin-chart h2,.ad
 html { font-size:100%; }
 @media (min-width: 1200px) { html { font-size:106.25%; } }
 :focus-visible { outline:2px solid #a34b3c; outline-offset:2px; }
+.admin-command-backdrop { position:fixed; inset:0; z-index:80; display:grid; place-items:start center; padding:8vh 1rem 1rem; background:rgba(24,18,14,.55); backdrop-filter:blur(4px); }
+.admin-command-palette { width:min(720px, 100%); max-height:min(70vh, 640px); overflow:hidden; background:#fffdfa; border:1px solid #e4d9ce; border-radius:1rem; box-shadow:0 24px 60px rgba(40,24,14,.22); }
+.admin-command-search { display:flex; align-items:center; gap:.75rem; padding:1rem 1.1rem; border-bottom:1px solid #ece1d5; }
+.admin-command-search input { flex:1; min-width:0; color:#35271f; background:transparent; border:0; outline:0; font-size:1rem; }
+.admin-command-search kbd { display:inline-flex; align-items:center; gap:.25rem; padding:.2rem .45rem; color:#8d7d70; background:#f6efe6; border:1px solid #e7dccf; border-radius:.35rem; font-size:.68rem; }
+.admin-command-body { max-height:calc(70vh - 72px); overflow:auto; padding:.5rem; }
+.admin-command-group { padding:.35rem .25rem .75rem; }
+.admin-command-group .admin-kicker { margin:.35rem .5rem .55rem; }
+.admin-command-item,.admin-command-static { display:flex; align-items:center; justify-content:space-between; gap:.75rem; width:100%; padding:.7rem .75rem; color:#3a291f; background:transparent; border:0; border-radius:.65rem; text-align:left; }
+.admin-command-item:hover,.admin-command-item:focus { background:#f8efe6; }
+.admin-command-item span,.admin-command-static span { display:grid; gap:.15rem; }
+.admin-command-item small,.admin-command-static small { color:#8d7d70; font-size:.72rem; }
+.admin-command-item em { color:#a34b3c; font-size:.68rem; font-style:normal; text-transform:uppercase; letter-spacing:.08em; }
+.admin-command-meta { margin:.75rem; color:#8d7d70; font-size:.8rem; }
+.admin-settings-link-button { display:flex; align-items:center; gap:12px; width:100%; min-height:82px; padding:14px; color:#6d4c2a; background:#fcf8f1; border:1px solid #ebdfce; border-radius:8px; text-align:left; }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import { FiArrowUpRight, FiBox, FiCheckCircle, FiDollarSign, FiFileText, FiGlobe, FiPackage, FiPlus, FiShoppingBag } from 'react-icons/fi'
+import { Link, useLocation } from 'react-router-dom'
+import { FiActivity, FiArrowUpRight, FiBox, FiCheckCircle, FiDollarSign, FiFileText, FiGlobe, FiPackage, FiPlus, FiShoppingBag, FiZap } from 'react-icons/fi'
 import AdminDataTable from '../../components/admin/AdminDataTable'
 import AdminExportButton from '../../components/admin/AdminExportButton'
 import AdminFilters from '../../components/admin/AdminFilters'
@@ -57,15 +57,47 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   </form></AdminModal>
 }
 
-function Dashboard({ orders, products, coupons, payments }) {
+function Dashboard({ orders, products, coupons, payments, workspace }) {
   const revenue = orders.reduce((total, order) => total + Number(order.grand_total || 0), 0)
   const paid = payments.filter((payment) => payment.status === 'paid').length
-  return <><section className="admin-metrics">
-    <Metric icon={FiDollarSign} label="Gross revenue" value={money(revenue)} change={`${orders.length} recent orders`} tone="violet" />
-    <Metric icon={FiShoppingBag} label="Orders" value={orders.length} change={`${orders.filter((order) => order.status === 'pending').length} awaiting action`} tone="gold" />
-    <Metric icon={FiBox} label="Catalog items" value={products.length} change={`${products.filter((product) => product.status === 'published').length} published`} tone="blue" />
-    <Metric icon={FiCheckCircle} label="Captured payments" value={paid} change={`${coupons.length} active offers`} tone="green" />
-  </section><div className="admin-dashboard-grid"><RevenueChart orders={orders} /><section className="admin-panel"><div className="admin-panel-head"><div><p className="admin-kicker">FULFILMENT</p><h2>Recent orders</h2></div></div><OrderTable rows={orders.slice(0, 5)} /></section></div></>
+  const quickActions = workspace?.quick_actions || []
+  const recentActivity = workspace?.recent_activity || []
+  const pinned = workspace?.pinned_dashboards || []
+  return <>
+    <section className="admin-metrics">
+      <Metric icon={FiDollarSign} label="Gross revenue" value={money(revenue)} change={`${orders.length} recent orders`} tone="violet" />
+      <Metric icon={FiShoppingBag} label="Orders" value={orders.length} change={`${orders.filter((order) => order.status === 'pending').length} awaiting action`} tone="gold" />
+      <Metric icon={FiBox} label="Catalog items" value={products.length} change={`${products.filter((product) => product.status === 'published').length} published`} tone="blue" />
+      <Metric icon={FiCheckCircle} label="Captured payments" value={paid} change={`${coupons.length} active offers`} tone="green" />
+    </section>
+    <div className="admin-dashboard-grid">
+      <RevenueChart orders={orders} />
+      <section className="admin-panel">
+        <div className="admin-panel-head"><div><p className="admin-kicker">FULFILMENT</p><h2>Recent orders</h2></div></div>
+        <OrderTable rows={orders.slice(0, 5)} />
+      </section>
+    </div>
+    <div className="admin-dashboard-grid mt-4">
+      <section className="admin-panel">
+        <div className="admin-panel-head"><div><p className="admin-kicker">QUICK ACTIONS</p><h2>Command shortcuts</h2></div><FiZap /></div>
+        <div className="admin-settings-links">
+          {quickActions.map((action) => action.href
+            ? <Link key={action.id} to={action.href}><FiArrowUpRight /><span><strong>{action.label}</strong><small>Shortcut {action.shortcut || '—'}</small></span></Link>
+            : <button key={action.id} className="admin-settings-link-button" type="button"><FiZap /><span><strong>{action.label}</strong><small>Runtime action</small></span></button>)}
+        </div>
+      </section>
+      <section className="admin-panel">
+        <div className="admin-panel-head"><div><p className="admin-kicker">PINNED DASHBOARDS</p><h2>Favorites</h2></div></div>
+        <div className="admin-settings-links">
+          {pinned.map((item) => <Link key={item.id} to={item.href}><FiActivity /><span><strong>{item.label}</strong><small>Open dashboard</small></span><FiArrowUpRight /></Link>)}
+        </div>
+      </section>
+    </div>
+    {recentActivity.length > 0 && <section className="admin-panel mt-4">
+      <div className="admin-panel-head"><div><p className="admin-kicker">RECENT ACTIVITY</p><h2>Latest admin events</h2></div><Link className="admin-text-button" to="/admin/activity">View all</Link></div>
+      <AdminDataTable columns={[{ label: 'Event', key: 'event' }, { label: 'Actor', render: (row) => row.actor?.name || 'System' }, { label: 'When', render: (row) => new Date(row.created_at).toLocaleString() }]} rows={recentActivity} emptyMessage="No recent activity." />
+    </section>}
+  </>
 }
 
 function OrderTable({ rows, onSelect }) {
@@ -184,10 +216,10 @@ export default function AdminPanel() {
   const location = useLocation(); const slug = location.pathname.replace('/admin', '').replace(/^\//, '')
   const [open, setOpen] = useState(false); const [loading, setLoading] = useState(true); const [error, setError] = useState('')
   const [clearing, setClearing] = useState(false)
-  const [data, setData] = useState({ orders: [], products: [], coupons: [], payments: [], categories: [], analytics: null, health: null, operations: null })
+  const [data, setData] = useState({ orders: [], products: [], coupons: [], payments: [], categories: [], analytics: null, health: null, operations: null, workspace: null })
   const load = async () => {
     setLoading(true); setError('')
-    const results = await Promise.allSettled([api.orders({ per_page: 20 }), api.products({ per_page: 20 }), api.coupons({ per_page: 20 }), api.payments({ per_page: 20 }), catalogService.categories(), api.analytics(), api.systemHealth(), api.operationsMetrics(), api.operationsQueues(), api.operationsScheduler(), api.operationsBackups(), api.featureFlags(), api.operationsWebhooks()])
+    const results = await Promise.allSettled([api.orders({ per_page: 20 }), api.products({ per_page: 20 }), api.coupons({ per_page: 20 }), api.payments({ per_page: 20 }), catalogService.categories(), api.analytics(), api.systemHealth(), api.operationsMetrics(), api.operationsQueues(), api.operationsScheduler(), api.operationsBackups(), api.featureFlags(), api.operationsWebhooks(), api.workspace()])
     const [orders, products, coupons, payments] = results.map((result) => result.status === 'fulfilled' ? extract(result.value) : { data: [] })
     if (results.some((result, index) => index < 4 && result.status === 'rejected')) setError('Some live operational records could not be loaded. Check the current role and API connection.')
     const categoryResult = results[4]?.status === 'fulfilled' ? extract(results[4].value) : { data: [] }
@@ -201,7 +233,7 @@ export default function AdminPanel() {
       flags: results[11]?.status === 'fulfilled' ? results[11].value.data.data : null,
       webhooks: results[12]?.status === 'fulfilled' ? results[12].value.data.data : null,
     }
-    setData({ orders: orders.data, products: products.data, coupons: coupons.data, payments: payments.data, categories: categoryResult.data, analytics, health, operations }); setLoading(false)
+    setData({ orders: orders.data, products: products.data, coupons: coupons.data, payments: payments.data, categories: categoryResult.data, analytics, health, operations, workspace: results[13]?.status === 'fulfilled' ? results[13].value.data.data : null }); setLoading(false)
   }
   const runBackup = async () => { await api.runBackup(); await load() }
   const toggleFlag = async (flag) => { await api.updateFeatureFlag(flag.id, !flag.enabled); await load() }

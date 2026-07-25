@@ -25,5 +25,9 @@ class DatabaseSeeder extends Seeder
             SearchSynonymSeeder::class,
             FeatureFlagSeeder::class,
         ]);
+
+        if (config('velora.demo_mode')) {
+            $this->call(DemoEnvironmentSeeder::class);
+        }
     }
 }

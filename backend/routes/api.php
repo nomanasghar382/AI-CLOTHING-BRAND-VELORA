@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\AdminController;
+use App\Http\Controllers\Api\V1\Admin\AdminSearchController;
 use App\Http\Controllers\Api\V1\Admin\OperationsController;
 use App\Http\Controllers\Api\V1\Admin\SystemHealthController;
 use App\Http\Controllers\Api\V1\Admin\BusinessIntelligenceController;
@@ -98,6 +99,8 @@ Route::prefix('v1')->middleware(['api.version:v1', 'throttle:api'])->group(funct
     Route::middleware(['auth:sanctum', 'permission:dashboard.view'])->prefix('admin')->group(function (): void {
         Route::get('dashboard', [AdminController::class, 'dashboard']);
         Route::get('analytics', [AdminController::class, 'analytics']);
+        Route::get('workspace', [AdminController::class, 'workspace']);
+        Route::get('search', AdminSearchController::class)->middleware('permission:content.view');
     });
 
     Route::middleware(['auth:sanctum', 'role:super-admin,admin', 'permission:bi.view'])->prefix('admin/bi')->group(function (): void {

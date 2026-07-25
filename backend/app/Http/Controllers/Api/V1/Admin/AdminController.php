@@ -48,6 +48,36 @@ final class AdminController extends Controller
             ],
             'recent_orders' => Order::query()->with('user:id,name,email')->latest()->limit(5)->get(),
             'low_stock_products' => Product::query()->whereColumn('stock_quantity', '<=', 'minimum_stock')->orderBy('stock_quantity')->limit(5)->get(['id', 'name', 'sku', 'stock_quantity', 'minimum_stock']),
+            'release' => [
+                'version' => config('velora.release.version'),
+                'demo_mode' => config('velora.demo_mode'),
+            ],
+        ]);
+    }
+
+    public function workspace(Request $request): JsonResponse
+    {
+        return $this->success([
+            'quick_actions' => [
+                ['id' => 'add-product', 'label' => 'Add product', 'href' => '/admin/products', 'shortcut' => 'P'],
+                ['id' => 'view-orders', 'label' => 'Review orders', 'href' => '/admin/orders', 'shortcut' => 'O'],
+                ['id' => 'export-reports', 'label' => 'Export reports', 'href' => '/admin/reports', 'shortcut' => 'R'],
+                ['id' => 'system-health', 'label' => 'System health', 'href' => '/admin/system', 'shortcut' => 'H'],
+                ['id' => 'operations', 'label' => 'Operations center', 'href' => '/admin/operations', 'shortcut' => 'M'],
+                ['id' => 'clear-cache', 'label' => 'Clear application cache', 'action' => 'clear-cache', 'shortcut' => 'C'],
+            ],
+            'shortcuts' => [
+                ['keys' => ['Meta', 'K'], 'label' => 'Open command palette'],
+                ['keys' => ['G', 'D'], 'label' => 'Go to dashboard'],
+                ['keys' => ['G', 'O'], 'label' => 'Go to orders'],
+                ['keys' => ['G', 'P'], 'label' => 'Go to products'],
+            ],
+            'pinned_dashboards' => [
+                ['id' => 'commerce', 'label' => 'Commerce overview', 'href' => '/admin'],
+                ['id' => 'analytics', 'label' => 'Analytics', 'href' => '/admin/analytics'],
+                ['id' => 'operations', 'label' => 'Operations', 'href' => '/admin/operations'],
+            ],
+            'recent_activity' => ActivityLog::query()->with('actor:id,name,email')->latest()->limit(8)->get(),
         ]);
     }
 

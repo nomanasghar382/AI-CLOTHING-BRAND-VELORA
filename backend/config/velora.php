@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'demo_mode' => (bool) env('VELORA_DEMO_MODE', false),
+    'release' => [
+        'version' => env('VELORA_RELEASE_VERSION', '1.0.0-rc.1'),
+        'codename' => 'Release Candidate',
+    ],
     'security' => [
         'csp' => env('VELORA_CSP', "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; connect-src 'self' ".env('FRONTEND_URL', 'http://localhost:5173').' '.env('APP_URL', 'http://localhost:8000').'; frame-ancestors \'none\'; base-uri \'self\'; form-action \'self\''),
         'hsts_max_age' => (int) env('VELORA_HSTS_MAX_AGE', 31536000),
