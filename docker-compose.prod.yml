@@ -1,0 +1,7 @@
+services:
+  nginx:
+  php:
+  queue:
+  scheduler:
+  mysql:
+  redis:

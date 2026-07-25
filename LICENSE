@@ -1,0 +1,20 @@
+VELORA Platform License
+
+Copyright (c) 2026 VELORA
+
+All rights reserved.
+
+Permission is granted to view, evaluate, and demonstrate this software for
+educational, academic, and portfolio purposes, including university project
+submission and non-commercial technical review.
+
+Restrictions:
+
+1. Commercial use, redistribution, or sublicensing requires prior written
+   permission from the copyright holder.
+2. The software is provided "as is", without warranty of any kind.
+3. Integration secrets (API keys, credentials) must remain in server-side
+   configuration only and must never be committed to version control.
+
+For licensing inquiries, contact the project maintainer via the GitHub
+repository issue tracker.
