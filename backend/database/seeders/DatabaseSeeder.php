@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             AdminDomainSeeder::class,
             InternationalCommerceSeeder::class,
             LoyaltyPassportSeeder::class,
+            SearchSynonymSeeder::class,
         ]);
     }
 }

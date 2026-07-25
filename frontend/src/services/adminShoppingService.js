@@ -25,4 +25,6 @@ export const adminShoppingService = {
   refund: (id, amount) => apiClient.post(`/admin/payments/${id}/refund`, { amount }),
   returns: (params) => apiClient.get('/admin/returns', { params }),
   updateReturn: (id, payload) => apiClient.patch(`/admin/returns/${id}`, payload),
+  systemHealth: () => apiClient.get('/admin/system/health'),
+  clearCache: () => apiClient.post('/admin/system/cache/clear'),
 }

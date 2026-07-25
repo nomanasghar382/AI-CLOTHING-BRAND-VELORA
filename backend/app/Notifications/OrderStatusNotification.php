@@ -15,7 +15,27 @@ final class OrderStatusNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    public function toArray(object $notifiable): array
+    {
+        $labels = [
+            'order' => 'Order received',
+            'payment' => 'Payment received',
+            'shipped' => 'Order shipped',
+            'delivered' => 'Order delivered',
+            'cancelled' => 'Order cancelled',
+            'refunded' => 'Order refunded',
+        ];
+
+        return [
+            'title' => $labels[$this->event] ?? 'Order update',
+            'body' => ($labels[$this->event] ?? 'Order update')." for order {$this->order->number}.",
+            'order_id' => $this->order->id,
+            'order_number' => $this->order->number,
+            'event' => $this->event,
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

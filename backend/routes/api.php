@@ -1,14 +1,17 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\AdminController;
+use App\Http\Controllers\Api\V1\Admin\SystemHealthController;
 use App\Http\Controllers\Api\V1\Admin\BusinessIntelligenceController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Catalog\AdminCatalogController;
 use App\Http\Controllers\Api\V1\Catalog\CatalogController;
+use App\Http\Controllers\Api\V1\Catalog\SearchController;
 use App\Http\Controllers\Api\V1\Community\CommunityController;
 use App\Http\Controllers\Api\V1\Creator\CreatorController;
 use App\Http\Controllers\Api\V1\Loyalty\LoyaltyController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Shopping\AdminShoppingController;
 use App\Http\Controllers\Api\V1\Shopping\CartController;
 use App\Http\Controllers\Api\V1\Shopping\InternationalCommerceController;
@@ -23,6 +26,8 @@ Route::prefix('v1')->group(function (): void {
     Route::get('products/{product:slug}', [CatalogController::class, 'show'])->name('products.show');
     Route::get('categories', [CatalogController::class, 'categories']);
     Route::get('catalog/filters', [CatalogController::class, 'filters']);
+    Route::get('search', [SearchController::class, 'index']);
+    Route::get('search/suggestions', [SearchController::class, 'suggestions']);
     Route::prefix('auth')->middleware('throttle:auth')->group(function (): void {
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
@@ -131,6 +136,8 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware(['auth:sanctum', 'permission:notifications.view'])->get('admin/notifications', [AdminController::class, 'notifications']);
     Route::middleware(['auth:sanctum', 'permission:notifications.manage'])->post('admin/notifications', [AdminController::class, 'storeNotification']);
     Route::middleware(['auth:sanctum', 'permission:activity.view'])->get('admin/activity-logs', [AdminController::class, 'activity']);
+    Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->get('admin/system/health', [SystemHealthController::class, 'index']);
+    Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->post('admin/system/cache/clear', [SystemHealthController::class, 'clearCache']);
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('analytics/events', [BusinessIntelligenceController::class, 'event']);
@@ -219,6 +226,9 @@ Route::prefix('v1')->group(function (): void {
         Route::post('style/saved-outfits', [StyleController::class, 'saveOutfit']);
         Route::post('style/feedback', [StyleController::class, 'feedback']);
         Route::get('loyalty/wallet', [LoyaltyController::class, 'wallet']);
+        Route::get('loyalty/overview', [LoyaltyController::class, 'overview']);
+        Route::get('loyalty/rewards', [LoyaltyController::class, 'rewards']);
+        Route::get('loyalty/achievements', [LoyaltyController::class, 'achievements']);
         Route::get('loyalty/referral-code', [LoyaltyController::class, 'referralCode']);
         Route::post('loyalty/referrals', [LoyaltyController::class, 'applyReferral']);
         Route::get('loyalty/preferences', [LoyaltyController::class, 'preferences']);
@@ -229,5 +239,8 @@ Route::prefix('v1')->group(function (): void {
         Route::post('loyalty/gift-cards', [LoyaltyController::class, 'giftCard']);
         Route::post('loyalty/gift-cards/redeem', [LoyaltyController::class, 'redeemGiftCard']);
         Route::get('products/{product}/ethical-passport', [LoyaltyController::class, 'passport']);
+        Route::get('notifications', [NotificationController::class, 'index']);
+        Route::patch('notifications/{notification}', [NotificationController::class, 'update']);
+        Route::post('notifications/read-all', [NotificationController::class, 'markAllRead']);
     });
 });

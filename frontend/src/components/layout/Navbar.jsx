@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { FiBell, FiHeart, FiMenu, FiShoppingBag, FiStar, FiUser, FiX } from 'react-icons/fi'
+import { FiHeart, FiMenu, FiShoppingBag, FiStar, FiUser, FiX } from 'react-icons/fi'
 import useAuth from '../../hooks/useAuth'
 import useCart from '../../hooks/useCart'
 import useWishlist from '../../hooks/useWishlist'
 import MarketSelector from '../international/MarketSelector'
+import NotificationCenter from '../notifications/NotificationCenter'
 
 const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Marketplace', to: '/marketplace' }, { label: 'Community', to: '/community' }, { label: 'Catalog', to: '/catalog' }, { label: 'Global services', to: '/international' }, { label: 'Our Vision', to: '/about' }]
 
@@ -29,7 +30,7 @@ export default function Navbar() {
             <>
               <Link className="nav-link-velora" to="/ai">AI stylist</Link>
               <Link className="nav-link-velora" to="/wardrobe">Wardrobe</Link>
-              <Link className="nav-icon-link" to="/notifications" aria-label="Notifications"><FiBell /></Link>
+              <NotificationCenter />
               <Link className="nav-link-velora" to="/rewards"><FiStar /> Rewards</Link>
               <span className="small text-slate-300">Hello, {user?.first_name || user?.name}</span>
               <button type="button" className="btn btn-link nav-link-velora p-0" onClick={signOut}>Sign out</button>

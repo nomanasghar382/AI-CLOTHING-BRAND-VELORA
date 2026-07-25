@@ -33,6 +33,42 @@ final class LoyaltyController extends Controller
         return $this->success(new LoyaltyWalletResource($this->loyalty->wallet($request->user())->load(['transactions' => fn ($q) => $q->latest()->limit(50)])));
     }
 
+    public function overview(Request $request): JsonResponse
+    {
+        $wallet = $this->loyalty->wallet($request->user());
+        $tier = collect(config('velora.vip_tiers'))->sortByDesc('threshold')->first(fn ($tier) => $wallet->points_balance >= $tier['threshold']);
+
+        return $this->success([
+            'points_balance' => $wallet->points_balance,
+            'store_credit_balance' => $wallet->store_credit_balance,
+            'tier' => $tier['label'] ?? ucfirst($wallet->vip_tier),
+            'vip_tier' => $wallet->vip_tier,
+        ]);
+    }
+
+    public function rewards(): JsonResponse
+    {
+        return $this->success(config('velora.rewards'));
+    }
+
+    public function achievements(Request $request): JsonResponse
+    {
+        $wallet = $this->loyalty->wallet($request->user());
+        $achievements = collect(config('velora.achievements'))->map(function (array $achievement) use ($wallet) {
+            $progress = match ($achievement['id']) {
+                3 => min(100, (int) round(($wallet->points_balance / 500) * 100)),
+                default => $achievement['progress'],
+            };
+
+            return $achievement + [
+                'progress' => $progress,
+                'earned_at' => $progress >= 100 ? now()->toIso8601String() : null,
+            ];
+        });
+
+        return $this->success($achievements);
+    }
+
     public function referralCode(Request $request): JsonResponse
     {
         return $this->success(['code' => $this->loyalty->referralCode($request->user())->code]);

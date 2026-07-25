@@ -1,18 +1,28 @@
 # VELORA
 
-**Style, Intelligently Yours.** A production-oriented foundation for an AI-powered global modest-fashion marketplace.
+**Style, Intelligently Yours.** Production-ready AI-powered global modest-fashion marketplace.
 
-## Architecture
+## Stack
 
-```text
-frontend/  React + Vite + Bootstrap 5
-     ↓ REST / JSON
-backend/   Laravel 12 + Sanctum
-     ↓
-MySQL
-```
+| Layer | Technology |
+| --- | --- |
+| Frontend | React 19, Vite, Bootstrap 5, Framer Motion, PWA |
+| Backend | Laravel 12, Sanctum, REST API |
+| Database | MySQL 8 |
+| Media | Cloudinary (server-side only) |
+| Cache / Queue | Redis-ready (file/database drivers supported locally) |
 
-The current release intentionally includes only the core platform foundation: authentication, role-based access, API conventions, responsive UI primitives, layouts, and routing. Commerce, AI, payments, orders, dashboards, and analytics are deliberately excluded.
+## Platform modules
+
+- Authentication and role-based access (customer, creator, supplier, admin)
+- Product catalog with instant search, advanced filters and SEO
+- Shopping (cart, wishlist, checkout, orders, coupons, returns)
+- AI fashion engine (quiz, stylist chat, recommendations)
+- Enterprise admin, supplier portal, creator commerce
+- Community, wardrobe, visual search
+- International commerce, loyalty, ethical passport
+- Business intelligence and trend forecasting
+- Production optimization (PWA, performance, accessibility, notifications)
 
 ## Prerequisites
 
@@ -21,7 +31,9 @@ The current release intentionally includes only the core platform foundation: au
 - Composer 2+
 - MySQL 8+
 
-## Backend setup
+## Installation
+
+### Backend
 
 ```bash
 cd backend
@@ -32,16 +44,9 @@ php artisan migrate --seed
 php artisan serve
 ```
 
-Create a MySQL database called `velora` and set the `DB_*` values in `backend/.env` before running migrations.
+Create a MySQL database named `velora` and configure `DB_*` in `backend/.env`.
 
-Seeded accounts use password `VeloraDemo!2026`:
-
-- `admin@velora.test` — Super Admin
-- `customer@velora.test` — Customer
-- `creator@velora.test` — Creator
-- `supplier@velora.test` — Supplier
-
-## Frontend setup
+### Frontend
 
 ```bash
 cd frontend
@@ -50,7 +55,19 @@ npm install
 npm run dev
 ```
 
-The frontend is available at `http://localhost:5173` and calls Laravel at `http://localhost:8000/api/v1`.
+Frontend: `http://localhost:5173`  
+API: `http://localhost:8000/api/v1`
+
+## Demo accounts
+
+Password: `VeloraDemo!2026`
+
+| Email | Role |
+| --- | --- |
+| admin@velora.test | Super Admin |
+| customer@velora.test | Customer |
+| creator@velora.test | Creator |
+| supplier@velora.test | Supplier |
 
 ## Validation
 
@@ -59,46 +76,58 @@ cd backend && php artisan test
 cd frontend && npm run lint && npm run build
 ```
 
-## Backend folders
+## Environment variables
 
-- `app/Contracts` — stable repository contracts
-- `app/Repositories` — Eloquent data access implementations
-- `app/Services` — application business logic
-- `app/Http/Controllers/Api/V1` — versioned API controllers
-- `app/Http/Requests` — request validation
-- `app/Http/Resources` — response transformations
-- `app/Support` and `app/Traits` — standardized API response utilities
+All external credentials are read from `backend/.env` only. Never expose secrets to React.
 
-## Frontend folders
+Key backend variables:
 
-- `src/components` — reusable UI and feedback components
-- `src/layouts` — public and guest shell layouts
-- `src/pages` — route-level screens
-- `src/routes` — route guards and route map
-- `src/context` — global authentication state
-- `src/services` — Axios API clients
-- `src/config` — environment-driven configuration
+| Variable | Purpose |
+| --- | --- |
+| `APP_URL` | Laravel application URL |
+| `FRONTEND_URL` | React app URL for emails and redirects |
+| `DB_*` | MySQL connection |
+| `CACHE_STORE` | `file` locally, `redis` in production |
+| `QUEUE_CONNECTION` | `database` locally, `redis` in production |
+| `OPENAI_API_KEY` | AI stylist (optional) |
+| `STRIPE_*` | Payments (test mode) |
+| `CLOUDINARY_*` | Media uploads |
 
-## API envelope
+Frontend only needs:
 
-All Velora API endpoints return:
+| Variable | Purpose |
+| --- | --- |
+| `VITE_API_BASE_URL` | Laravel API base URL |
 
-```json
-{
-  "success": true,
-  "message": "Request completed successfully.",
-  "data": {},
-  "errors": null,
-  "status": 200,
-  "timestamp": "2026-07-25T10:00:00+00:00"
-}
+## Documentation
+
+- [Developer Guide](docs/DEVELOPER.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
+- [API Overview](docs/API.md)
+- [Maintenance Guide](docs/MAINTENANCE.md)
+
+## Architecture
+
+```text
+frontend/  React SPA + PWA service worker
+     ↓ REST / JSON (Sanctum bearer tokens)
+backend/   Laravel API (controllers → services → repositories)
+     ↓
+MySQL (+ Redis recommended in production)
 ```
 
-## Security baseline
+## Production features
 
-- Laravel Sanctum personal access tokens
-- Hashed passwords with strict password validation
-- Email verification and password reset endpoints
-- Role middleware for Super Admin, Admin, Customer, Creator, and Supplier
-- API validation, rate limiting, CORS configuration, and safe ORM queries
-- Secret values are environment variables; never commit `.env`
+- Progressive Web App with offline fallback, install prompt and app shortcuts
+- Instant search with debouncing, synonyms, analytics and suggestions
+- Advanced catalog filters with saved presets (device-local)
+- Toast notifications and notification center with unread counter
+- WCAG-oriented accessibility (skip links, focus states, reduced motion)
+- Dynamic SEO meta tags, Open Graph, Twitter cards and Schema.org product data
+- Admin system health dashboard with cache management
+- Professional email templates for lifecycle messaging
+- API performance logging with `X-Response-Time` header
+
+## License
+
+Proprietary — VELORA platform source.

@@ -14,7 +14,7 @@ import { PortalBars, PortalExport, PortalFilters, PortalTable } from '../../comp
 
 const money = (value, currency = 'USD') => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(Number(value || 0))
 const statusClass = (status) => `admin-status admin-status-${String(status || '').replaceAll('_', '-')}`
-const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', forecasting: 'Trend forecasting', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', loyalty: 'Loyalty & VIP', 'gift-cards': 'Gift cards', alerts: 'Product alerts', activity: 'Activity logs', settings: 'Settings', international: 'International commerce' }
+const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', forecasting: 'Trend forecasting', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', loyalty: 'Loyalty & VIP', 'gift-cards': 'Gift cards', alerts: 'Product alerts', activity: 'Activity logs', settings: 'Settings', international: 'International commerce', system: 'System health' }
 
 function extract(response) {
   const payload = response?.data?.data
@@ -124,6 +124,41 @@ function SettingsPage() {
   </section>
 }
 
+function SystemHealthPage({ health, onRefresh, onClearCache, clearing }) {
+  if (!health) return <UnavailablePage title="System health" capability="system health monitoring" />
+  return (
+    <>
+      <section className="admin-metrics">
+        <Metric icon={FiCheckCircle} label="Database" value={health.database?.connected ? 'Connected' : 'Unavailable'} tone={health.database?.connected ? 'green' : 'gold'} />
+        <Metric icon={FiActivity} label="Cache driver" value={health.cache?.driver || '—'} change={health.cache?.healthy ? 'Healthy' : 'Check cache'} tone="blue" />
+        <Metric icon={FiPackage} label="Pending jobs" value={health.queue?.pending_jobs ?? 0} change={`${health.queue?.failed_jobs ?? 0} failed`} tone="violet" />
+        <Metric icon={FiDollarSign} label="Free storage" value={`${health.storage?.disk_free_mb ?? 0} MB`} change={health.application?.environment} tone="gold" />
+      </section>
+      <section className="admin-panel">
+        <div className="admin-panel-head">
+          <div><p className="admin-kicker">APPLICATION HEALTH</p><h2>Runtime diagnostics</h2></div>
+          <div className="admin-actions">
+            <button className="admin-button admin-button-secondary" type="button" onClick={onRefresh}>Refresh</button>
+            <button className="admin-button admin-button-primary" type="button" onClick={onClearCache} disabled={clearing}>{clearing ? 'Clearing...' : 'Clear cache'}</button>
+          </div>
+        </div>
+        <AdminDataTable
+          columns={[
+            { label: 'Component', key: 'component' },
+            { label: 'Status', key: 'status' },
+            { label: 'Details', key: 'details' },
+          ]}
+          rows={[
+            { component: 'Laravel', status: health.application?.laravel || '—', details: `Debug ${health.application?.debug ? 'on' : 'off'}` },
+            { component: 'Queue connection', status: health.queue?.connection || '—', details: `${health.queue?.pending_jobs ?? 0} pending` },
+            { component: 'Public storage', status: health.storage?.public_writable ? 'Writable' : 'Read only', details: `${health.storage?.disk_free_mb ?? 0} MB free` },
+            { component: 'Logs', status: health.storage?.logs_writable ? 'Writable' : 'Read only', details: 'Application logs' },
+          ]}
+        />
+      </section>
+    </>
+  )
+}
 function InternationalPage() {
   const regions = [{ market: 'United States', currency: 'USD', tax: 'Existing tax rules' }, { market: 'United Kingdom', currency: 'GBP', tax: 'Configure tax rule' }, { market: 'Gulf region', currency: 'AED / SAR', tax: 'Configure tax rule' }, { market: 'European Union', currency: 'EUR', tax: 'Configure tax rule' }]
   return <section className="admin-panel international-admin"><div className="admin-panel-head"><div><p className="admin-kicker">GLOBAL OPERATIONS</p><h2>International commerce</h2></div><FiGlobe /></div><p className="admin-settings-copy">Regional shipping and tax configuration uses the existing protected operations APIs. Tracking, duty and warehouse inventory endpoints are not yet exposed by the backend, so this view does not fabricate operational data.</p><AdminDataTable columns={[{ label: 'Market', key: 'market' }, { label: 'Settlement currency', key: 'currency' }, { label: 'Tax readiness', key: 'tax' }, { label: 'Next action', render: () => <a href="/admin/taxes">Configure tax rules</a> }]} rows={regions} /><div className="international-admin-note"><FiPackage /><span><strong>Carrier tracking & warehouse allocation</strong><small>Frontend ready; connect international API endpoints to enable live operational records.</small></span></div></section>
@@ -132,15 +167,21 @@ function InternationalPage() {
 export default function AdminPanel() {
   const location = useLocation(); const slug = location.pathname.replace('/admin', '').replace(/^\//, '')
   const [open, setOpen] = useState(false); const [loading, setLoading] = useState(true); const [error, setError] = useState('')
-  const [data, setData] = useState({ orders: [], products: [], coupons: [], payments: [], categories: [], analytics: null })
+  const [clearing, setClearing] = useState(false)
+  const [data, setData] = useState({ orders: [], products: [], coupons: [], payments: [], categories: [], analytics: null, health: null })
   const load = async () => {
     setLoading(true); setError('')
-    const results = await Promise.allSettled([api.orders({ per_page: 20 }), api.products({ per_page: 20 }), api.coupons({ per_page: 20 }), api.payments({ per_page: 20 }), catalogService.categories(), api.analytics()])
+    const results = await Promise.allSettled([api.orders({ per_page: 20 }), api.products({ per_page: 20 }), api.coupons({ per_page: 20 }), api.payments({ per_page: 20 }), catalogService.categories(), api.analytics(), api.systemHealth()])
     const [orders, products, coupons, payments] = results.map((result) => result.status === 'fulfilled' ? extract(result.value) : { data: [] })
     if (results.some((result, index) => index < 4 && result.status === 'rejected')) setError('Some live operational records could not be loaded. Check the current role and API connection.')
     const categoryResult = results[4]?.status === 'fulfilled' ? extract(results[4].value) : { data: [] }
     const analytics = results[5]?.status === 'fulfilled' ? results[5].value.data.data : null
-    setData({ orders: orders.data, products: products.data, coupons: coupons.data, payments: payments.data, categories: categoryResult.data, analytics }); setLoading(false)
+    const health = results[6]?.status === 'fulfilled' ? results[6].value.data.data : null
+    setData({ orders: orders.data, products: products.data, coupons: coupons.data, payments: payments.data, categories: categoryResult.data, analytics, health }); setLoading(false)
+  }
+  const clearCache = async () => {
+    setClearing(true)
+    try { await api.clearCache(); await load() } finally { setClearing(false) }
   }
   useEffect(() => { load() }, [])
   const title = pageNames[slug] || 'Administration'
@@ -153,6 +194,7 @@ export default function AdminPanel() {
     if (slug === 'reports') return <ReportsPage {...data} />
     if (slug === 'settings') return <SettingsPage />
     if (slug === 'international') return <InternationalPage />
+    if (slug === 'system') return <SystemHealthPage health={data.health} onRefresh={load} onClearCache={clearCache} clearing={clearing} />
     if (!slug) return <Dashboard {...data} />
     return <UnavailablePage title={title} capability={title.toLowerCase()} />
   })()
