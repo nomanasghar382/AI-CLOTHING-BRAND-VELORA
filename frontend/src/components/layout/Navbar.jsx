@@ -33,11 +33,11 @@ export default function Navbar() {
               <NotificationCenter />
               <Link className="nav-link-velora" to="/rewards"><FiStar /> Rewards</Link>
               <span className="small text-slate-300">Hello, {user?.first_name || user?.name}</span>
-              <button type="button" className="btn btn-link nav-link-velora p-0" onClick={signOut}>Sign out</button>
+              <button type="button" className="btn btn-link nav-link-velora p-0" onClick={signOut} aria-label="Sign out">Sign out</button>
             </>
           ) : <Link className="nav-link-velora d-flex gap-2 align-items-center" to="/login"><FiUser /> Sign in</Link>}
         </div>
-        <button type="button" className="btn btn-icon d-lg-none" aria-label="Toggle menu" onClick={() => setOpen(!open)}>
+        <button type="button" className="btn btn-icon d-lg-none" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? <FiX /> : <FiMenu />}
         </button>
       </nav>

@@ -16,6 +16,9 @@ final class WebhookController extends Controller
     public function stripe(Request $request, WebhookService $webhooks): JsonResponse
     {
         $event = $webhooks->ingest('stripe', $request, fn ($req) => $webhooks->verifyStripe($req));
+        if (! $event->verified) {
+            return $this->failure('Invalid webhook signature.', [], 401);
+        }
         ProcessIncomingWebhookJob::dispatch($event->id);
 
         return $this->success(['id' => $event->id], 'Webhook received.', 202);
@@ -24,6 +27,9 @@ final class WebhookController extends Controller
     public function cloudinary(Request $request, WebhookService $webhooks): JsonResponse
     {
         $event = $webhooks->ingest('cloudinary', $request, fn ($req) => $webhooks->verifySharedSecret($req, 'velora.webhooks.cloudinary_secret'));
+        if (! $event->verified) {
+            return $this->failure('Invalid webhook signature.', [], 401);
+        }
         ProcessIncomingWebhookJob::dispatch($event->id);
 
         return $this->success(['id' => $event->id], 'Webhook received.', 202);
@@ -32,6 +38,9 @@ final class WebhookController extends Controller
     public function shipping(Request $request, WebhookService $webhooks): JsonResponse
     {
         $event = $webhooks->ingest('shipping', $request, fn ($req) => $webhooks->verifySharedSecret($req, 'velora.webhooks.shipping_secret'));
+        if (! $event->verified) {
+            return $this->failure('Invalid webhook signature.', [], 401);
+        }
         ProcessIncomingWebhookJob::dispatch($event->id);
 
         return $this->success(['id' => $event->id], 'Webhook received.', 202);

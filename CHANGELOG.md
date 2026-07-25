@@ -2,6 +2,26 @@
 
 All notable changes to VELORA are documented in this file.
 
+## [1.0.0-rc.2] - 2026-07-25
+
+### Fixed
+- Webhook endpoints now reject unverified signatures with 401
+- Gift card redemption returns validation errors instead of 404 for invalid codes
+- Cart and wishlist no longer flash empty state while loading
+- API client error messages now surface offline and timeout states
+- Product alert dispatch N+1 query on notification preferences
+
+### Enhanced
+- Shared `getApiErrorMessage`, `formatMoney`, `useAsyncAction`, and reduced-motion hooks
+- Error states support retry across catalog, orders, and product detail pages
+- Community, navbar, and pagination accessibility improvements
+- Admin dashboard recent orders return slim response payloads
+- Demo seeder expanded with 8 orders, 14-day analytics, and resolved support ticket
+- International page discloses locally estimated shipping and duty fallbacks
+
+### Added
+- Gift card and webhook signature regression tests (47 tests, 324 assertions)
+
 ## [1.0.0-rc.1] - 2026-07-25
 
 ### Added

@@ -9,7 +9,6 @@ import Loader from '../../components/feedback/Loader'
 import EmptyState from '../../components/feedback/EmptyState'
 import ErrorState from '../../components/feedback/ErrorState'
 import Seo from '../../components/system/Seo'
-import PageTransition from '../../components/system/PageTransition'
 import { catalogService } from '../../services/catalogService'
 import { searchService } from '../../services/searchService'
 
@@ -21,22 +20,26 @@ function CatalogPage() {
   const [error, setError] = useState(false)
   const query = params.get('q') || ''
 
-  useEffect(() => {
-    catalogService.filters().then(({ data: response }) => setFilters(response.data)).catch(() => {})
-  }, [])
-
-  useEffect(() => {
+  const loadCatalog = useCallback(() => {
     setLoading(true)
     setError(false)
     const request = query
       ? searchService.search(Object.fromEntries(params))
       : catalogService.products(Object.fromEntries(params))
 
-    request
+    return request
       .then(({ data: response }) => setData(response.data))
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [params, query])
+
+  useEffect(() => {
+    catalogService.filters().then(({ data: response }) => setFilters(response.data)).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    loadCatalog()
+  }, [loadCatalog])
 
   const update = useCallback((key, value) => {
     const next = new URLSearchParams(params)
@@ -49,7 +52,7 @@ function CatalogPage() {
   const clearFilters = useCallback(() => setParams(new URLSearchParams(query ? { q: query } : {})), [query, setParams])
 
   return (
-    <PageTransition>
+    <>
       <Seo title="Catalog" description="Discover curated modest fashion from the VELORA edit." />
       <section className="container py-4 py-lg-5">
         <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Catalog' }]} />
@@ -67,7 +70,7 @@ function CatalogPage() {
             <CatalogFilterPanel filters={filters} params={params} onChange={update} onClear={clearFilters} />
           </aside>
           <div className="col-lg-9">
-            {loading ? <Loader label="Curating the Velora edit..." /> : error ? <ErrorState /> : data.items.length ? (
+            {loading ? <Loader label="Curating the Velora edit..." /> : error ? <ErrorState onRetry={loadCatalog} /> : data.items.length ? (
               <>
                 <div className="row g-3">
                   {data.items.map((product) => (
@@ -84,7 +87,7 @@ function CatalogPage() {
           </div>
         </div>
       </section>
-    </PageTransition>
+    </>
   )
 }
 

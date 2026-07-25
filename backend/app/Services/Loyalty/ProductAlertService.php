@@ -15,7 +15,7 @@ final class ProductAlertService
         $inStock = $product->stock_quantity > 0;
 
         return DB::transaction(function () use ($product, $price, $inStock): int {
-            $alerts = ProductAlert::query()->with(['user', 'product'])
+            $alerts = ProductAlert::query()->with(['user.notificationPreference', 'product'])
                 ->where('product_id', $product->id)->where('is_active', true)
                 ->where(function ($query) use ($price, $inStock) {
                     $query->where(fn ($q) => $q->where('type', 'price')->where('target_price', '>=', $price))

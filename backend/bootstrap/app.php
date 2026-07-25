@@ -89,6 +89,9 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (HttpException $exception, Request $request) {
+            if ($request->is('api/*') && $exception->getStatusCode() < 500) {
+                return ApiResponse::error($exception->getMessage() ?: 'Request failed.', [], $exception->getStatusCode());
+            }
             if ($request->is('api/*') && $exception->getStatusCode() >= 500) {
                 return ApiResponse::error('An unexpected error occurred.', [], 500);
             }

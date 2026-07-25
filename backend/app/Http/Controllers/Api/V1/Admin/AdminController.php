@@ -46,7 +46,16 @@ final class AdminController extends Controller
                 'revenue' => (float) Order::query()->where('payment_status', 'paid')->where('created_at', '>=', $from)->sum('grand_total'),
                 'orders' => Order::query()->where('created_at', '>=', $from)->count(),
             ],
-            'recent_orders' => Order::query()->with('user:id,name,email')->latest()->limit(5)->get(),
+            'recent_orders' => Order::query()->with('user:id,name,email')->latest()->limit(5)->get()->map(fn (Order $order) => [
+                'id' => $order->id,
+                'number' => $order->number,
+                'status' => $order->status,
+                'payment_status' => $order->payment_status,
+                'grand_total' => (float) $order->grand_total,
+                'currency' => $order->currency,
+                'created_at' => $order->created_at,
+                'user' => $order->user ? ['id' => $order->user->id, 'name' => $order->user->name, 'email' => $order->user->email] : null,
+            ]),
             'low_stock_products' => Product::query()->whereColumn('stock_quantity', '<=', 'minimum_stock')->orderBy('stock_quantity')->limit(5)->get(['id', 'name', 'sku', 'stock_quantity', 'minimum_stock']),
             'release' => [
                 'version' => config('velora.release.version'),

@@ -19,7 +19,7 @@
 body { margin: 0; min-width: 320px; color: var(--velora-white); background: var(--velora-void); }
 a { color: #8b483b; text-decoration: none; }
 a:hover { color: #5f2e28; }
-.app-shell { min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; overflow-x: clip; }
 .site-header { position: sticky; top: 0; z-index: 20; background: rgba(5, 8, 22, .85); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(148, 163, 184, .12); }
 .brand-mark { color: var(--velora-white); font-size: 1.25rem; font-weight: 800; letter-spacing: .18em; }
 .brand-mark:hover { color: var(--velora-white); }
@@ -142,3 +142,10 @@ html { font-size:100%; }
 .admin-command-item em { color:#a34b3c; font-size:.68rem; font-style:normal; text-transform:uppercase; letter-spacing:.08em; }
 .admin-command-meta { margin:.75rem; color:#8d7d70; font-size:.8rem; }
 .admin-settings-link-button { display:flex; align-items:center; gap:12px; width:100%; min-height:82px; padding:14px; color:#6d4c2a; background:#fcf8f1; border:1px solid #ebdfce; border-radius:8px; text-align:left; }
+@media (max-width: 991px) { .filter-panel { position: static; top: auto; } }
+@media (max-width: 575px) {
+  .hero-orbit-one { width: 280px; height: 280px; right: -80px; top: -80px; }
+  .hero-orbit-two { display: none; }
+  .spec-grid { grid-template-columns: 1fr; }
+  .product-passport .btn { width: 100%; }
+}

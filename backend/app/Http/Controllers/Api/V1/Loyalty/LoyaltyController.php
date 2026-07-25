@@ -145,7 +145,10 @@ final class LoyaltyController extends Controller
     {
         $data = $request->validate(['code' => ['required', 'string'], 'amount' => ['required', 'numeric', 'min:0.01']]);
         $wallet = DB::transaction(function () use ($request, $data) {
-            $gift = GiftCard::query()->where('code', strtoupper($data['code']))->lockForUpdate()->firstOrFail();
+            $gift = GiftCard::query()->where('code', strtoupper($data['code']))->lockForUpdate()->first();
+            if (! $gift) {
+                throw ValidationException::withMessages(['code' => ['Gift card not found.']]);
+            }
             if (! $gift->is_active || ($gift->expires_at && $gift->expires_at->isPast()) || $gift->balance < $data['amount']) {
                 throw ValidationException::withMessages(['code' => ['Gift card is unavailable or has insufficient balance.']]);
             }

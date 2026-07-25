@@ -41,7 +41,12 @@ final class DemoEnvironmentSeeder extends Seeder
         $customer = User::query()->where('email', 'customer@velora.test')->firstOrFail();
         $creator = User::query()->where('email', 'creator@velora.test')->firstOrFail();
         $supplier = User::query()->where('email', 'supplier@velora.test')->firstOrFail();
-        $products = Product::query()->where('status', 'published')->orderBy('id')->limit(40)->get();
+        $products = Product::query()
+            ->with(['category:id,name', 'colors:id,name', 'images:id,product_id,url,thumbnail_url,is_primary,sort_order'])
+            ->where('status', 'published')
+            ->orderBy('id')
+            ->limit(40)
+            ->get();
 
         $this->seedProfiles($creator, $supplier);
         $this->seedShipping($customer);
@@ -141,9 +146,13 @@ final class DemoEnvironmentSeeder extends Seeder
         $address = ShippingAddress::query()->where('user_id', $customer->id)->first();
         $billing = BillingAddress::query()->where('user_id', $customer->id)->first();
         $statuses = [
-            ['status' => 'delivered', 'payment_status' => 'paid', 'days' => 14],
-            ['status' => 'shipped', 'payment_status' => 'paid', 'days' => 7],
-            ['status' => 'processing', 'payment_status' => 'paid', 'days' => 3],
+            ['status' => 'delivered', 'payment_status' => 'paid', 'days' => 28],
+            ['status' => 'delivered', 'payment_status' => 'paid', 'days' => 21],
+            ['status' => 'shipped', 'payment_status' => 'paid', 'days' => 14],
+            ['status' => 'shipped', 'payment_status' => 'paid', 'days' => 10],
+            ['status' => 'processing', 'payment_status' => 'paid', 'days' => 7],
+            ['status' => 'processing', 'payment_status' => 'paid', 'days' => 5],
+            ['status' => 'pending', 'payment_status' => 'paid', 'days' => 3],
             ['status' => 'pending', 'payment_status' => 'pending', 'days' => 1],
         ];
 
@@ -244,11 +253,17 @@ final class DemoEnvironmentSeeder extends Seeder
             ['user_id' => $creator->id, 'body' => 'Three ways to style the same wide-leg pant across seasons.'],
         ];
 
+        $mediaUrls = [
+            'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
+        ];
+
         foreach ($posts as $index => $post) {
             $record = CommunityPost::query()->updateOrCreate(
                 ['user_id' => $post['user_id'], 'body' => $post['body']],
                 [
-                    'media' => [['url' => 'https://images.unsplash.com/photo-'.(1480000000000 + $index).'?auto=format&fit=crop&w=800&q=80', 'type' => 'image']],
+                    'media' => [['url' => $mediaUrls[$index], 'type' => 'image']],
                     'status' => 'published',
                     'likes_count' => 12 + $index * 4,
                     'comments_count' => 2 + $index,
@@ -270,8 +285,8 @@ final class DemoEnvironmentSeeder extends Seeder
                 [
                     'name' => $product->name,
                     'category' => $product->category?->name,
-                    'color' => $product->colors()->first()?->name,
-                    'image_url' => $product->images()->first()?->url,
+                    'color' => $product->colors->first()?->name,
+                    'image_url' => $product->images->first()?->url,
                 ]
             );
         }
@@ -325,7 +340,7 @@ final class DemoEnvironmentSeeder extends Seeder
                 'user_id' => $customer->id,
                 'assigned_to' => $admin->id,
                 'subject' => 'Sizing guidance for layered abaya',
-                'status' => 'pending',
+                'status' => 'open',
                 'priority' => 'normal',
             ]
         );
@@ -337,6 +352,23 @@ final class DemoEnvironmentSeeder extends Seeder
 
         SupportMessage::query()->updateOrCreate(
             ['support_ticket_id' => $ticket->id, 'body' => 'We recommend sizing up one size for comfortable layering.'],
+            ['user_id' => $admin->id, 'is_internal' => false]
+        );
+
+        $resolved = SupportTicket::query()->updateOrCreate(
+            ['number' => 'SUP-DEMO-002'],
+            [
+                'user_id' => $customer->id,
+                'assigned_to' => $admin->id,
+                'subject' => 'Delivery timing for international order',
+                'status' => 'resolved',
+                'priority' => 'low',
+                'resolved_at' => now()->subDays(2),
+            ]
+        );
+
+        SupportMessage::query()->updateOrCreate(
+            ['support_ticket_id' => $resolved->id, 'body' => 'Your parcel cleared customs and is on schedule.'],
             ['user_id' => $admin->id, 'is_internal' => false]
         );
     }
@@ -368,7 +400,7 @@ final class DemoEnvironmentSeeder extends Seeder
             ['type' => 'page_view', 'properties' => ['page' => '/catalog'], 'created_at' => now()->subHours(3)],
         ];
 
-        foreach ($events as $index => $event) {
+        foreach ($events as $event) {
             DB::table('bi_analytics_events')->updateOrInsert(
                 ['type' => $event['type'], 'query' => $event['query'] ?? null],
                 [
@@ -377,6 +409,13 @@ final class DemoEnvironmentSeeder extends Seeder
                     'created_at' => $event['created_at'],
                     'updated_at' => now(),
                 ]
+            );
+        }
+
+        foreach (range(1, 14) as $day) {
+            DB::table('bi_analytics_events')->updateOrInsert(
+                ['type' => 'search', 'query' => 'demo-day-'.$day, 'created_at' => now()->subDays($day)->startOfDay()],
+                ['updated_at' => now()]
             );
         }
 

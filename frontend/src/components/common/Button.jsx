@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useInteractiveMotionProps } from '../../hooks/useMotionConfig'
 
 const variants = {
   primary: 'btn-velora-primary',
@@ -7,12 +8,12 @@ const variants = {
 }
 
 export default function Button({ children, className = '', variant = 'primary', type = 'button', ...props }) {
+  const motionProps = useInteractiveMotionProps()
   return (
     <motion.button
       type={type}
       className={`btn ${variants[variant]} ${className}`}
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.98 }}
+      {...motionProps}
       {...props}
     >
       {children}
