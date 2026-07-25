@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { FiCamera, FiExternalLink, FiSearch, FiUpload } from 'react-icons/fi'
-import { modestFashionImage } from '../../constants/modestFashionImages'
+import { menModestImage, womenModestImage } from '../../constants/modestFashionImages'
 
 const results = [
-  { name: 'Draped modest blouse', provider: 'Velora Studio', price: '$84', image: modestFashionImage(10, 600) },
-  { name: 'Wide-leg abaya pant', provider: 'Velora Studio', price: '$92', image: modestFashionImage(5, 600) },
-  { name: 'Silk hijab scarf', provider: 'Velora Studio', price: '$76', image: modestFashionImage(11, 600) },
+  { name: 'Silk hijab & niqab set', provider: 'Velora Studio', price: '$84', image: womenModestImage(0, 600) },
+  { name: 'Premium white thobe', provider: 'Velora Studio', price: '$92', image: menModestImage(1, 600) },
+  { name: 'Flowing black abaya', provider: 'Velora Studio', price: '$76', image: womenModestImage(4, 600) },
 ]
 
 export default function VisualSearchPage() {

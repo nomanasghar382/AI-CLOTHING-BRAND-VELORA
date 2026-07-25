@@ -15,7 +15,7 @@ import { searchService } from '../../services/searchService'
 function CatalogPage() {
   const [params, setParams] = useSearchParams()
   const [data, setData] = useState({ items: [], meta: null })
-  const [filters, setFilters] = useState({ brands: [], colors: [], sizes: [], materials: [], fabrics: [], coverage_levels: [], occasions: [], price_range: { min: 0, max: 0 } })
+  const [filters, setFilters] = useState({ brands: [], colors: [], sizes: [], materials: [], fabrics: [], coverage_levels: [], genders: [], occasions: [], price_range: { min: 0, max: 0 } })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const query = params.get('q') || ''

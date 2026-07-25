@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react'
-import { modestFashionImage } from '../constants/modestFashionImages'
+import { menModestImage, womenModestImage } from '../constants/modestFashionImages'
 import { CommunityContext } from './communityContext'
 
 const starterPosts = [
-  { id: 'post-1', author: 'Amara Idris', handle: '@amaraedits', time: '18 min', text: 'The outfit formula I keep returning to: one generous layer, one crisp shape, and one small point of shine.', image: modestFashionImage(0), likes: 312, liked: false, bookmarked: true, comments: [{ id: 'c1', author: 'Nora', text: 'That last detail changes everything.' }] },
-  { id: 'post-2', author: 'Nora Kim', handle: '@noraspace', time: '42 min', text: 'A reminder that your closet does not need a new personality every season. Repeat the pieces that make you feel like yourself.', image: modestFashionImage(9), likes: 187, liked: true, bookmarked: false, comments: [] },
+  { id: 'post-1', author: 'Amara Idris', handle: '@amaraedits', time: '18 min', text: 'The outfit formula I keep returning to: one generous layer, one crisp shape, and one small point of shine.', image: womenModestImage(0), likes: 312, liked: false, bookmarked: true, comments: [{ id: 'c1', author: 'Nora', text: 'That last detail changes everything.' }] },
+  { id: 'post-2', author: 'Omar Hassan', handle: '@omarstyle', time: '42 min', text: 'A well-cut thobe is the foundation of every Islamic wardrobe. Invest in fabric that breathes and drapes with dignity.', image: menModestImage(1), likes: 187, liked: true, bookmarked: false, comments: [] },
 ]
 
 export function CommunityProvider({ children }) {

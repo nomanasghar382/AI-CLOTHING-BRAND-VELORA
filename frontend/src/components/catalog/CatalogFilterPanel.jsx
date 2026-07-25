@@ -81,6 +81,12 @@ function CatalogFilterPanel({ filters, params, onChange, onClear }) {
         {filters.fabrics?.map((fabric) => <option key={fabric} value={fabric}>{fabric}</option>)}
       </select>
 
+      <label className="form-label" htmlFor="catalog-gender">Shop for</label>
+      <select id="catalog-gender" className="form-select velora-input mb-3" value={params.get('gender') || ''} onChange={(e) => onChange('gender', e.target.value)}>
+        <option value="">Women &amp; men</option>
+        {filters.genders?.map((gender) => <option key={gender} value={gender}>{gender === 'men' ? 'Men' : 'Women'}</option>)}
+      </select>
+
       <label className="form-label" htmlFor="catalog-coverage">Coverage</label>
       <select id="catalog-coverage" className="form-select velora-input mb-3" value={params.get('coverage_level') || ''} onChange={(e) => onChange('coverage_level', e.target.value)}>
         <option value="">All coverage</option>

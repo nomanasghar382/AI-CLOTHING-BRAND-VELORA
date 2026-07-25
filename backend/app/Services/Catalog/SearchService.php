@@ -36,7 +36,7 @@ final class SearchService
       });
     }
 
-    foreach (['category', 'brand', 'fabric', 'material', 'coverage_level'] as $field) {
+    foreach (['category', 'brand', 'fabric', 'material', 'coverage_level', 'gender'] as $field) {
       if (!empty($filters[$field])) {
         if (in_array($field, ['category', 'brand'], true)) {
           $relation = $field;

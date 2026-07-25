@@ -71,7 +71,7 @@ final class DemoEnvironmentSeeder extends Seeder
                 'handle' => 'velora-creator',
                 'display_name' => 'Velora Creator',
                 'bio' => 'Curating modest fashion edits and seasonal lookboards.',
-                'avatar_url' => 'https://images.unsplash.com/photo-1561442748-c50715dc32f6?auto=format&fit=crop&w=400&q=80',
+                'avatar_url' => 'https://images.unsplash.com/photo-1559730775-67f621597262?auto=format&fit=crop&w=400&q=80',
                 'social_links' => ['instagram' => '@veloracreator', 'tiktok' => '@veloracreator'],
                 'is_accepting_commissions' => true,
                 'commission_rate' => 12.5,
@@ -232,7 +232,7 @@ final class DemoEnvironmentSeeder extends Seeder
             ['user_id' => $creator->id, 'title' => 'Weekend Layers'],
             [
                 'description' => 'Relaxed weekend styling with elevated basics.',
-                'cover_url' => 'https://images.unsplash.com/photo-1770964211782-013475eacc3f?auto=format&fit=crop&w=900&q=80',
+                'cover_url' => 'https://images.unsplash.com/photo-1559730775-67f621597262?auto=format&fit=crop&w=900&q=80',
                 'is_public' => true,
             ]
         );
@@ -254,9 +254,9 @@ final class DemoEnvironmentSeeder extends Seeder
         ];
 
         $mediaUrls = [
-            'https://images.unsplash.com/photo-1770964211782-013475eacc3f?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1750190321796-c749877df841?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1630735988694-12186aedd73d?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1559730775-67f621597262?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1564289851149-a9f8940f795c?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1756412066323-a336d2becc10?auto=format&fit=crop&w=800&q=80',
         ];
 
         foreach ($posts as $index => $post) {
@@ -294,7 +294,7 @@ final class DemoEnvironmentSeeder extends Seeder
         VisualSearch::query()->updateOrCreate(
             ['user_id' => $customer->id, 'image_hash' => hash('sha256', 'velora-demo-visual-search')],
             [
-                'image_url' => 'https://images.unsplash.com/photo-1585728748176-455ac5eed962?auto=format&fit=crop&w=600&q=80',
+                'image_url' => 'https://images.unsplash.com/photo-1771162766051-c330f1d664ea?auto=format&fit=crop&w=600&q=80',
                 'provider' => 'catalog_fallback',
                 'results' => $products->take(5)->map(fn (Product $product) => [
                     'product_id' => $product->id,

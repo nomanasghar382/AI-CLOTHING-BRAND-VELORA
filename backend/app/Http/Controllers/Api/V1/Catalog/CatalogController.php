@@ -37,6 +37,7 @@ final class CatalogController extends Controller
         if ($request->filled('material')) $query->where('material', $request->string('material'));
         if ($request->filled('fabric')) $query->where('fabric', $request->string('fabric'));
         if ($request->filled('coverage_level')) $query->where('coverage_level', $request->string('coverage_level'));
+        if ($request->filled('gender')) $query->where('gender', $request->string('gender'));
         if ($request->filled('season')) $query->where('season', $request->string('season'));
         if ($request->filled('min_price')) $query->where('price', '>=', $request->float('min_price'));
         if ($request->filled('max_price')) $query->where('price', '<=', $request->float('max_price'));
@@ -61,6 +62,7 @@ final class CatalogController extends Controller
             'materials' => (clone $published)->whereNotNull('material')->distinct()->orderBy('material')->pluck('material'),
             'fabrics' => (clone $published)->whereNotNull('fabric')->distinct()->orderBy('fabric')->pluck('fabric'),
             'coverage_levels' => (clone $published)->whereNotNull('coverage_level')->distinct()->orderBy('coverage_level')->pluck('coverage_level'),
+            'genders' => (clone $published)->whereNotNull('gender')->distinct()->orderBy('gender')->pluck('gender'),
             'occasions' => (clone $published)->whereNotNull('season')->distinct()->orderBy('season')->pluck('season'),
             'price_range' => [
                 'min' => (float) ((clone $published)->min('price') ?? 0),
