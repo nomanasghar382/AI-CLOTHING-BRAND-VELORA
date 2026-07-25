@@ -66,7 +66,7 @@ return new class extends Migration
             $table->decimal('score', 5, 2)->nullable();
             $table->json('product_snapshot')->nullable();
             $table->timestamps();
-            $table->unique(['style_recommendation_id', 'product_id']);
+            $table->unique(['style_recommendation_id', 'product_id'], 'style_rec_item_rec_prod_uniq');
         });
         Schema::create('ai_response_caches', function (Blueprint $table) {
             $table->id();

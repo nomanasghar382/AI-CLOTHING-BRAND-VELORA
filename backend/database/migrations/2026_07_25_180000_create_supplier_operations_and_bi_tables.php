@@ -181,7 +181,7 @@ return new class extends Migration
             $table->decimal('score', 5, 2)->default(0);
             $table->json('metrics')->nullable();
             $table->timestamps();
-            $table->unique(['supplier_profile_id', 'period_date']);
+            $table->unique(['supplier_profile_id', 'period_date'], 'supplier_perf_profile_date_uniq');
         });
         Schema::create('supplier_messages', function (Blueprint $table) {
             $table->id();

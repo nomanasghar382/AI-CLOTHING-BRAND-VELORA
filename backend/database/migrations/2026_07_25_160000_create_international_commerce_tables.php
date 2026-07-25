@@ -153,7 +153,7 @@ return new class extends Migration
             $table->unsignedInteger('available_stock')->default(0);
             $table->unsignedInteger('reserved_stock')->default(0);
             $table->timestamps();
-            $table->unique(['warehouse_id', 'product_id', 'product_variant_id']);
+            $table->unique(['warehouse_id', 'product_id', 'product_variant_id'], 'wh_inv_wh_prod_var_uniq');
         });
         Schema::create('international_addresses', function (Blueprint $table) {
             $table->id();
