@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class InventoryLog extends Model
 {
-    //
+    protected $guarded = [];
 }

@@ -4,6 +4,9 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Catalog\AdminCatalogController;
 use App\Http\Controllers\Api\V1\Catalog\CatalogController;
+use App\Http\Controllers\Api\V1\Shopping\CartController;
+use App\Http\Controllers\Api\V1\Shopping\OrderController;
+use App\Http\Controllers\Api\V1\Shopping\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -36,4 +39,17 @@ Route::prefix('v1')->group(function (): void {
     });
 
     Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->get('admin/ping', fn () => response()->json(['ok' => true]));
+
+    Route::middleware('auth:sanctum')->group(function (): void {
+        Route::get('cart', [CartController::class, 'show']);
+        Route::post('cart/items', [CartController::class, 'store']);
+        Route::patch('cart/items/{cartItem}', [CartController::class, 'update']);
+        Route::delete('cart/items/{cartItem}', [CartController::class, 'destroy']);
+        Route::get('wishlist', [WishlistController::class, 'show']);
+        Route::post('wishlist/items', [WishlistController::class, 'store']);
+        Route::delete('wishlist/items/{wishlistItem}', [WishlistController::class, 'destroy']);
+        Route::post('checkout', [OrderController::class, 'checkout']);
+        Route::get('orders', [OrderController::class, 'index']);
+        Route::get('orders/{order}', [OrderController::class, 'show']);
+    });
 });
