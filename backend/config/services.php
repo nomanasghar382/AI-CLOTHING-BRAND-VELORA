@@ -40,4 +40,17 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'url' => env('OPENAI_API_URL', 'https://api.openai.com/v1'),
+        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+        'timeout' => env('OPENAI_TIMEOUT', 15),
+    ],
+
+    'weather' => [
+        'key' => env('WEATHER_API_KEY'),
+        'url' => env('WEATHER_API_URL', 'https://api.openweathermap.org/data/2.5'),
+        'timeout' => env('WEATHER_TIMEOUT', 8),
+    ],
+
 ];

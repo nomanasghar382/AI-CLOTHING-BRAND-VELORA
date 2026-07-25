@@ -25,6 +25,7 @@ export default function Navbar() {
           <Link className="nav-icon-link" to="/cart" aria-label={`Shopping bag, ${cartCount} items`}><FiShoppingBag />{cartCount > 0 && <span className="nav-counter">{cartCount}</span>}</Link>
           {isAuthenticated ? (
             <>
+              <Link className="nav-link-velora" to="/ai">AI stylist</Link>
               <span className="small text-slate-300">Hello, {user?.first_name || user?.name}</span>
               <button type="button" className="btn btn-link nav-link-velora p-0" onClick={signOut}>Sign out</button>
             </>
@@ -39,6 +40,7 @@ export default function Navbar() {
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/wishlist">Wishlist{wishlistCount ? ` (${wishlistCount})` : ''}</NavLink>
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/cart">Shopping bag{cartCount ? ` (${cartCount})` : ''}</NavLink>
         {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/orders">Orders</NavLink>}
+        {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/ai">AI stylist</NavLink>}
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={isAuthenticated ? '/account' : '/login'}>{isAuthenticated ? 'Account' : 'Sign in'}</NavLink>
       </div>}
     </header>

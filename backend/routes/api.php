@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Shopping\AdminShoppingController;
 use App\Http\Controllers\Api\V1\Shopping\CartController;
 use App\Http\Controllers\Api\V1\Shopping\OrderController;
 use App\Http\Controllers\Api\V1\Shopping\WishlistController;
+use App\Http\Controllers\Api\V1\Style\StyleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -81,5 +82,19 @@ Route::prefix('v1')->group(function (): void {
         Route::post('orders/{order}/payment-intent', [OrderController::class, 'paymentIntent']);
         Route::get('orders/{order}/invoice/{format}', [OrderController::class, 'invoice'])->whereIn('format', ['html', 'pdf']);
         Route::post('orders/{order}/returns', [OrderController::class, 'requestReturn']);
+
+        Route::get('style/quiz', [StyleController::class, 'quiz']);
+        Route::get('style/profile', [StyleController::class, 'profile']);
+        Route::put('style/profile', [StyleController::class, 'updateProfile']);
+        Route::put('style/body', [StyleController::class, 'updateBody']);
+        Route::post('style/recommendations', [StyleController::class, 'recommend']);
+        Route::post('style/outfits/occasion', [StyleController::class, 'occasion']);
+        Route::post('style/chat', [StyleController::class, 'chat']);
+        Route::get('style/conversations', [StyleController::class, 'conversations']);
+        Route::get('style/conversations/{conversation}/messages', [StyleController::class, 'messages']);
+        Route::get('style/trends', [StyleController::class, 'trends']);
+        Route::get('style/saved-outfits', [StyleController::class, 'savedOutfits']);
+        Route::post('style/saved-outfits', [StyleController::class, 'saveOutfit']);
+        Route::post('style/feedback', [StyleController::class, 'feedback']);
     });
 });
