@@ -71,7 +71,7 @@ final class DemoEnvironmentSeeder extends Seeder
                 'handle' => 'velora-creator',
                 'display_name' => 'Velora Creator',
                 'bio' => 'Curating modest fashion edits and seasonal lookboards.',
-                'avatar_url' => 'https://images.unsplash.com/photo-1559730775-67f621597262?auto=format&fit=crop&w=400&q=80',
+                'avatar_url' => 'https://images.unsplash.com/photo-1744727811425-e1c0af8b4022?auto=format&fit=crop&w=400&q=70',
                 'social_links' => ['instagram' => '@veloracreator', 'tiktok' => '@veloracreator'],
                 'is_accepting_commissions' => true,
                 'commission_rate' => 12.5,
@@ -232,7 +232,7 @@ final class DemoEnvironmentSeeder extends Seeder
             ['user_id' => $creator->id, 'title' => 'Weekend Layers'],
             [
                 'description' => 'Relaxed weekend styling with elevated basics.',
-                'cover_url' => 'https://images.unsplash.com/photo-1559730775-67f621597262?auto=format&fit=crop&w=900&q=80',
+                'cover_url' => 'https://images.unsplash.com/photo-1744727811425-e1c0af8b4022?auto=format&fit=crop&w=720&q=72',
                 'is_public' => true,
             ]
         );
@@ -254,9 +254,9 @@ final class DemoEnvironmentSeeder extends Seeder
         ];
 
         $mediaUrls = [
-            'https://images.unsplash.com/photo-1559730775-67f621597262?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1564289851149-a9f8940f795c?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1756412066323-a336d2becc10?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1744727811425-e1c0af8b4022?auto=format&fit=crop&w=640&q=72',
+            'https://images.unsplash.com/photo-1564289851149-a9f8940f795c?auto=format&fit=crop&w=640&q=72',
+            'https://images.unsplash.com/photo-1756412066323-a336d2becc10?auto=format&fit=crop&w=640&q=72',
         ];
 
         foreach ($posts as $index => $post) {

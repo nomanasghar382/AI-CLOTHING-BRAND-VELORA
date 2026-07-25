@@ -82,7 +82,7 @@ export default function ProductDetailPage() {
           <div className="d-flex gap-2 mt-3">{product.images?.slice(0, 5).map((image, index) => <CloudinaryImage key={index} className="detail-thumbnail" src={image.thumbnail_url || image.url} alt={image.alt_text || `${product.name} view ${index + 1}`} width={120} sizes="80px" />)}</div>
         </div>
         <div className="col-lg-5">
-          <p className="eyebrow">{product.brand?.name} / {product.category?.name}</p>
+          <p className="eyebrow">{product.brand?.name} / {product.gender === 'men' ? "Men's" : "Women's"} · {product.category?.name}</p>
           <h1 className="display-6">{product.name}</h1>
           <div className="my-3">
             <span className="product-price fs-3">{formatMoney(product.sale_price || product.price)}</span>

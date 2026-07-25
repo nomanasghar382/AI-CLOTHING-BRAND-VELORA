@@ -15,7 +15,7 @@ import { searchService } from '../../services/searchService'
 function CatalogPage() {
   const [params, setParams] = useSearchParams()
   const [data, setData] = useState({ items: [], meta: null })
-  const [filters, setFilters] = useState({ brands: [], colors: [], sizes: [], materials: [], fabrics: [], coverage_levels: [], genders: [], occasions: [], price_range: { min: 0, max: 0 } })
+  const [filters, setFilters] = useState({ brands: [], colors: [], sizes: [], materials: [], fabrics: [], coverage_levels: [], genders: [], women_categories: [], men_categories: [], occasions: [], price_range: { min: 0, max: 0 } })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const query = params.get('q') || ''
@@ -51,19 +51,36 @@ function CatalogPage() {
 
   const clearFilters = useCallback(() => setParams(new URLSearchParams(query ? { q: query } : {})), [query, setParams])
 
+  const activeGender = params.get('gender') || ''
+  const setGender = useCallback((gender) => {
+    const next = new URLSearchParams(params)
+    if (gender) next.set('gender', gender)
+    else next.delete('gender')
+    next.delete('category')
+    next.delete('page')
+    setParams(next)
+  }, [params, setParams])
+
+  const heading = activeGender === 'men' ? 'Islamic menswear.' : activeGender === 'women' ? 'Modest womenswear.' : 'Discover your next expression.'
+
   return (
     <>
       <Seo title="Catalog" description="Discover curated modest fashion from the VELORA edit." />
       <section className="container py-4 py-lg-5">
         <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Catalog' }]} />
-        <div className="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
+        <div className="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-3">
           <div>
             <p className="eyebrow">THE VELORA EDIT</p>
-            <h1 className="h2 mb-0">Discover your next expression.</h1>
+            <h1 className="h2 mb-0">{heading}</h1>
           </div>
           <div className="catalog-search">
             <InstantSearchBox initial={query} onSubmit={(term) => update('q', term)} />
           </div>
+        </div>
+        <div className="catalog-gender-tabs mb-4" role="tablist" aria-label="Shop by gender">
+          <button type="button" role="tab" aria-selected={activeGender === ''} className={activeGender === '' ? 'active' : ''} onClick={() => setGender('')}>All</button>
+          <button type="button" role="tab" aria-selected={activeGender === 'women'} className={activeGender === 'women' ? 'active' : ''} onClick={() => setGender('women')}>Women</button>
+          <button type="button" role="tab" aria-selected={activeGender === 'men'} className={activeGender === 'men' ? 'active' : ''} onClick={() => setGender('men')}>Men</button>
         </div>
         <div className="row g-4">
           <aside className="col-lg-3">

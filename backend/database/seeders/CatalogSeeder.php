@@ -9,19 +9,14 @@ use Illuminate\Support\Str;
 
 class CatalogSeeder extends Seeder
 {
-    /** @var list<string> */
+    /** Face-covered only: niqab and mannequin product shots (no hijab portraits). */
     private const WOMEN_PHOTO_IDS = [
         'photo-1559730775-67f621597262',
+        'photo-1744727811425-e1c0af8b4022',
+        'photo-1618297655311-ab851e7045d6',
         'photo-1771162766051-c330f1d664ea',
-        'photo-1770367358711-b42cf1a6c2b1',
-        'photo-1588594509615-62de3570d696',
-        'photo-1750190321796-c749877df841',
-        'photo-1767766277273-a53443ab8639',
-        'photo-1752794674886-fb12817a5e96',
-        'photo-1560350530-a12ec1414cf5',
     ];
 
-    /** @var list<string> */
     private const MEN_PHOTO_IDS = [
         'photo-1564289851149-a9f8940f795c',
         'photo-1578507435314-e39e7852eddd',
@@ -38,9 +33,6 @@ class CatalogSeeder extends Seeder
         return "https://images.unsplash.com/{$photoId}?auto=format&fit=crop&w={$width}&q={$quality}";
     }
 
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $colors = collect(['Black'=>'#111827','Ivory'=>'#FFFFF0','Emerald'=>'#047857','Plum'=>'#7E2253','Navy'=>'#1E3A8A','Sand'=>'#D6C5A2','Rose'=>'#E9A0B5','Olive'=>'#556B2F','Taupe'=>'#8B7D6B','Cocoa'=>'#6F4E37','Sky'=>'#87CEEB','Lilac'=>'#C8A2C8','Stone'=>'#78716C','Sage'=>'#9CAF88','Burgundy'=>'#800020','Teal'=>'#0F766E','Mocha'=>'#967969','Coral'=>'#FF7F50','Silver'=>'#C0C0C0','Gold'=>'#D4AF37'])->map(fn ($hex, $name) => Color::query()->updateOrCreate(['slug'=>Str::slug($name)], ['name'=>$name,'hex_code'=>$hex,'status'=>'active']))->values();
@@ -48,34 +40,44 @@ class CatalogSeeder extends Seeder
 
         $womenFamilies = ['Abaya', 'Niqab', 'Burqa', 'Hijab Set', 'Khimar', 'Jilbab', 'Maxi Dress', 'Modest Top', 'Wide Leg Pant', 'Scarf'];
         $menFamilies = ['Thobe', 'Kandura', 'Shalwar Kameez', 'Kurta', 'Jubba', 'Modest Shirt', 'Sirwal', 'Kufi Cap', 'Prayer Set', 'Waistcoat'];
-        $catalogFamilies = collect($womenFamilies)->zip($menFamilies)->flatMap(fn ($pair) => [
-            ['gender' => 'women', 'name' => $pair[0]],
-            ['gender' => 'men', 'name' => $pair[1]],
-        ])->values();
 
-        $categories = collect(range(1, 50))->map(function ($i) use ($catalogFamilies) {
-            $family = $catalogFamilies[($i - 1) % $catalogFamilies->count()];
-            $label = $family['gender'] === 'men' ? "Men's {$family['name']}" : $family['name'];
-            $name = "{$label} {$i}";
-            $category = Category::query()->updateOrCreate(['slug' => Str::slug($name)], ['name' => $name, 'description' => "Contemporary Islamic {$label}.", 'status' => 'active', 'is_featured' => $i <= 8, 'is_trending' => $i <= 12]);
-            foreach (range(1, 3) as $child) {
-                Category::query()->updateOrCreate(['slug' => Str::slug("{$name} edit {$child}")], ['parent_id' => $category->id, 'name' => "{$name} Edit {$child}", 'status' => 'active']);
-            }
+        $womenParent = Category::query()->updateOrCreate(
+            ['slug' => 'women'],
+            ['name' => 'Women', 'description' => 'Islamic modest fashion for women — abayas, niqabs, hijabs, and more.', 'status' => 'active', 'is_featured' => true, 'is_trending' => true]
+        );
 
-            return $category;
+        $menParent = Category::query()->updateOrCreate(
+            ['slug' => 'men'],
+            ['name' => 'Men', 'description' => 'Islamic modest fashion for men — thobes, kanduras, shalwar kameez, and more.', 'status' => 'active', 'is_featured' => true, 'is_trending' => true]
+        );
+
+        $womenCategories = collect($womenFamilies)->values()->map(function ($name, $index) use ($womenParent) {
+            return Category::query()->updateOrCreate(
+                ['slug' => 'women-'.Str::slug($name)],
+                ['parent_id' => $womenParent->id, 'name' => $name, 'description' => "Women's {$name} collection.", 'status' => 'active', 'is_featured' => $index < 4, 'is_trending' => $index < 6]
+            );
+        });
+
+        $menCategories = collect($menFamilies)->values()->map(function ($name, $index) use ($menParent) {
+            return Category::query()->updateOrCreate(
+                ['slug' => 'men-'.Str::slug($name)],
+                ['parent_id' => $menParent->id, 'name' => $name, 'description' => "Men's {$name} collection.", 'status' => 'active', 'is_featured' => $index < 4, 'is_trending' => $index < 6]
+            );
         });
 
         $brands = collect(range(1, 100))->map(fn ($i) => Brand::query()->updateOrCreate(['slug' => "velora-studio-{$i}"], ['name' => "Velora Studio {$i}", 'description' => 'Islamic modest fashion for men and women.', 'country' => ['Pakistan', 'UAE', 'Turkey', 'UK', 'Indonesia'][($i - 1) % 5], 'status' => 'active', 'is_featured' => $i <= 12]));
         $supplierId = User::query()->where('email', 'supplier@velora.test')->value('id');
 
         foreach (range(1, 1000) as $i) {
-            $family = $catalogFamilies[($i - 1) % $catalogFamilies->count()];
-            $gender = $family['gender'];
-            $familyName = $family['name'];
-            $prefix = $gender === 'men' ? "Men's {$familyName}" : $familyName;
+            $isMen = $i % 2 === 0;
+            $gender = $isMen ? 'men' : 'women';
+            $familyIndex = intdiv($i - 1, 2) % 10;
+            $familyName = $isMen ? $menFamilies[$familyIndex] : $womenFamilies[$familyIndex];
+            $prefix = $isMen ? "Men's {$familyName}" : $familyName;
             $name = "Velora {$prefix} {$i}";
             $price = 40 + ($i % 20) * 8;
-            $photoIds = $gender === 'men' ? self::MEN_PHOTO_IDS : self::WOMEN_PHOTO_IDS;
+            $photoIds = $isMen ? self::MEN_PHOTO_IDS : self::WOMEN_PHOTO_IDS;
+            $categoryPool = $isMen ? $menCategories : $womenCategories;
             $coverage = $gender === 'women' ? 'Full' : ['Full', 'Modest', 'Layered'][$i % 3];
 
             $product = Product::query()->updateOrCreate(['slug' => Str::slug($name)], [
@@ -85,7 +87,7 @@ class CatalogSeeder extends Seeder
                 'sku' => "VLR-{$i}",
                 'barcode' => '890'.str_pad((string) $i, 9, '0', STR_PAD_LEFT),
                 'brand_id' => $brands[$i % 100]->id,
-                'category_id' => $categories[$i % 50]->id,
+                'category_id' => $categoryPool[$familyIndex]->id,
                 'supplier_id' => $supplierId,
                 'price' => $price,
                 'sale_price' => $i % 4 === 0 ? $price * .8 : null,

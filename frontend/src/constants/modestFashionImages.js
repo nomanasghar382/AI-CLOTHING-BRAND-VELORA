@@ -2,26 +2,21 @@
 const photo = (id, width = 480) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=${width <= 320 ? 65 : 72}`
 
-/** Women: niqab, mannequin, and back-facing abaya shots (no visible faces). */
+/** Face-covered only: niqab and mannequin shots (no hijab portraits). */
 const WOMEN_PHOTO_IDS = [
   'photo-1559730775-67f621597262', // black niqab
+  'photo-1744727811425-e1c0af8b4022', // woman in black niqab
+  'photo-1618297655311-ab851e7045d6', // niqab standing
   'photo-1771162766051-c330f1d664ea', // mannequin, modest dress & hijab
-  'photo-1770367358711-b42cf1a6c2b1', // black abaya, walking outdoors
-  'photo-1588594509615-62de3570d696', // white hijab & black abaya, street
-  'photo-1750190321796-c749877df841', // flowing black abaya
-  'photo-1767766277273-a53443ab8639', // black abaya outdoors
-  'photo-1752794674886-fb12817a5e96', // modest gray abaya
-  'photo-1560350530-a12ec1414cf5', // abaya & hijab, outdoor
 ]
 
-/** Men: thobe, kandura, and traditional Islamic attire. */
 const MEN_PHOTO_IDS = [
-  'photo-1564289851149-a9f8940f795c', // black thobe
-  'photo-1578507435314-e39e7852eddd', // white thobe
-  'photo-1756412066323-a336d2becc10', // brown thobe
-  'photo-1761475048588-e00acbdce66f', // traditional Islamic attire
-  'photo-1774424420923-6936309c3c5e', // men in traditional clothing
-  'photo-1757143137159-316220046829', // group in traditional attire
+  'photo-1564289851149-a9f8940f795c',
+  'photo-1578507435314-e39e7852eddd',
+  'photo-1756412066323-a336d2becc10',
+  'photo-1761475048588-e00acbdce66f',
+  'photo-1774424420923-6936309c3c5e',
+  'photo-1757143137159-316220046829',
 ]
 
 const poolFor = (gender) => (gender === 'men' ? MEN_PHOTO_IDS : WOMEN_PHOTO_IDS)

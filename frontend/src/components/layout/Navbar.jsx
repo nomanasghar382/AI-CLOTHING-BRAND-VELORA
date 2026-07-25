@@ -7,7 +7,7 @@ import useWishlist from '../../hooks/useWishlist'
 import MarketSelector from '../international/MarketSelector'
 import NotificationCenter from '../notifications/NotificationCenter'
 
-const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Marketplace', to: '/marketplace' }, { label: 'Community', to: '/community' }, { label: 'Catalog', to: '/catalog' }, { label: 'Global services', to: '/international' }, { label: 'Our Vision', to: '/about' }]
+const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Marketplace', to: '/marketplace' }, { label: 'Community', to: '/community' }, { label: 'Women', to: '/catalog?gender=women' }, { label: 'Men', to: '/catalog?gender=men' }, { label: 'Global services', to: '/international' }, { label: 'Our Vision', to: '/about' }]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
