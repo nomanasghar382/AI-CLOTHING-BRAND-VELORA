@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { FiMenu, FiUser, FiX } from 'react-icons/fi'
-import { useAuth } from '../../context/AuthContext'
+import useAuth from '../../hooks/useAuth'
 
 const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Our Vision', to: '/about' }]
 

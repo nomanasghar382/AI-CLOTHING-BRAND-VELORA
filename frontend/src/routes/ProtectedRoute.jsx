@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import useAuth from '../hooks/useAuth'
 import Loader from '../components/feedback/Loader'
 
 export default function ProtectedRoute({ roles = [] }) {

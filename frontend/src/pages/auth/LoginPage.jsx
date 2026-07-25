@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import Button from '../../components/common/Button'
 import Input from '../../components/common/Input'
-import { useAuth } from '../../context/AuthContext'
+import useAuth from '../../hooks/useAuth'
 
 export default function LoginPage() {
   const [values, setValues] = useState({ email: '', password: '', remember: false })
