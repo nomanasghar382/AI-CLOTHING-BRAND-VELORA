@@ -43,7 +43,7 @@ See [docs/DEMO.md](docs/DEMO.md) for complete demonstration workflows.
 ## Validation
 
 ```bash
-cd backend && php artisan test                    # 47 tests
+cd backend && php artisan test                    # 51 tests
 cd backend && php artisan velora:validate-release --migrate
 cd frontend && npm run lint && npm run build
 ```

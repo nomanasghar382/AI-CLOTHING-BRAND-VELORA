@@ -28,7 +28,7 @@ velora/
 │   │   ├── api.php             # v1 API routes
 │   │   ├── api_v2.php          # v2 status endpoint
 │   │   └── console.php         # Scheduler tasks
-│   └── tests/                  # Feature + unit tests (47 tests)
+│   └── tests/                  # Feature + unit tests (51 tests)
 │
 ├── frontend/                   # React 19 SPA + PWA
 │   ├── src/

@@ -8,7 +8,7 @@ See [docs/release/TESTING.md](release/TESTING.md) for detailed testing procedure
 cd backend && php artisan test
 ```
 
-**Current coverage:** 47 tests, 324 assertions
+**Current coverage:** 51 tests, 349 assertions
 
 ### Test Suites
 
