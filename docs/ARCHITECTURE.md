@@ -2,6 +2,22 @@
 
 See [docs/release/ARCHITECTURE.md](release/ARCHITECTURE.md) for the complete architecture documentation including system diagrams.
 
+## System Diagrams
+
+Full Mermaid diagrams available in [diagrams/ARCHITECTURE_DIAGRAMS.md](diagrams/ARCHITECTURE_DIAGRAMS.md):
+
+- Overall Architecture
+- Frontend Flow
+- Backend Flow
+- Authentication Flow
+- AI Recommendation Flow
+- Wardrobe Flow
+- Creator Commerce Flow
+- International Commerce Flow
+- Database ER Diagram
+- Admin Architecture
+- Deployment Architecture
+
 ## Overview
 
 VELORA is a full-stack modest fashion commerce platform:

@@ -6,10 +6,18 @@ All notable changes to VELORA are documented in this file.
 
 ### Release
 - VELORA v1.0.0 — production release of the full-stack modest fashion commerce platform
-- Complete documentation suite (17 guides + release checklists)
+- Complete documentation suite (45+ guides + release checklists)
 - Release validation command with migration support (`velora:validate-release --migrate`)
 - Release certification test suite (51 tests, 349 assertions)
 - Demo package with `VELORA_DEMO_MODE` for semester presentation
+
+### Submission Package
+- Project overview, feature matrix, and project statistics
+- 10 Mermaid architecture diagrams
+- 15–20 minute demo script and presentation outline
+- Portfolio package (resume, LinkedIn, GitHub, case study)
+- Submission verification script (`scripts/verify-submission.sh`)
+- LICENSE and CONTRIBUTING guidelines
 
 ### Fixed
 - Release validation auto-migrates pending schema when migrations table exists
