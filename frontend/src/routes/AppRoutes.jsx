@@ -9,11 +9,16 @@ import StatusPage from '../pages/errors/StatusPage'
 import CatalogPage from '../pages/catalog/CatalogPage'
 import ProductDetailPage from '../pages/catalog/ProductDetailPage'
 import ProtectedRoute from './ProtectedRoute'
+import CartPage from '../pages/shopping/CartPage'
+import WishlistPage from '../pages/shopping/WishlistPage'
+import CheckoutPage from '../pages/shopping/CheckoutPage'
+import OrdersPage from '../pages/shopping/OrdersPage'
+import OrderDetailPage from '../pages/shopping/OrderDetailPage'
 
 export default function AppRoutes() {
   return <Routes>
     <Route element={<PublicLayout />}><Route index element={<HomePage />} /><Route path="about" element={<AboutPage />} /><Route path="catalog" element={<CatalogPage />} /><Route path="catalog/:slug" element={<ProductDetailPage />} />
-      <Route element={<ProtectedRoute />}><Route path="account" element={<StatusPage code="ACCOUNT" title="Account foundation ready." description="Future profile modules plug in here." />} /></Route>
+      <Route element={<ProtectedRoute />}><Route path="account" element={<StatusPage code="ACCOUNT" title="Account foundation ready." description="Future profile modules plug in here." />} /><Route path="cart" element={<CartPage />} /><Route path="wishlist" element={<WishlistPage />} /><Route path="checkout" element={<CheckoutPage />} /><Route path="orders" element={<OrdersPage />} /><Route path="orders/:id" element={<OrderDetailPage />} /></Route>
       <Route path="forbidden" element={<StatusPage code="403" title="Access restricted." description="Your account does not have permission to view this page." />} />
       <Route path="error" element={<StatusPage code="500" title="An unexpected error occurred." description="Our team has been notified. Please try again shortly." />} />
       <Route path="maintenance" element={<StatusPage code="MAINTENANCE" title="Refining the experience." description="Velora will return shortly." />} />

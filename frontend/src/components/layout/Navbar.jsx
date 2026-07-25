@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { FiMenu, FiUser, FiX } from 'react-icons/fi'
+import { FiHeart, FiMenu, FiShoppingBag, FiUser, FiX } from 'react-icons/fi'
 import useAuth from '../../hooks/useAuth'
+import useCart from '../../hooks/useCart'
+import useWishlist from '../../hooks/useWishlist'
 
 const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Catalog', to: '/catalog' }, { label: 'Our Vision', to: '/about' }]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { isAuthenticated, user, signOut } = useAuth()
+  const { itemCount: cartCount } = useCart()
+  const { itemCount: wishlistCount } = useWishlist()
 
   return (
     <header className="site-header">
@@ -17,6 +21,8 @@ export default function Navbar() {
           {navItems.map((item) => <NavLink key={item.to} className="nav-link-velora" to={item.to}>{item.label}</NavLink>)}
         </div>
         <div className="d-none d-lg-flex align-items-center gap-3">
+          <Link className="nav-icon-link" to="/wishlist" aria-label={`Wishlist, ${wishlistCount} items`}><FiHeart />{wishlistCount > 0 && <span className="nav-counter">{wishlistCount}</span>}</Link>
+          <Link className="nav-icon-link" to="/cart" aria-label={`Shopping bag, ${cartCount} items`}><FiShoppingBag />{cartCount > 0 && <span className="nav-counter">{cartCount}</span>}</Link>
           {isAuthenticated ? (
             <>
               <span className="small text-slate-300">Hello, {user?.first_name || user?.name}</span>
@@ -30,6 +36,9 @@ export default function Navbar() {
       </nav>
       {open && <div className="container pb-3 d-lg-none mobile-nav">
         {navItems.map((item) => <NavLink key={item.to} className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={item.to}>{item.label}</NavLink>)}
+        <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/wishlist">Wishlist{wishlistCount ? ` (${wishlistCount})` : ''}</NavLink>
+        <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/cart">Shopping bag{cartCount ? ` (${cartCount})` : ''}</NavLink>
+        {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/orders">Orders</NavLink>}
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={isAuthenticated ? '/account' : '/login'}>{isAuthenticated ? 'Account' : 'Sign in'}</NavLink>
       </div>}
     </header>
