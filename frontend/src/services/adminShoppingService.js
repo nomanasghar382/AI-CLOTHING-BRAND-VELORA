@@ -1,6 +1,10 @@
 import apiClient from './apiClient'
 
 export const adminShoppingService = {
+  products: (params) => apiClient.get('/admin/products', { params }),
+  product: (id) => apiClient.get(`/admin/products/${id}`),
+  saveProduct: (product) => product.id ? apiClient.put(`/admin/products/${product.id}`, product) : apiClient.post('/admin/products', product),
+  removeProduct: (id) => apiClient.delete(`/admin/products/${id}`),
   orders: (params) => apiClient.get('/admin/orders', { params }),
   order: (id) => apiClient.get(`/admin/orders/${id}`),
   transition: (id, payload) => apiClient.post(`/admin/orders/${id}/transition`, payload),

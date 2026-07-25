@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CatalogSeeder::class,
             FashionTrendSeeder::class,
+            AdminDomainSeeder::class,
         ]);
     }
 }

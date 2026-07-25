@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RoleSeeder extends Seeder
@@ -20,5 +19,7 @@ class RoleSeeder extends Seeder
             ['name' => 'Creator', 'slug' => 'creator', 'description' => 'Creator commerce account.'],
             ['name' => 'Supplier', 'slug' => 'supplier', 'description' => 'Supplier account.'],
         ])->each(fn (array $role) => Role::query()->updateOrCreate(['slug' => $role['slug']], $role));
+
+        $this->call(PermissionSeeder::class);
     }
 }

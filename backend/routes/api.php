@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\AdminController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Catalog\AdminCatalogController;
@@ -37,22 +38,22 @@ Route::prefix('v1')->group(function (): void {
     });
 
     Route::middleware('auth:sanctum')->prefix('admin')->group(function (): void {
-        Route::apiResource('products', AdminCatalogController::class);
+        Route::apiResource('products', AdminCatalogController::class)->middleware('permission:catalog.manage');
     });
 
     Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->get('admin/ping', fn () => response()->json(['ok' => true]));
 
-    Route::middleware(['auth:sanctum', 'role:super-admin,admin,supplier'])->prefix('admin')->group(function (): void {
+    Route::middleware(['auth:sanctum', 'role:super-admin,admin,supplier', 'permission:orders.manage'])->prefix('admin')->group(function (): void {
         Route::get('orders', [AdminShoppingController::class, 'orders']);
         Route::get('orders/{order}', [AdminShoppingController::class, 'order']);
         Route::post('orders/{order}/transition', [AdminShoppingController::class, 'transition']);
     });
 
     Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->prefix('admin')->group(function (): void {
-        Route::get('coupons', [AdminShoppingController::class, 'coupons']);
-        Route::post('coupons', [AdminShoppingController::class, 'storeCoupon']);
-        Route::put('coupons/{coupon}', [AdminShoppingController::class, 'updateCoupon']);
-        Route::delete('coupons/{coupon}', [AdminShoppingController::class, 'destroyCoupon']);
+        Route::get('coupons', [AdminShoppingController::class, 'coupons'])->middleware('permission:coupons.manage');
+        Route::post('coupons', [AdminShoppingController::class, 'storeCoupon'])->middleware('permission:coupons.manage');
+        Route::put('coupons/{coupon}', [AdminShoppingController::class, 'updateCoupon'])->middleware('permission:coupons.manage');
+        Route::delete('coupons/{coupon}', [AdminShoppingController::class, 'destroyCoupon'])->middleware('permission:coupons.manage');
         Route::get('shipping-methods', [AdminShoppingController::class, 'shippingMethods']);
         Route::post('shipping-methods', [AdminShoppingController::class, 'storeShippingMethod']);
         Route::put('shipping-methods/{shippingMethod}', [AdminShoppingController::class, 'updateShippingMethod']);
@@ -67,6 +68,49 @@ Route::prefix('v1')->group(function (): void {
         Route::get('returns', [AdminShoppingController::class, 'returns']);
         Route::patch('returns/{returnRequest}', [AdminShoppingController::class, 'updateReturn']);
     });
+
+    Route::middleware(['auth:sanctum', 'permission:dashboard.view'])->prefix('admin')->group(function (): void {
+        Route::get('dashboard', [AdminController::class, 'dashboard']);
+        Route::get('analytics', [AdminController::class, 'analytics']);
+    });
+
+    Route::middleware(['auth:sanctum', 'permission:reports.export'])->get('admin/reports/{report}/csv', [AdminController::class, 'exportReport'])
+        ->whereIn('report', ['orders', 'customers', 'products']);
+
+    Route::middleware(['auth:sanctum', 'permission:settings.view'])->get('admin/settings', [AdminController::class, 'settings']);
+    Route::middleware(['auth:sanctum', 'permission:settings.manage'])->group(function (): void {
+        Route::post('admin/settings', [AdminController::class, 'storeSetting']);
+        Route::patch('admin/settings/{setting}', [AdminController::class, 'updateSetting']);
+    });
+
+    Route::middleware(['auth:sanctum', 'permission:content.view'])->group(function (): void {
+        Route::get('admin/content', [AdminController::class, 'contents']);
+        Route::get('admin/content/{content}', [AdminController::class, 'showContent']);
+    });
+    Route::middleware(['auth:sanctum', 'permission:content.manage'])->group(function (): void {
+        Route::post('admin/content', [AdminController::class, 'storeContent']);
+        Route::put('admin/content/{content}', [AdminController::class, 'updateContent']);
+        Route::delete('admin/content/{content}', [AdminController::class, 'destroyContent']);
+    });
+
+    Route::middleware(['auth:sanctum', 'permission:customers.view'])->group(function (): void {
+        Route::get('admin/customers', [AdminController::class, 'customers']);
+        Route::get('admin/customers/{customer}', [AdminController::class, 'showCustomer']);
+    });
+    Route::middleware(['auth:sanctum', 'permission:customers.manage'])->patch('admin/customers/{customer}', [AdminController::class, 'updateCustomer']);
+
+    Route::middleware(['auth:sanctum', 'permission:support.view'])->group(function (): void {
+        Route::get('admin/support/tickets', [AdminController::class, 'tickets']);
+        Route::get('admin/support/tickets/{ticket}', [AdminController::class, 'showTicket']);
+    });
+    Route::middleware(['auth:sanctum', 'permission:support.manage'])->group(function (): void {
+        Route::patch('admin/support/tickets/{ticket}', [AdminController::class, 'updateTicket']);
+        Route::post('admin/support/tickets/{ticket}/messages', [AdminController::class, 'replyTicket']);
+    });
+
+    Route::middleware(['auth:sanctum', 'permission:notifications.view'])->get('admin/notifications', [AdminController::class, 'notifications']);
+    Route::middleware(['auth:sanctum', 'permission:notifications.manage'])->post('admin/notifications', [AdminController::class, 'storeNotification']);
+    Route::middleware(['auth:sanctum', 'permission:activity.view'])->get('admin/activity-logs', [AdminController::class, 'activity']);
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('cart', [CartController::class, 'show']);

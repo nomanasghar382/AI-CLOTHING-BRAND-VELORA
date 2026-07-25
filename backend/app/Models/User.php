@@ -75,7 +75,44 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->roles()->whereIn('slug', $roles)->exists();
     }
 
-    public function cart(): HasOne { return $this->hasOne(ShoppingCart::class); }
-    public function wishlist(): HasOne { return $this->hasOne(Wishlist::class); }
-    public function orders(): HasMany { return $this->hasMany(Order::class); }
+    public function hasPermission(string ...$permissions): bool
+    {
+        if ($this->hasRole('super-admin')) {
+            return true;
+        }
+
+        return $this->roles()
+            ->whereHas('permissions', fn ($query) => $query->whereIn('slug', $permissions))
+            ->exists();
+    }
+
+    public function cart(): HasOne
+    {
+        return $this->hasOne(ShoppingCart::class);
+    }
+
+    public function wishlist(): HasOne
+    {
+        return $this->hasOne(Wishlist::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function supportTickets(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class);
+    }
+
+    public function assignedTickets(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class, 'assigned_to');
+    }
+
+    public function adminNotifications(): HasMany
+    {
+        return $this->hasMany(AdminNotification::class);
+    }
 }
