@@ -2,16 +2,14 @@ import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import Card from '../common/Card'
 import CloudinaryImage from '../common/CloudinaryImage'
-import { iconHandleFromProduct } from '../../utils/productIcon'
 
 function ProductCard({ product }) {
   const image = product.images?.find((item) => item.is_primary)?.thumbnail_url || product.images?.[0]?.thumbnail_url
-  const iconHandle = iconHandleFromProduct(product)
   return (
     <Card className="product-card h-100 overflow-hidden">
       <Link to={`/catalog/${product.slug}`} className="product-image-wrap">
         {image ? <CloudinaryImage src={image} alt={product.name} className="product-image" width={540} sizes="(max-width: 768px) 50vw, 25vw" /> : <div className="product-image product-image-fallback" aria-hidden="true" />}
-        {iconHandle && <span className="badge icon-badge">{iconHandle}</span>}
+        {product.is_new_arrival && <span className="badge icon-badge">New drop</span>}
         {product.discount_percent > 0 && <span className="badge product-badge">-{product.discount_percent}%</span>}
       </Link>
       <div className="p-3">
