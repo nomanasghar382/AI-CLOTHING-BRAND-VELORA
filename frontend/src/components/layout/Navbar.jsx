@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { FiMenu, FiUser, FiX } from 'react-icons/fi'
 import useAuth from '../../hooks/useAuth'
 
-const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Our Vision', to: '/about' }]
+const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Catalog', to: '/catalog' }, { label: 'Our Vision', to: '/about' }]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)

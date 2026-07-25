@@ -1,0 +1,7 @@
+import { Link } from 'react-router-dom'
+import Card from '../common/Card'
+
+export default function ProductCard({ product }) {
+  const image = product.images?.find((item) => item.is_primary)?.thumbnail_url || product.images?.[0]?.thumbnail_url
+  return <Card className="product-card h-100 overflow-hidden"><Link to={`/catalog/${product.slug}`} className="product-image-wrap">{image ? <img src={image} alt={product.name} loading="lazy" className="product-image" /> : <div className="product-image product-image-fallback" />}{product.discount_percent > 0 && <span className="badge product-badge">-{product.discount_percent}%</span>}</Link><div className="p-3"><p className="eyebrow mb-1">{product.brand?.name}</p><Link className="product-name" to={`/catalog/${product.slug}`}>{product.name}</Link><div className="mt-2"><span className="product-price">${Number(product.sale_price || product.price).toFixed(2)}</span>{product.sale_price && <del className="ms-2 text-slate-300">${Number(product.price).toFixed(2)}</del>}</div></div></Card>
+}
