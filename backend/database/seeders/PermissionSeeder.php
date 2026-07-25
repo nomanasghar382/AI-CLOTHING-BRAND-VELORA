@@ -16,7 +16,7 @@ class PermissionSeeder extends Seeder
             'customers.view', 'customers.manage', 'support.view', 'support.manage',
             'notifications.view', 'notifications.manage', 'activity.view',
             'catalog.manage', 'orders.manage', 'coupons.manage', 'shipping.manage',
-            'taxes.manage', 'payments.manage', 'returns.manage',
+            'taxes.manage', 'payments.manage', 'returns.manage', 'loyalty.manage', 'passports.manage',
         ];
 
         foreach ($permissions as $slug) {

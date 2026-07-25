@@ -140,4 +140,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(CommunityPost::class);
     }
+
+    public function loyaltyWallet(): HasOne
+    {
+        return $this->hasOne(LoyaltyWallet::class);
+    }
+
+    public function productAlerts(): HasMany
+    {
+        return $this->hasMany(ProductAlert::class);
+    }
+
+    public function notificationPreference(): HasOne
+    {
+        return $this->hasOne(NotificationPreference::class);
+    }
 }

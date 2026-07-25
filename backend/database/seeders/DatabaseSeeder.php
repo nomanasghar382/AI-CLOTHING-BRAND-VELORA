@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             FashionTrendSeeder::class,
             AdminDomainSeeder::class,
             InternationalCommerceSeeder::class,
+            LoyaltyPassportSeeder::class,
         ]);
     }
 }

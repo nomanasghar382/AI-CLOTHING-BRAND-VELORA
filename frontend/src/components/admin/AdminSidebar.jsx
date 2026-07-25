@@ -9,6 +9,7 @@ const items = [
   ['Customers', 'customers', FiUsers], ['Analytics', 'analytics', FiBarChart2], ['Reports', 'reports', FiActivity],
   ['Coupons', 'coupons', FiGift], ['Support', 'support', FiHelpCircle], ['Reviews', 'reviews', FiStar],
   ['Suppliers', 'suppliers', FiTruck], ['Creators', 'creators', FiUsers], ['Notifications', 'notifications', FiBell],
+  ['Loyalty & VIP', 'loyalty', FiStar], ['Gift cards', 'gift-cards', FiGift], ['Product alerts', 'alerts', FiBell],
   ['Activity logs', 'activity', FiActivity], ['International', 'international', FiGlobe], ['Settings', 'settings', FiSettings],
 ]
 

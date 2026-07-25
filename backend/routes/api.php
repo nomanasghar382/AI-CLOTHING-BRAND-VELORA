@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Catalog\AdminCatalogController;
 use App\Http\Controllers\Api\V1\Catalog\CatalogController;
 use App\Http\Controllers\Api\V1\Community\CommunityController;
 use App\Http\Controllers\Api\V1\Creator\CreatorController;
+use App\Http\Controllers\Api\V1\Loyalty\LoyaltyController;
 use App\Http\Controllers\Api\V1\Shopping\AdminShoppingController;
 use App\Http\Controllers\Api\V1\Shopping\CartController;
 use App\Http\Controllers\Api\V1\Shopping\InternationalCommerceController;
@@ -74,6 +75,10 @@ Route::prefix('v1')->group(function (): void {
         Route::post('international/{resource}', [InternationalCommerceController::class, 'adminStore']);
         Route::put('international/{resource}/{id}', [InternationalCommerceController::class, 'adminUpdate']);
         Route::delete('international/{resource}/{id}', [InternationalCommerceController::class, 'adminDestroy']);
+        Route::post('loyalty/wallets/{userId}/adjust', [LoyaltyController::class, 'administerWallet'])->middleware('permission:loyalty.manage');
+        Route::post('loyalty/products/{product}/dispatch-alerts', [LoyaltyController::class, 'dispatchAlerts'])->middleware('permission:loyalty.manage');
+        Route::post('ethical-passports', [LoyaltyController::class, 'storePassport'])->middleware('permission:passports.manage');
+        Route::put('ethical-passports/{passport}', [LoyaltyController::class, 'updatePassport'])->middleware('permission:passports.manage');
     });
 
     Route::middleware(['auth:sanctum', 'permission:dashboard.view'])->prefix('admin')->group(function (): void {
@@ -191,5 +196,16 @@ Route::prefix('v1')->group(function (): void {
         Route::get('style/saved-outfits', [StyleController::class, 'savedOutfits']);
         Route::post('style/saved-outfits', [StyleController::class, 'saveOutfit']);
         Route::post('style/feedback', [StyleController::class, 'feedback']);
+        Route::get('loyalty/wallet', [LoyaltyController::class, 'wallet']);
+        Route::get('loyalty/referral-code', [LoyaltyController::class, 'referralCode']);
+        Route::post('loyalty/referrals', [LoyaltyController::class, 'applyReferral']);
+        Route::get('loyalty/preferences', [LoyaltyController::class, 'preferences']);
+        Route::put('loyalty/preferences', [LoyaltyController::class, 'preferences']);
+        Route::get('loyalty/alerts', [LoyaltyController::class, 'alerts']);
+        Route::post('loyalty/alerts', [LoyaltyController::class, 'storeAlert']);
+        Route::delete('loyalty/alerts/{alert}', [LoyaltyController::class, 'destroyAlert']);
+        Route::post('loyalty/gift-cards', [LoyaltyController::class, 'giftCard']);
+        Route::post('loyalty/gift-cards/redeem', [LoyaltyController::class, 'redeemGiftCard']);
+        Route::get('products/{product}/ethical-passport', [LoyaltyController::class, 'passport']);
     });
 });

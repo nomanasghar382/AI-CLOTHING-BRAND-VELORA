@@ -13,7 +13,7 @@ import { catalogService } from '../../services/catalogService'
 
 const money = (value, currency = 'USD') => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(Number(value || 0))
 const statusClass = (status) => `admin-status admin-status-${String(status || '').replaceAll('_', '-')}`
-const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', activity: 'Activity logs', settings: 'Settings', international: 'International commerce' }
+const pageNames = { '': 'Command center', products: 'Product catalog', orders: 'Order management', customers: 'Customers', analytics: 'Analytics', reports: 'Reports', coupons: 'Coupons', support: 'Support desk', reviews: 'Reviews', suppliers: 'Suppliers', creators: 'Creators', notifications: 'Notifications', loyalty: 'Loyalty & VIP', 'gift-cards': 'Gift cards', alerts: 'Product alerts', activity: 'Activity logs', settings: 'Settings', international: 'International commerce' }
 
 function extract(response) {
   const payload = response?.data?.data

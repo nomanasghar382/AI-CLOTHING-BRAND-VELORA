@@ -71,4 +71,14 @@ class Product extends Model
     {
         return $this->hasMany(Inventory::class);
     }
+
+    public function ethicalPassport(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(EthicalPassport::class);
+    }
+
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(ProductAlert::class);
+    }
 }

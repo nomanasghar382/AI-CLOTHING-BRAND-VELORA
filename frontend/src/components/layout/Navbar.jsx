@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { FiHeart, FiMenu, FiShoppingBag, FiUser, FiX } from 'react-icons/fi'
+import { FiBell, FiHeart, FiMenu, FiShoppingBag, FiStar, FiUser, FiX } from 'react-icons/fi'
 import useAuth from '../../hooks/useAuth'
 import useCart from '../../hooks/useCart'
 import useWishlist from '../../hooks/useWishlist'
@@ -29,6 +29,8 @@ export default function Navbar() {
             <>
               <Link className="nav-link-velora" to="/ai">AI stylist</Link>
               <Link className="nav-link-velora" to="/wardrobe">Wardrobe</Link>
+              <Link className="nav-icon-link" to="/notifications" aria-label="Notifications"><FiBell /></Link>
+              <Link className="nav-link-velora" to="/rewards"><FiStar /> Rewards</Link>
               <span className="small text-slate-300">Hello, {user?.first_name || user?.name}</span>
               <button type="button" className="btn btn-link nav-link-velora p-0" onClick={signOut}>Sign out</button>
             </>
@@ -44,6 +46,8 @@ export default function Navbar() {
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/wishlist">Wishlist{wishlistCount ? ` (${wishlistCount})` : ''}</NavLink>
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/cart">Shopping bag{cartCount ? ` (${cartCount})` : ''}</NavLink>
         {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/orders">Orders</NavLink>}
+        {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/rewards">Rewards & VIP</NavLink>}
+        {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/notifications">Notifications</NavLink>}
         {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/ai">AI stylist</NavLink>}
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/visual-search">Visual search</NavLink>
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={isAuthenticated ? '/account' : '/login'}>{isAuthenticated ? 'Account' : 'Sign in'}</NavLink>

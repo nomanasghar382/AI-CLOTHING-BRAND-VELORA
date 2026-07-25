@@ -10,6 +10,7 @@ import { WishlistProvider } from './context/WishlistContext.jsx'
 import { AiStylistProvider } from './context/AiStylistContext.jsx'
 import { CommunityProvider } from './context/CommunityContext.jsx'
 import { InternationalProvider } from './context/InternationalContext.jsx'
+import { LoyaltyProvider } from './context/LoyaltyContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -19,9 +20,11 @@ createRoot(document.getElementById('root')).render(
           <WishlistProvider>
             <CommunityProvider>
               <InternationalProvider>
-                <AiStylistProvider>
-                  <App />
-                </AiStylistProvider>
+                <LoyaltyProvider>
+                  <AiStylistProvider>
+                    <App />
+                  </AiStylistProvider>
+                </LoyaltyProvider>
               </InternationalProvider>
             </CommunityProvider>
           </WishlistProvider>
