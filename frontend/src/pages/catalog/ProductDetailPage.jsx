@@ -8,6 +8,7 @@ import ErrorState from '../../components/feedback/ErrorState'
 import Seo from '../../components/system/Seo'
 import useAsyncAction from '../../hooks/useAsyncAction'
 import { formatMoney } from '../../utils/format'
+import { iconHandleFromProduct, iconNameFromProduct } from '../../utils/productIcon'
 import { catalogService } from '../../services/catalogService'
 import useAuth from '../../hooks/useAuth'
 import useCart from '../../hooks/useCart'
@@ -58,6 +59,8 @@ export default function ProductDetailPage() {
   if (!product) return <section className="container py-5"><Loader label="Opening the collection..." /></section>
 
   const primary = product.images?.find((image) => image.is_primary) || product.images?.[0]
+  const iconHandle = iconHandleFromProduct(product)
+  const iconName = iconNameFromProduct(product)
   const perform = async (action) => {
     if (!isAuthenticated) {
       navigate('/login', { state: { from: { pathname: `/catalog/${slug}` } } })
@@ -83,7 +86,9 @@ export default function ProductDetailPage() {
         </div>
         <div className="col-lg-5">
           <p className="eyebrow">{product.brand?.name} / {product.gender === 'men' ? "Men's" : "Women's"} · {product.category?.name}</p>
+          {iconHandle && <p className="icon-drop-label mb-2">Velora Icon Series · worn by <strong>{iconHandle}</strong></p>}
           <h1 className="display-6">{product.name}</h1>
+          {iconName && <p className="text-slate-300 mb-0">Campaign face: {iconName}</p>}
           <div className="my-3">
             <span className="product-price fs-3">{formatMoney(product.sale_price || product.price)}</span>
             {product.sale_price && <del className="ms-2 text-slate-300">{formatMoney(product.price)}</del>}

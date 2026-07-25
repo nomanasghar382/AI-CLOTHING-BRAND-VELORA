@@ -8,34 +8,16 @@ use Illuminate\Support\Str;
 
 class CatalogSeeder extends Seeder
 {
-    /** @var array{crop_variants: list<string>, women: list<string>, men: list<string>, gen_z_adjectives: list<string>, gen_z_suffixes: list<string>} */
-    private array $library;
+    /** @var array{women: list<array{name: string, handle: string, photo: string}>, men: list<array{name: string, handle: string, photo: string}>, garment_photos: array{women: list<string>, men: list<string>}} */
+    private array $icons;
 
-    /** @var list<array{photo_id: string, variant: int}> */
-    private array $womenImageSlots = [];
-
-    /** @var list<array{photo_id: string, variant: int}> */
-    private array $menImageSlots = [];
+    /** @var array{gen_z_adjectives: list<string>, gen_z_suffixes: list<string>} */
+    private array $copy;
 
     public function __construct()
     {
-        $this->library = require database_path('data/ModestFashionImageLibrary.php');
-        $this->womenImageSlots = $this->buildImageSlots($this->library['women']);
-        $this->menImageSlots = $this->buildImageSlots($this->library['men']);
-    }
-
-    /** @param list<string> $photoIds */
-    private function buildImageSlots(array $photoIds): array
-    {
-        $slots = [];
-
-        foreach ($photoIds as $photoId) {
-            foreach (array_keys($this->library['crop_variants']) as $variant) {
-                $slots[] = ['photo_id' => $photoId, 'variant' => $variant];
-            }
-        }
-
-        return $slots;
+        $this->icons = require database_path('data/VeloraIconLibrary.php');
+        $this->copy = require database_path('data/ModestFashionImageLibrary.php');
     }
 
     private static function imageUrl(string $photoId, int $width, int $variant = 0): string
@@ -45,7 +27,7 @@ class CatalogSeeder extends Seeder
         if (str_starts_with($photoId, 'pexels:')) {
             $id = substr($photoId, 7);
 
-            return "https://images.pexels.com/photos/{$id}/pexels-photo-{$id}.jpeg?auto=compress&fit=crop&w={$width}&q={$quality}&dpr=2";
+            return "https://images.pexels.com/photos/{$id}/pexels-photo-{$id}.jpeg?auto=compress&fit=crop&w={$width}&h=".($width <= 540 ? 720 : 1350)."&q={$quality}&dpr=2";
         }
 
         $host = str_starts_with($photoId, 'premium_photo') ? 'plus.unsplash.com' : 'images.unsplash.com';
@@ -55,30 +37,32 @@ class CatalogSeeder extends Seeder
         return "https://{$host}/{$photoId}?auto=format&fit=crop&w={$width}&q={$quality}&dpr=2{$crop}";
     }
 
-    /** @param array{photo_id: string, variant: int} $slot */
-    private static function urlFromSlot(array $slot, int $width): string
+    /** @return array{name: string, handle: string, photo: string} */
+    private function iconForProduct(int $productIndex, string $gender): array
     {
-        return self::imageUrl($slot['photo_id'], $width, $slot['variant']);
+        $ordinal = intdiv($productIndex - 1, 2);
+        $pool = $gender === 'men' ? $this->icons['men'] : $this->icons['women'];
+
+        return $pool[$ordinal];
     }
 
-    /** @return array{photo_id: string, variant: int} */
-    private function slotForProduct(int $productIndex, string $gender, int $offset = 0): array
+    private function garmentPhoto(string $gender, int $productIndex, int $offset): string
     {
-        $slots = $gender === 'men' ? $this->menImageSlots : $this->womenImageSlots;
+        $pool = $this->icons['garment_photos'][$gender];
         $ordinal = intdiv($productIndex - 1, 2) + $offset;
 
-        return $slots[$ordinal % count($slots)];
+        return $pool[$ordinal % count($pool)];
     }
 
-    private function genZProductName(string $familyName, int $productIndex, string $gender): string
+    private function iconProductName(array $icon, string $familyName, int $productIndex, string $gender): string
     {
-        $adjectives = $this->library['gen_z_adjectives'];
-        $suffixes = $this->library['gen_z_suffixes'];
+        $adjectives = $this->copy['gen_z_adjectives'];
+        $suffixes = $this->copy['gen_z_suffixes'];
         $adj = $adjectives[$productIndex % count($adjectives)];
         $suffix = $suffixes[intdiv($productIndex, count($adjectives)) % count($suffixes)];
         $prefix = $gender === 'men' ? "Men's" : '';
 
-        return trim("{$adj} {$prefix} {$familyName} {$suffix}");
+        return trim("{$icon['name']} × {$adj} {$prefix} {$familyName} {$suffix}");
     }
 
     public function run(): void
@@ -128,19 +112,19 @@ class CatalogSeeder extends Seeder
             $gender = $isMen ? 'men' : 'women';
             $familyIndex = intdiv($i - 1, 2) % $familyCount;
             $familyName = $isMen ? $menFamilies[$familyIndex] : $womenFamilies[$familyIndex];
-            $name = $this->genZProductName($familyName, $i, $gender);
+            $icon = $this->iconForProduct($i, $gender);
+            $name = $this->iconProductName($icon, $familyName, $i, $gender);
             $price = 35 + ($i % 25) * 6;
             $categoryPool = $isMen ? $menCategories : $womenCategories;
             $coverage = $gender === 'women' ? 'Full' : ['Full', 'Modest', 'Layered'][$i % 3];
-            $tagline = $gender === 'women'
-                ? 'Full-coverage fit made for Gen Z modest wardrobes.'
-                : 'Clean modest silhouette for school, Eid, and everyday.';
+            $tagline = "Velora Icon Series — styled exclusively for {$icon['handle']}.";
+            $keywords = "{$icon['handle']}, velora-icon, icon-drop, {$familyName}";
 
             $product = Product::query()->updateOrCreate(['sku' => "VLR-{$i}"], [
                 'slug' => Str::slug($name.'-'.$i),
                 'name' => $name,
                 'short_description' => $tagline,
-                'description' => "Built for ages 16–35 who want modest Islamic style that still feels current. The {$name} uses premium fabric, relaxed tailoring, and easy layering for campus, Jummah, and weekend fits.",
+                'description' => "{$icon['name']} wears this {$familyName} piece in the Velora Icon Series — our Gen Z modest campaign for ages 16–35. Full coverage, premium fabric, and a look made for campus, Jummah, and weekend edits.",
                 'barcode' => '890'.str_pad((string) $i, 9, '0', STR_PAD_LEFT),
                 'brand_id' => $brands[$i % 100]->id,
                 'category_id' => $categoryPool[$familyIndex]->id,
@@ -161,6 +145,9 @@ class CatalogSeeder extends Seeder
                 'care_instructions' => 'Machine wash cold. Dry flat. Warm iron if needed.',
                 'gender' => $gender,
                 'season' => ['All season', 'Summer', 'Winter', 'Eid edit'][$i % 4],
+                'meta_title' => "{$icon['name']} × {$familyName} | Velora Icons",
+                'meta_description' => "Worn by {$icon['handle']} in the Velora Icon Series.",
+                'keywords' => $keywords,
                 'published_at' => now()->subDays($i % 120),
             ]);
 
@@ -170,10 +157,18 @@ class CatalogSeeder extends Seeder
             $product->sizes()->sync($selectedSizes->pluck('id'));
 
             foreach (range(0, 4) as $j) {
-                $slot = $this->slotForProduct($i, $gender, $j * 17);
-                $url = self::urlFromSlot($slot, 1080);
-                $thumbnailUrl = self::urlFromSlot($slot, 540);
-                ProductImage::query()->updateOrCreate(['product_id' => $product->id, 'sort_order' => $j], ['url' => $url, 'thumbnail_url' => $thumbnailUrl, 'alt_text' => $name, 'is_primary' => $j === 0]);
+                $photoId = $j === 0 ? $icon['photo'] : $this->garmentPhoto($gender, $i, $j);
+                $url = self::imageUrl($photoId, 1080, $j === 0 ? 0 : $j - 1);
+                $thumbnailUrl = self::imageUrl($photoId, 540, $j === 0 ? 0 : $j - 1);
+                ProductImage::query()->updateOrCreate(
+                    ['product_id' => $product->id, 'sort_order' => $j],
+                    [
+                        'url' => $url,
+                        'thumbnail_url' => $thumbnailUrl,
+                        'alt_text' => $j === 0 ? "{$icon['name']} wearing {$name}" : "{$name} garment detail",
+                        'is_primary' => $j === 0,
+                    ]
+                );
                 $variant = ProductVariant::query()->updateOrCreate(['sku' => "VLR-{$i}-{$j}"], ['product_id' => $product->id, 'color_id' => $selectedColors[$j % 2]->id, 'size_id' => $selectedSizes[$j % 3]->id, 'stock_quantity' => 5 + $i % 30, 'status' => 'active']);
                 Inventory::query()->updateOrCreate(['product_id' => $product->id, 'product_variant_id' => $variant->id, 'location' => 'primary'], ['current_stock' => $variant->stock_quantity, 'reserved_stock' => 0, 'minimum_stock' => 5]);
             }
