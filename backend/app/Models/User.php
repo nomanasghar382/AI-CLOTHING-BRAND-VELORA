@@ -115,4 +115,29 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(AdminNotification::class);
     }
+
+    public function creatorProfile(): HasOne
+    {
+        return $this->hasOne(CreatorProfile::class);
+    }
+
+    public function lookboards(): HasMany
+    {
+        return $this->hasMany(Lookboard::class);
+    }
+
+    public function wardrobeItems(): HasMany
+    {
+        return $this->hasMany(WardrobeItem::class);
+    }
+
+    public function visualSearches(): HasMany
+    {
+        return $this->hasMany(VisualSearch::class);
+    }
+
+    public function communityPosts(): HasMany
+    {
+        return $this->hasMany(CommunityPost::class);
+    }
 }

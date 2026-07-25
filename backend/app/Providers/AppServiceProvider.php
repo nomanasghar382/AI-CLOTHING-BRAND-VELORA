@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
-use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Contracts\Repositories\CartRepositoryInterface;
+use App\Contracts\Repositories\CreatorProfileRepositoryInterface;
+use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Repositories\WishlistRepositoryInterface;
 use App\Repositories\Eloquent\EloquentCartRepository;
+use App\Repositories\Eloquent\EloquentCreatorProfileRepository;
 use App\Repositories\Eloquent\EloquentProductRepository;
 use App\Repositories\Eloquent\EloquentUserRepository;
 use App\Repositories\Eloquent\EloquentWishlistRepository;
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
         $this->app->bind(CartRepositoryInterface::class, EloquentCartRepository::class);
         $this->app->bind(WishlistRepositoryInterface::class, EloquentWishlistRepository::class);
+        $this->app->bind(CreatorProfileRepositoryInterface::class, EloquentCreatorProfileRepository::class);
     }
 
     /**

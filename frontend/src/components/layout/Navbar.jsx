@@ -5,7 +5,7 @@ import useAuth from '../../hooks/useAuth'
 import useCart from '../../hooks/useCart'
 import useWishlist from '../../hooks/useWishlist'
 
-const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Catalog', to: '/catalog' }, { label: 'Our Vision', to: '/about' }]
+const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Marketplace', to: '/marketplace' }, { label: 'Community', to: '/community' }, { label: 'Catalog', to: '/catalog' }, { label: 'Our Vision', to: '/about' }]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -26,6 +26,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               <Link className="nav-link-velora" to="/ai">AI stylist</Link>
+              <Link className="nav-link-velora" to="/wardrobe">Wardrobe</Link>
               <span className="small text-slate-300">Hello, {user?.first_name || user?.name}</span>
               <button type="button" className="btn btn-link nav-link-velora p-0" onClick={signOut}>Sign out</button>
             </>
@@ -41,6 +42,7 @@ export default function Navbar() {
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/cart">Shopping bag{cartCount ? ` (${cartCount})` : ''}</NavLink>
         {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/orders">Orders</NavLink>}
         {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/ai">AI stylist</NavLink>}
+        <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/visual-search">Visual search</NavLink>
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={isAuthenticated ? '/account' : '/login'}>{isAuthenticated ? 'Account' : 'Sign in'}</NavLink>
       </div>}
     </header>

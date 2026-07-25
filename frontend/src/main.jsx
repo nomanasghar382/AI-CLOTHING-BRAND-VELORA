@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { WishlistProvider } from './context/WishlistContext.jsx'
 import { AiStylistProvider } from './context/AiStylistContext.jsx'
+import { CommunityProvider } from './context/CommunityContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -15,9 +16,11 @@ createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
-            <AiStylistProvider>
-              <App />
-            </AiStylistProvider>
+            <CommunityProvider>
+              <AiStylistProvider>
+                <App />
+              </AiStylistProvider>
+            </CommunityProvider>
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>

@@ -53,4 +53,19 @@ return [
         'timeout' => env('WEATHER_TIMEOUT', 8),
     ],
 
+    'cloudinary' => [
+        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+        'api_key' => env('CLOUDINARY_API_KEY'),
+        'api_secret' => env('CLOUDINARY_API_SECRET'),
+        'timeout' => env('CLOUDINARY_TIMEOUT', 15),
+    ],
+
+    'visual_search' => [
+        'key' => env('VISUAL_SEARCH_API_KEY'),
+        'url' => env('VISUAL_SEARCH_API_URL'),
+        'provider' => env('VISUAL_SEARCH_PROVIDER', 'external'),
+        'timeout' => env('VISUAL_SEARCH_TIMEOUT', 15),
+        'cache_minutes' => env('VISUAL_SEARCH_CACHE_MINUTES', 60),
+    ],
+
 ];
