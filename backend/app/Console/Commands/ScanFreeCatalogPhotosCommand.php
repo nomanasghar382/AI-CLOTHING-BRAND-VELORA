@@ -17,16 +17,15 @@ class ScanFreeCatalogPhotosCommand extends Command
 
         $this->info('Free catalog photo pool');
         $this->table(['Source', 'Women', 'Men'], [
-            ['Your phone photos (public/free-catalog/)', $counts['women_local'], $counts['men_local']],
-            ['Total pool (local + free Unsplash)', $counts['women_total'], $counts['men_total']],
-            ['Men brand model (all men\'s products)', '—', $counts['men_brand_model'] ? 'YES' : 'missing'],
+            ['Your uploaded photos', $counts['women_local'], $counts['men_local']],
+            ['Total pool', $counts['women_total'], $counts['men_total']],
+            ['Brand model active', $counts['women_catalog_photos'] ? 'YOUR LOOKS' : 'add photos', $counts['men_brand_model'] ? 'YES' : 'add photo'],
         ]);
 
         $this->newLine();
-        $this->line('Use YOUR photo on ALL men\'s clothing (free):');
-        $this->line('  1. Save your photo as: backend/public/free-catalog/men/brand-model.jpg');
-        $this->line('  2. Run: php artisan db:seed --class=CatalogSeeder');
-        $this->line('Every men\'s product will show you wearing that look + garment detail shots.');
+        $this->line('WOMEN: copy your niqab/abaya images to backend/public/free-catalog/women/');
+        $this->line('MEN: save your portrait as backend/public/free-catalog/men/brand-model.jpg');
+        $this->line('Then: php artisan db:seed --class=CatalogSeeder');
 
         return self::SUCCESS;
     }

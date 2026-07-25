@@ -28,18 +28,9 @@ class CatalogSeeder extends Seeder
     /** @return array{type: string, id?: string, path?: string} */
     private function entryFor(string $gender, int $ordinal, int $galleryIndex): array
     {
-        if ($gender === 'men' && $galleryIndex === 0 && ($brand = FreeCatalogPhotoPool::menBrandModelPath())) {
-            return ['type' => 'local', 'path' => $brand];
-        }
-
-        if ($gender === 'men' && $galleryIndex > 0 && FreeCatalogPhotoPool::usesMenBrandModel()) {
-            return ['type' => 'unsplash', 'id' => FreeCatalogPhotoPool::menGarmentPhoto($ordinal, $galleryIndex)];
-        }
-
         $pool = $gender === 'men' ? $this->menPool : $this->womenPool;
-        $index = $ordinal + ($galleryIndex * 97);
 
-        return $pool[$index % count($pool)];
+        return FreeCatalogPhotoPool::entryFor($gender, $ordinal, $galleryIndex, $pool);
     }
 
     private function genZProductName(string $familyName, int $productIndex, string $gender): string
@@ -61,6 +52,11 @@ class CatalogSeeder extends Seeder
             $this->command?->info('Men brand model detected — your photo will be used on ALL men\'s products.');
         } else {
             $this->command?->warn('Tip: save your photo as backend/public/free-catalog/men/brand-model.jpg for all men\'s products.');
+        }
+        if ($counts['women_catalog_photos']) {
+            $this->command?->info("Women catalog photos: {$counts['women_local']} looks — used on ALL women's products.");
+        } else {
+            $this->command?->warn('Tip: add your niqab/abaya photos to backend/public/free-catalog/women/');
         }
 
         $colors = collect(['Black'=>'#111827','Ivory'=>'#FFFFF0','Emerald'=>'#047857','Plum'=>'#7E2253','Navy'=>'#1E3A8A','Sand'=>'#D6C5A2','Rose'=>'#E9A0B5','Olive'=>'#556B2F','Taupe'=>'#8B7D6B','Cocoa'=>'#6F4E37','Sky'=>'#87CEEB','Lilac'=>'#C8A2C8','Stone'=>'#78716C','Sage'=>'#9CAF88','Burgundy'=>'#800020','Teal'=>'#0F766E','Mocha'=>'#967969','Coral'=>'#FF7F50','Silver'=>'#C0C0C0','Gold'=>'#D4AF37'])->map(fn ($hex, $name) => Color::query()->updateOrCreate(['slug'=>Str::slug($name)], ['name'=>$name,'hex_code'=>$hex,'status'=>'active']))->values();
@@ -115,13 +111,16 @@ class CatalogSeeder extends Seeder
             $coverage = $gender === 'women' ? 'Full' : ['Full', 'Modest', 'Layered'][$i % 3];
 
             $modeledBy = $gender === 'men' && FreeCatalogPhotoPool::usesMenBrandModel() ? ' Modeled by Noman Asghar.' : '';
+            $womenLook = $gender === 'women' && FreeCatalogPhotoPool::usesWomenCatalogPhotos() ? ' Velora niqab & abaya edit.' : '';
             $product = Product::query()->updateOrCreate(['sku' => "VLR-{$i}"], [
                 'slug' => Str::slug($name.'-'.$i),
                 'name' => $name,
                 'short_description' => $gender === 'men' && FreeCatalogPhotoPool::usesMenBrandModel()
                     ? "Worn by Noman Asghar — {$familyName} edit."
-                    : '100% free photos — your pics or Unsplash stock.',
-                'description' => "Built for ages 16–35. The {$name} is styled for campus, Jummah, and weekend fits.{$modeledBy}",
+                    : ($gender === 'women' && FreeCatalogPhotoPool::usesWomenCatalogPhotos()
+                        ? "Your niqab & abaya look — {$familyName} drop."
+                        : '100% free photos — your pics or Unsplash stock.'),
+                'description' => "Built for ages 16–35. The {$name} is styled for campus, Jummah, and weekend fits.{$modeledBy}{$womenLook}",
                 'barcode' => '890'.str_pad((string) $i, 9, '0', STR_PAD_LEFT),
                 'brand_id' => $brands[$i % 100]->id,
                 'category_id' => $categoryPool[$familyIndex]->id,

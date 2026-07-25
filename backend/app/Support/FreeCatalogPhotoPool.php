@@ -31,6 +31,18 @@ final class FreeCatalogPhotoPool
         return self::menBrandModelPath() !== null;
     }
 
+    public static function usesWomenCatalogPhotos(): bool
+    {
+        return count(self::womenCatalogPhotos()) > 0;
+    }
+
+    /** Your uploaded women looks — niqab, abaya, khimar, jilbab (excludes README). */
+    /** @return list<string> */
+    public static function womenCatalogPhotos(): array
+    {
+        return self::localPhotos('women');
+    }
+
     /** @return list<array{type: string, id?: string, path?: string}> */
     public static function forGender(string $gender): array
     {
@@ -43,6 +55,10 @@ final class FreeCatalogPhotoPool
 
         foreach (self::localPhotos($gender) as $path) {
             $pool[] = ['type' => 'local', 'path' => $path];
+        }
+
+        if ($gender === 'women' && self::usesWomenCatalogPhotos()) {
+            return $pool;
         }
 
         foreach ($editorial as $id) {
@@ -60,7 +76,7 @@ final class FreeCatalogPhotoPool
         return $pool;
     }
 
-    /** @return list<string> Public URL paths e.g. /free-catalog/women/look-01.jpg */
+    /** @return list<string> Public URL paths e.g. /free-catalog/women/01.jpg */
     public static function localPhotos(string $gender): array
     {
         $dir = public_path("free-catalog/{$gender}");
@@ -68,9 +84,15 @@ final class FreeCatalogPhotoPool
             return [];
         }
 
+        $reserved = $gender === 'men' ? self::MEN_BRAND_MODEL_NAMES : [];
         $paths = [];
+
         foreach (glob($dir.'/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', GLOB_BRACE) ?: [] as $file) {
-            $paths[] = '/free-catalog/'.$gender.'/'.basename($file);
+            $name = basename($file);
+            if (in_array(strtolower($name), array_map('strtolower', $reserved), true)) {
+                continue;
+            }
+            $paths[] = '/free-catalog/'.$gender.'/'.$name;
         }
 
         sort($paths);
@@ -93,7 +115,6 @@ final class FreeCatalogPhotoPool
         return "https://{$host}/{$photoId}?auto=format&fit=crop&w={$width}&h=".($width <= 540 ? 900 : 1350)."&q={$quality}&dpr=2{$crop}";
     }
 
-    /** Garment detail shots shown alongside your brand-model photo. */
     public static function menGarmentPhoto(int $ordinal, int $galleryIndex): string
     {
         $catalog = require database_path('data/GenZCuratedCatalog.php');
@@ -103,14 +124,47 @@ final class FreeCatalogPhotoPool
         return $pool[$index % count($pool)];
     }
 
+    public static function womenGarmentPhoto(int $ordinal, int $galleryIndex): string
+    {
+        $catalog = require database_path('data/GenZCuratedCatalog.php');
+        $pool = array_merge($catalog['women_editorial'], $catalog['women_product']);
+        $index = $ordinal + ($galleryIndex * 11);
+
+        return $pool[$index % count($pool)];
+    }
+
+    /** @return array{type: string, id?: string, path?: string} */
+    public static function entryFor(string $gender, int $ordinal, int $galleryIndex, array $fallbackPool): array
+    {
+        if ($gender === 'men' && $galleryIndex === 0 && ($brand = self::menBrandModelPath())) {
+            return ['type' => 'local', 'path' => $brand];
+        }
+
+        if ($gender === 'men' && $galleryIndex > 0 && self::usesMenBrandModel()) {
+            return ['type' => 'unsplash', 'id' => self::menGarmentPhoto($ordinal, $galleryIndex)];
+        }
+
+        $womenPhotos = self::womenCatalogPhotos();
+        if ($gender === 'women' && $womenPhotos !== []) {
+            $path = $womenPhotos[($ordinal + $galleryIndex) % count($womenPhotos)];
+
+            return ['type' => 'local', 'path' => $path];
+        }
+
+        $index = $ordinal + ($galleryIndex * 97);
+
+        return $fallbackPool[$index % count($fallbackPool)];
+    }
+
     public static function counts(): array
     {
         return [
-            'women_local' => count(self::localPhotos('women')),
+            'women_local' => count(self::womenCatalogPhotos()),
             'men_local' => count(self::localPhotos('men')),
             'women_total' => count(self::forGender('women')),
             'men_total' => count(self::forGender('men')),
             'men_brand_model' => self::usesMenBrandModel(),
+            'women_catalog_photos' => self::usesWomenCatalogPhotos(),
         ];
     }
 }
