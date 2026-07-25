@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\V1\Catalog\AdminCatalogController;
 use App\Http\Controllers\Api\V1\Catalog\CatalogController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,10 @@ Route::prefix('v1')->group(function (): void {
             ->name('verification.verify');
         Route::post('email/verification-notification', [EmailVerificationController::class, 'resend'])
             ->middleware('throttle:6,1');
+    });
+
+    Route::middleware('auth:sanctum')->prefix('admin')->group(function (): void {
+        Route::apiResource('products', AdminCatalogController::class);
     });
 
     Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->get('admin/ping', fn () => response()->json(['ok' => true]));
