@@ -1,0 +1,28 @@
+import { useCallback, useMemo, useState } from 'react'
+import { CommunityContext } from './communityContext'
+
+const starterPosts = [
+  { id: 'post-1', author: 'Amara Idris', handle: '@amaraedits', time: '18 min', text: 'The outfit formula I keep returning to: one generous layer, one crisp shape, and one small point of shine.', image: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=900&q=80', likes: 312, liked: false, bookmarked: true, comments: [{ id: 'c1', author: 'Nora', text: 'That last detail changes everything.' }] },
+  { id: 'post-2', author: 'Nora Kim', handle: '@noraspace', time: '42 min', text: 'A reminder that your closet does not need a new personality every season. Repeat the pieces that make you feel like yourself.', image: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=900&q=80', likes: 187, liked: true, bookmarked: false, comments: [] },
+]
+
+export function CommunityProvider({ children }) {
+  const [posts, setPosts] = useState(starterPosts)
+  const [following, setFollowing] = useState(['amara'])
+
+  const toggleLike = useCallback((id) => setPosts((current) => current.map((post) => post.id === id ? { ...post, liked: !post.liked, likes: post.likes + (post.liked ? -1 : 1) } : post)), [])
+  const toggleBookmark = useCallback((id) => setPosts((current) => current.map((post) => post.id === id ? { ...post, bookmarked: !post.bookmarked } : post)), [])
+  const addComment = useCallback((id, text) => {
+    if (!text.trim()) return
+    setPosts((current) => current.map((post) => post.id === id ? { ...post, comments: [...post.comments, { id: `${id}-${Date.now()}`, author: 'You', text: text.trim() }] } : post))
+  }, [])
+  const reportPost = useCallback((id) => setPosts((current) => current.map((post) => post.id === id ? { ...post, reported: true } : post)), [])
+  const toggleFollow = useCallback((id) => setFollowing((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]), [])
+  const addPost = useCallback((text) => {
+    if (!text.trim()) return
+    setPosts((current) => [{ id: `post-${Date.now()}`, author: 'You', handle: '@yourcloset', time: 'now', text: text.trim(), likes: 0, liked: false, bookmarked: false, comments: [] }, ...current])
+  }, [])
+
+  const value = useMemo(() => ({ posts, following, toggleLike, toggleBookmark, addComment, reportPost, toggleFollow, addPost }), [posts, following, toggleLike, toggleBookmark, addComment, reportPost, toggleFollow, addPost])
+  return <CommunityContext.Provider value={value}>{children}</CommunityContext.Provider>
+}
