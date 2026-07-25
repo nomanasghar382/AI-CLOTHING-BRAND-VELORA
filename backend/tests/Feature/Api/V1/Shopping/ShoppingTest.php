@@ -6,6 +6,8 @@ use App\Models\CartItem;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ReturnRequest;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -84,5 +86,71 @@ class ShoppingTest extends TestCase
 
         $this->assertDatabaseCount('orders', 0);
         $this->assertDatabaseCount('cart_items', 1);
+    }
+
+    public function test_stripe_payment_intent_returns_a_safe_envelope_when_not_configured(): void
+    {
+        config(['services.stripe.secret' => '']);
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['status' => 'published', 'price' => 50, 'stock_quantity' => 3]);
+        Sanctum::actingAs($user);
+        $this->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 1])->assertCreated();
+        $this->postJson('/api/v1/checkout', [
+            'payment_provider' => 'stripe',
+            'shipping_address' => ['first_name' => 'Ada', 'last_name' => 'Lovelace', 'phone' => '123456789', 'line1' => '1 Main St', 'city' => 'London', 'postal_code' => 'EC1A1BB', 'country' => 'GB'],
+        ])->assertCreated();
+
+        $this->postJson('/api/v1/orders/'.Order::query()->sole()->id.'/payment-intent')
+            ->assertStatus(503)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Stripe payments are not configured.');
+    }
+
+    public function test_customer_can_download_html_and_pdf_invoices(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['status' => 'published', 'price' => 50, 'stock_quantity' => 3]);
+        Sanctum::actingAs($user);
+        $this->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 1])->assertCreated();
+        $this->postJson('/api/v1/checkout', [
+            'payment_provider' => 'cod',
+            'shipping_address' => ['first_name' => 'Ada', 'last_name' => 'Lovelace', 'phone' => '123456789', 'line1' => '1 Main St', 'city' => 'London', 'postal_code' => 'EC1A1BB', 'country' => 'GB'],
+        ])->assertCreated();
+        $order = Order::query()->sole();
+
+        $this->get("/api/v1/orders/{$order->id}/invoice/html")
+            ->assertOk()->assertHeader('content-type', 'text/html; charset=UTF-8')
+            ->assertSeeText("Invoice {$order->number}");
+        $this->get("/api/v1/orders/{$order->id}/invoice/pdf")
+            ->assertOk()->assertHeader('content-type', 'application/pdf')
+            ->assertSee('%PDF');
+    }
+
+    public function test_customer_can_request_a_return_and_admin_can_review_it(): void
+    {
+        $customer = User::factory()->create();
+        $product = Product::factory()->create(['status' => 'published', 'price' => 50, 'stock_quantity' => 3]);
+        Sanctum::actingAs($customer);
+        $this->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 1])->assertCreated();
+        $this->postJson('/api/v1/checkout', [
+            'payment_provider' => 'cod',
+            'shipping_address' => ['first_name' => 'Ada', 'last_name' => 'Lovelace', 'phone' => '123456789', 'line1' => '1 Main St', 'city' => 'London', 'postal_code' => 'EC1A1BB', 'country' => 'GB'],
+        ])->assertCreated();
+        $order = Order::query()->sole();
+        $order->update(['status' => 'delivered']);
+
+        $this->postJson("/api/v1/orders/{$order->id}/returns", ['type' => 'return', 'reason' => 'Does not fit'])
+            ->assertCreated()
+            ->assertJsonPath('success', true);
+        $return = ReturnRequest::query()->sole();
+        $this->assertDatabaseHas('return_requests', ['id' => $return->id, 'type' => 'return', 'status' => 'requested']);
+
+        $admin = User::factory()->create();
+        $role = Role::query()->create(['name' => 'Admin', 'slug' => 'admin']);
+        $admin->roles()->attach($role);
+        Sanctum::actingAs($admin);
+        $this->patchJson("/api/v1/admin/returns/{$return->id}", ['status' => 'approved', 'admin_note' => 'Approved'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'approved');
     }
 }

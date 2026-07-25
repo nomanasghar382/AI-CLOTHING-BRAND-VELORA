@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Catalog\AdminCatalogController;
 use App\Http\Controllers\Api\V1\Catalog\CatalogController;
+use App\Http\Controllers\Api\V1\Shopping\AdminShoppingController;
 use App\Http\Controllers\Api\V1\Shopping\CartController;
 use App\Http\Controllers\Api\V1\Shopping\OrderController;
 use App\Http\Controllers\Api\V1\Shopping\WishlistController;
@@ -40,6 +41,32 @@ Route::prefix('v1')->group(function (): void {
 
     Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->get('admin/ping', fn () => response()->json(['ok' => true]));
 
+    Route::middleware(['auth:sanctum', 'role:super-admin,admin,supplier'])->prefix('admin')->group(function (): void {
+        Route::get('orders', [AdminShoppingController::class, 'orders']);
+        Route::get('orders/{order}', [AdminShoppingController::class, 'order']);
+        Route::post('orders/{order}/transition', [AdminShoppingController::class, 'transition']);
+    });
+
+    Route::middleware(['auth:sanctum', 'role:super-admin,admin'])->prefix('admin')->group(function (): void {
+        Route::get('coupons', [AdminShoppingController::class, 'coupons']);
+        Route::post('coupons', [AdminShoppingController::class, 'storeCoupon']);
+        Route::put('coupons/{coupon}', [AdminShoppingController::class, 'updateCoupon']);
+        Route::delete('coupons/{coupon}', [AdminShoppingController::class, 'destroyCoupon']);
+        Route::get('shipping-methods', [AdminShoppingController::class, 'shippingMethods']);
+        Route::post('shipping-methods', [AdminShoppingController::class, 'storeShippingMethod']);
+        Route::put('shipping-methods/{shippingMethod}', [AdminShoppingController::class, 'updateShippingMethod']);
+        Route::delete('shipping-methods/{shippingMethod}', [AdminShoppingController::class, 'destroyShippingMethod']);
+        Route::get('tax-rules', [AdminShoppingController::class, 'taxRules']);
+        Route::post('tax-rules', [AdminShoppingController::class, 'storeTaxRule']);
+        Route::put('tax-rules/{taxRule}', [AdminShoppingController::class, 'updateTaxRule']);
+        Route::delete('tax-rules/{taxRule}', [AdminShoppingController::class, 'destroyTaxRule']);
+        Route::get('payments', [AdminShoppingController::class, 'payments']);
+        Route::post('payments/{payment}/capture', [AdminShoppingController::class, 'capturePayment']);
+        Route::post('payments/{payment}/refund', [AdminShoppingController::class, 'refundPayment']);
+        Route::get('returns', [AdminShoppingController::class, 'returns']);
+        Route::patch('returns/{returnRequest}', [AdminShoppingController::class, 'updateReturn']);
+    });
+
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('cart', [CartController::class, 'show']);
         Route::post('cart/items', [CartController::class, 'store']);
@@ -51,5 +78,8 @@ Route::prefix('v1')->group(function (): void {
         Route::post('checkout', [OrderController::class, 'checkout']);
         Route::get('orders', [OrderController::class, 'index']);
         Route::get('orders/{order}', [OrderController::class, 'show']);
+        Route::post('orders/{order}/payment-intent', [OrderController::class, 'paymentIntent']);
+        Route::get('orders/{order}/invoice/{format}', [OrderController::class, 'invoice'])->whereIn('format', ['html', 'pdf']);
+        Route::post('orders/{order}/returns', [OrderController::class, 'requestReturn']);
     });
 });

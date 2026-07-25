@@ -17,7 +17,9 @@ use App\Models\ProductVariant;
 use App\Models\ShippingAddress;
 use App\Models\ShippingRate;
 use App\Models\ShoppingCart;
+use App\Models\TaxRule;
 use App\Models\User;
+use App\Notifications\OrderStatusNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -42,14 +44,15 @@ final class CheckoutService
             $subtotal = round($lines->sum('line_total'), 2);
             [$coupon, $discount] = $this->discount($attributes['coupon_code'] ?? null, $subtotal);
             [$methodId, $shippingTotal] = $this->shipping($attributes['shipping_rate_id'] ?? null, $shipping->country, $subtotal);
-            $total = round($subtotal - $discount + $shippingTotal, 2);
+            $taxTotal = $this->tax($shipping, $subtotal - $discount);
+            $total = round($subtotal - $discount + $shippingTotal + $taxTotal, 2);
 
             $order = Order::query()->create([
                 'number' => 'VEL-'.now()->format('YmdHis').'-'.Str::upper(Str::random(6)),
                 'user_id' => $user->id, 'shipping_address_id' => $shipping->id, 'billing_address_id' => $billing->id,
                 'shipping_method_id' => $methodId, 'coupon_id' => $coupon?->id, 'status' => 'pending',
                 'payment_status' => 'pending', 'currency' => $cart->currency, 'subtotal' => $subtotal,
-                'discount_total' => $discount, 'shipping_total' => $shippingTotal, 'tax_total' => 0, 'grand_total' => $total,
+                'discount_total' => $discount, 'shipping_total' => $shippingTotal, 'tax_total' => $taxTotal, 'grand_total' => $total,
                 'notes' => $attributes['notes'] ?? null,
             ]);
             foreach ($lines as $line) {
@@ -67,6 +70,7 @@ final class CheckoutService
             Payment::query()->create(['order_id' => $order->id, 'provider' => $attributes['payment_provider'], 'status' => 'pending', 'amount' => $total, 'currency' => $cart->currency]);
             OrderStatusHistory::query()->create(['order_id' => $order->id, 'user_id' => $user->id, 'to_status' => 'pending', 'note' => 'Order created.']);
             CartItem::query()->where('shopping_cart_id', $cart->id)->delete();
+            DB::afterCommit(fn () => $user->notify(new OrderStatusNotification($order, 'order')));
 
             return $order->load(['items', 'shippingAddress', 'billingAddress', 'shippingMethod', 'history']);
         }, 3);
@@ -135,5 +139,17 @@ final class CheckoutService
         }
 
         return [$rate->shipping_method_id, $rate->free_shipping_threshold && $subtotal >= (float) $rate->free_shipping_threshold ? 0.0 : (float) $rate->amount];
+    }
+
+    private function tax(ShippingAddress $address, float $taxableAmount): float
+    {
+        $rule = TaxRule::query()->where('is_active', true)->where('country', strtoupper($address->country))
+            ->where(fn ($query) => $query->whereNull('state')->orWhere('state', $address->state))
+            ->where(fn ($query) => $query->whereNull('postal_code')->orWhere('postal_code', $address->postal_code))
+            ->orderByRaw('case when postal_code is null then 0 else 1 end desc')
+            ->orderByRaw('case when state is null then 0 else 1 end desc')
+            ->first();
+
+        return $rule ? round($taxableAmount * ((float) $rule->rate / 100), 2) : 0.0;
     }
 }
