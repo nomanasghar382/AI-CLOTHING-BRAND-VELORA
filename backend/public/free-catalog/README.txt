@@ -1,6 +1,15 @@
 FREE PHOTOS — NO PAYMENT NEEDED
 ================================
 
+STARTER IMAGES INCLUDED
+-----------------------
+This repo now ships with 6 women's + 1 men's starter photo in:
+  women/01-olive-jilbab-niqab.jpg … 06-black-niqab-portrait.jpg
+  men/brand-model.jpg
+
+Replace any file with your own photo (same filename) to use your originals.
+Then run: php artisan catalog:free-photos && php artisan db:seed --class=CatalogSeeder
+
 WOMEN — YOUR NIQAB / ABAYA / KHIMAR PHOTOS
 ------------------------------------------
 Save the 6 women's images you want into:
