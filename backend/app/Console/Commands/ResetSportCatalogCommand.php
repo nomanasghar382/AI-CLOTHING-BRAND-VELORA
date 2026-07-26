@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Database\Seeders\NikeCatalogSeeder;
 use Illuminate\Console\Command;
 
 final class ResetSportCatalogCommand extends Command
@@ -13,7 +14,13 @@ final class ResetSportCatalogCommand extends Command
     public function handle(): int
     {
         $this->call('db:seed', ['--class' => 'Database\\Seeders\\SportsCatalogSeeder', '--force' => true]);
-        $this->call('db:seed', ['--class' => 'Database\\Seeders\\NikeCatalogSeeder', '--force' => true]);
+
+        if (class_exists(NikeCatalogSeeder::class)) {
+            $this->call('db:seed', ['--class' => NikeCatalogSeeder::class, '--force' => true]);
+        } else {
+            $this->warn('NikeCatalogSeeder not found — run git pull, then: composer dump-autoload');
+        }
+
         $this->call('db:seed', ['--class' => 'Database\\Seeders\\SearchSynonymSeeder', '--force' => true]);
         $this->info('VELORA Sport catalog reset complete (synthetic + Nike dataset).');
 
