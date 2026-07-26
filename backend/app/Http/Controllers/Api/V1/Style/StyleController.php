@@ -62,7 +62,21 @@ final class StyleController extends Controller
         }
         DB::table('body_profiles')->updateOrInsert(['user_id' => $request->user()->id], $attributes + ['created_at' => now(), 'updated_at' => now()]);
 
-        return $this->success(DB::table('body_profiles')->where('user_id', $request->user()->id)->first());
+        return $this->bodyProfile($request);
+    }
+
+    public function bodyProfile(Request $request): JsonResponse
+    {
+        $profile = DB::table('body_profiles')->where('user_id', $request->user()->id)->first();
+        if ($profile) {
+            foreach (['measurements', 'size_preferences'] as $key) {
+                if ($profile->{$key}) {
+                    $profile->{$key} = json_decode($profile->{$key}, true);
+                }
+            }
+        }
+
+        return $this->success($profile);
     }
 
     public function recommend(RecommendationRequest $request): JsonResponse

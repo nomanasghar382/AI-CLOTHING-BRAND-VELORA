@@ -31,6 +31,7 @@ import CommunityPage from '../pages/community/CommunityPage'
 import { FollowersPage, SavedLooksPage, ShopTheLookPage } from '../pages/community/LookCollectionsPage'
 import WardrobePage, { WardrobeDetailPage, WardrobeUploadPage } from '../pages/wardrobe/WardrobePage'
 import VisualSearchPage from '../pages/search/VisualSearchPage'
+import AvatarStudioPage from '../pages/avatar/AvatarStudioPage'
 import InternationalPage from '../pages/shopping/InternationalPage'
 import { AchievementsPage, GiftCardsPage, NotificationsPage, ProductAlertsPage, ReferralPage, RewardsPage, VipPage, WalletPage } from '../pages/loyalty/LoyaltyPages'
 import ErrorBoundary from '../components/system/ErrorBoundary'
@@ -62,6 +63,7 @@ export default function AppRoutes() {
           <Route path="wardrobe/upload" element={<WardrobeUploadPage />} />
           <Route path="wardrobe/:id" element={<WardrobeDetailPage />} />
           <Route path="visual-search" element={<VisualSearchPage />} />
+          <Route path="avatar" element={<AvatarStudioPage />} />
           <Route path="international" element={<InternationalPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="account" element={<StatusPage code="ACCOUNT" title="Account foundation ready." description="Future profile modules plug in here." />} />

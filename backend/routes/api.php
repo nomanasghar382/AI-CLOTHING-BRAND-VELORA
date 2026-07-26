@@ -32,6 +32,7 @@ Route::prefix('v1')->middleware(['api.version:v1', 'throttle:api'])->group(funct
     Route::get('catalog/filters', [CatalogController::class, 'filters']);
     Route::get('search', [SearchController::class, 'index']);
     Route::get('search/suggestions', [SearchController::class, 'suggestions']);
+    Route::post('search/visual', [SearchController::class, 'visual']);
     Route::prefix('auth')->middleware('throttle:auth')->group(function (): void {
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
@@ -240,6 +241,7 @@ Route::prefix('v1')->middleware(['api.version:v1', 'throttle:api'])->group(funct
         Route::get('style/profile', [StyleController::class, 'profile']);
         Route::put('style/profile', [StyleController::class, 'updateProfile']);
         Route::put('style/body', [StyleController::class, 'updateBody']);
+        Route::get('style/body', [StyleController::class, 'bodyProfile']);
         Route::post('style/recommendations', [StyleController::class, 'recommend']);
         Route::post('style/outfits/occasion', [StyleController::class, 'occasion']);
         Route::post('style/chat', [StyleController::class, 'chat']);

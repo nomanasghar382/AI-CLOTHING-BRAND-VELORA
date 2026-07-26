@@ -10,16 +10,22 @@ class SearchSynonymSeeder extends Seeder
     public function run(): void
     {
         $pairs = [
-            ['abaya', 'robe'],
-            ['hijab', 'scarf'],
-            ['scarf', 'hijab'],
-            ['modest', 'covered'],
-            ['linen', 'breathable'],
-            ['kaftan', 'dress'],
-            ['thobe', 'abaya'],
-            ['jilbab', 'abaya'],
-            ['niqab', 'veil'],
-            ['chador', 'cloak'],
+            ['sneakers', 'trainers'],
+            ['trainers', 'sneakers'],
+            ['kicks', 'sneakers'],
+            ['joggers', 'track pants'],
+            ['track pants', 'joggers'],
+            ['hoodie', 'sweatshirt'],
+            ['sweatshirt', 'hoodie'],
+            ['gym', 'training'],
+            ['training', 'gym'],
+            ['run', 'running'],
+            ['running', 'run'],
+            ['basketball', 'court'],
+            ['football', 'soccer'],
+            ['soccer', 'football'],
+            ['dri-fit', 'moisture wicking'],
+            ['compression', 'base layer'],
         ];
 
         foreach ($pairs as [$term, $synonym]) {

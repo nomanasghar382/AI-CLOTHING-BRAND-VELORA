@@ -40,11 +40,13 @@ final class SearchService
       });
     }
 
-    foreach (['category', 'brand', 'fabric', 'material', 'coverage_level', 'gender'] as $field) {
+    foreach (['category', 'brand', 'fabric', 'material', 'gender', 'line'] as $field) {
       if (!empty($filters[$field])) {
         if (in_array($field, ['category', 'brand'], true)) {
           $relation = $field;
           $builder->whereHas($relation, fn ($q) => $q->where('slug', $filters[$field]));
+        } elseif ($field === 'line') {
+          $builder->where('catalog_line', $filters[$field]);
         } else {
           $builder->where($field, $filters[$field]);
         }

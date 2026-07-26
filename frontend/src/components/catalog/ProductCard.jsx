@@ -15,7 +15,7 @@ function ProductCard({ product }) {
         {product.discount_percent > 0 && <span className="badge product-badge">-{product.discount_percent}%</span>}
       </Link>
       <div className="p-3">
-        <p className="eyebrow mb-1">{product.gender === 'men' ? "Men's" : "Women's"} · {product.brand?.name}</p>
+        <p className="eyebrow mb-1">Men&apos;s sport · {product.brand?.name}</p>
         <Link className="product-name" to={`/catalog/${product.slug}`}>{product.name}</Link>
         <div className="mt-2">
           <span className="product-price">${Number(product.sale_price || product.price).toFixed(2)}</span>

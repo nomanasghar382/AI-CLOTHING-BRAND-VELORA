@@ -7,7 +7,15 @@ import useWishlist from '../../hooks/useWishlist'
 import MarketSelector from '../international/MarketSelector'
 import NotificationCenter from '../notifications/NotificationCenter'
 
-const navItems = [{ label: 'Foundation', to: '/' }, { label: 'Marketplace', to: '/marketplace' }, { label: 'Community', to: '/community' }, { label: 'Women', to: '/catalog?gender=women' }, { label: 'Men', to: '/catalog?gender=men' }, { label: 'Global services', to: '/international' }, { label: 'Our Vision', to: '/about' }]
+const navItems = [
+  { label: 'Sport', to: '/catalog?gender=men' },
+  { label: 'Sneakers', to: '/catalog?gender=men&line=footwear' },
+  { label: 'Avatar', to: '/avatar' },
+  { label: 'Image search', to: '/visual-search' },
+  { label: 'AI designer', to: '/ai' },
+  { label: 'Community', to: '/community' },
+  { label: 'About', to: '/about' },
+]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -24,11 +32,13 @@ export default function Navbar() {
         </div>
         <div className="d-none d-lg-flex align-items-center gap-3">
           <MarketSelector />
+          <Link className="nav-link-velora" to="/visual-search">Image search</Link>
+          <Link className="nav-link-velora" to="/avatar">Avatar</Link>
           <Link className="nav-icon-link" to="/wishlist" aria-label={`Wishlist, ${wishlistCount} items`}><FiHeart />{wishlistCount > 0 && <span className="nav-counter">{wishlistCount}</span>}</Link>
           <Link className="nav-icon-link" to="/cart" aria-label={`Shopping bag, ${cartCount} items`}><FiShoppingBag />{cartCount > 0 && <span className="nav-counter">{cartCount}</span>}</Link>
           {isAuthenticated ? (
             <>
-              <Link className="nav-link-velora" to="/ai">AI stylist</Link>
+              <Link className="nav-link-velora" to="/ai">AI designer</Link>
               <Link className="nav-link-velora" to="/wardrobe">Wardrobe</Link>
               <NotificationCenter />
               <Link className="nav-link-velora" to="/rewards"><FiStar /> Rewards</Link>
@@ -49,7 +59,8 @@ export default function Navbar() {
         {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/orders">Orders</NavLink>}
         {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/rewards">Rewards & VIP</NavLink>}
         {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/notifications">Notifications</NavLink>}
-        {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/ai">AI stylist</NavLink>}
+        {isAuthenticated && <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/ai">AI designer</NavLink>}
+        <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/avatar">Avatar & try-on</NavLink>
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/visual-search">Visual search</NavLink>
         <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={isAuthenticated ? '/account' : '/login'}>{isAuthenticated ? 'Account' : 'Sign in'}</NavLink>
       </div>}

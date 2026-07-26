@@ -82,7 +82,7 @@ export default function ProductDetailPage() {
           <div className="d-flex gap-2 mt-3">{product.images?.slice(0, 5).map((image, index) => <CloudinaryImage key={index} className="detail-thumbnail" src={image.thumbnail_url || image.url} alt={image.alt_text || `${product.name} view ${index + 1}`} width={120} sizes="80px" />)}</div>
         </div>
         <div className="col-lg-5">
-          <p className="eyebrow">{product.brand?.name} / {product.gender === 'men' ? "Men's" : "Women's"} · {product.category?.name}</p>
+          <p className="eyebrow">{product.brand?.name} / Men&apos;s sport · {product.category?.name}</p>
           <h1 className="display-6">{product.name}</h1>
           <div className="my-3">
             <span className="product-price fs-3">{formatMoney(product.sale_price || product.price)}</span>
@@ -100,9 +100,10 @@ export default function ProductDetailPage() {
           <p className="small text-slate-300 mb-2">SIZES</p>
           <div className="d-flex gap-2 flex-wrap">{product.sizes?.map((size) => <button className={`btn ${selectedSize === size.name ? 'btn-velora-primary' : 'btn-velora-secondary'}`} type="button" key={size.name} aria-pressed={selectedSize === size.name} onClick={() => setSelectedSize(size.name)}>{size.name}</button>)}</div>
           {actionError && <div className="alert alert-danger mt-3 mb-0" role="alert">{actionError}</div>}
-          <div className="d-flex gap-2 mt-4">
+          <div className="d-flex gap-2 mt-4 flex-wrap">
             <button className="btn btn-velora-primary flex-grow-1" type="button" disabled={busy} onClick={() => perform(() => addToCart(item))}><FiShoppingBag /> Add to bag</button>
             <button className="btn btn-velora-secondary" type="button" disabled={busy} onClick={() => perform(() => addToWishlist(item))} aria-label="Add to wishlist"><FiHeart /></button>
+            <Link className="btn btn-velora-secondary" to={`/avatar?product=${product.slug}`}>Virtual try-on</Link>
           </div>
           <Link className="btn btn-velora-ghost mt-3" to="/catalog?gender=men">Continue exploring</Link>
         </div>

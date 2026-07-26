@@ -12,8 +12,9 @@ final class RecommendationService
 
     public function create(User $user, array $context, string $kind = 'general', ?int $conversationId = null): array
     {
-        $products = Product::query()->with(['category', 'images'])
+        $products = Product::query()->with(['category', 'images', 'matchedProduct.images'])
             ->where('status', 'published')->where('stock_quantity', '>', 0)
+            ->where(fn ($query) => $query->where('gender', 'men')->orWhereNull('gender'))
             ->when(isset($context['budget']), fn ($query) => $query->whereRaw('COALESCE(sale_price, price) <= ?', [(float) $context['budget']]))
             ->orderByDesc('is_featured')->orderByDesc('is_trending')->limit(40)->get();
         $catalog = $products->map(fn (Product $product) => [
@@ -38,6 +39,7 @@ final class RecommendationService
                 'request_context' => json_encode($context), 'weather' => json_encode($weather), 'response' => json_encode(['reply' => $result['reply']]),
                 'provider' => $result['provider'], 'generated_at' => now(), 'created_at' => now(), 'updated_at' => now(),
             ]);
+            $inserted = [];
             foreach ($items as $rank => $item) {
                 $product = $allowed[$item['product_id']];
                 DB::table('style_recommendation_items')->insert([
@@ -45,6 +47,16 @@ final class RecommendationService
                     'reason' => $item['reason'], 'score' => $item['score'], 'product_snapshot' => json_encode(['name' => $product->name, 'price' => $product->sale_price ?? $product->price]),
                     'created_at' => now(), 'updated_at' => now(),
                 ]);
+                $inserted[$product->id] = true;
+                if ($product->matchedProduct && ! isset($inserted[$product->matchedProduct->id])) {
+                    $shoe = $product->matchedProduct;
+                    DB::table('style_recommendation_items')->insert([
+                        'style_recommendation_id' => $id, 'product_id' => $shoe->id, 'rank' => $rank + 1,
+                        'reason' => 'Matching kicks for your sport fit', 'score' => $item['score'], 'product_snapshot' => json_encode(['name' => $shoe->name, 'price' => $shoe->sale_price ?? $shoe->price]),
+                        'created_at' => now(), 'updated_at' => now(),
+                    ]);
+                    $inserted[$shoe->id] = true;
+                }
             }
 
             return $this->find($user, $id);
@@ -57,8 +69,19 @@ final class RecommendationService
         abort_unless($recommendation, 404);
         $recommendation->items = DB::table('style_recommendation_items')->where('style_recommendation_id', $id)
             ->join('products', 'products.id', '=', 'style_recommendation_items.product_id')
+            ->leftJoin('product_images', function ($join) {
+                $join->on('product_images.product_id', '=', 'products.id')->where('product_images.is_primary', true);
+            })
             ->where('products.status', 'published')->where('products.stock_quantity', '>', 0)
-            ->orderBy('rank')->get(['style_recommendation_items.*', 'products.name as product_name', 'products.price as product_price', 'products.sale_price']);
+            ->orderBy('rank')->get([
+                'style_recommendation_items.*',
+                'products.name as product_name',
+                'products.slug as product_slug',
+                'products.price as product_price',
+                'products.sale_price',
+                'products.catalog_line',
+                'product_images.url as image_url',
+            ]);
 
         return (array) $recommendation;
     }

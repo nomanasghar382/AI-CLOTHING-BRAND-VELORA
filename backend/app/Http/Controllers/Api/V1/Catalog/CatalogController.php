@@ -60,21 +60,17 @@ final class CatalogController extends Controller
     public function categories(): JsonResponse { return $this->success(CategoryResource::collection(Category::query()->whereNull('parent_id')->where('status', 'active')->with('children')->get())); }
     public function filters(): JsonResponse
     {
-        $published = Product::query()->where('status', 'published');
-
-        $womenParentId = Category::query()->where('slug', 'women')->value('id');
-        $menParentId = Category::query()->where('slug', 'men')->value('id');
+        $published = Product::query()->where('status', 'published')->where('gender', 'men');
+        $sportParentId = Category::query()->where('slug', 'mens-sport')->value('id');
 
         return $this->success([
             'brands' => Brand::query()->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
             'colors' => Color::query()->where('status', 'active')->get(['name', 'slug', 'hex_code']),
             'sizes' => Size::query()->where('status', 'active')->orderBy('sort_order')->get(['name', 'slug', 'international_size']),
-            'women_categories' => Category::query()->where('parent_id', $womenParentId)->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
-            'men_categories' => Category::query()->where('parent_id', $menParentId)->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
+            'men_categories' => Category::query()->where('parent_id', $sportParentId)->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
+            'catalog_lines' => (clone $published)->whereNotNull('catalog_line')->distinct()->orderBy('catalog_line')->pluck('catalog_line'),
             'materials' => (clone $published)->whereNotNull('material')->distinct()->orderBy('material')->pluck('material'),
             'fabrics' => (clone $published)->whereNotNull('fabric')->distinct()->orderBy('fabric')->pluck('fabric'),
-            'coverage_levels' => (clone $published)->whereNotNull('coverage_level')->distinct()->orderBy('coverage_level')->pluck('coverage_level'),
-            'genders' => (clone $published)->whereNotNull('gender')->distinct()->orderBy('gender')->pluck('gender'),
             'occasions' => (clone $published)->whereNotNull('season')->distinct()->orderBy('season')->pluck('season'),
             'price_range' => [
                 'min' => (float) ((clone $published)->min('price') ?? 0),

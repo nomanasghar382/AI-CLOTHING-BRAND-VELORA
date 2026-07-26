@@ -150,3 +150,22 @@ html { font-size:100%; }
   .spec-grid { grid-template-columns: 1fr; }
   .product-passport .btn { width: 100%; }
 }
+
+/* Avatar studio & virtual try-on */
+.avatar-preview { overflow:hidden; }
+.avatar-stage { position:relative; display:grid; place-items:center; min-height:420px; padding:2rem 1rem; background:linear-gradient(180deg,#f4ebe2,#e8ddd2); border-radius:1rem; }
+.avatar-head { width:72px; height:72px; background:var(--skin-tone,#e8b796); border-radius:50% 50% 45% 45%; margin-bottom:.5rem; box-shadow:inset 0 -8px 0 rgba(0,0,0,.08); }
+.avatar-head[data-hair="fade"]:after,.avatar-head[data-hair="buzz"]:after { content:""; display:block; width:100%; height:28px; background:#2b211d; border-radius:50% 50% 0 0; }
+.avatar-torso { position:relative; width:160px; height:180px; display:grid; place-items:center; }
+.avatar-legs { width:110px; height:120px; margin-top:-8px; background:linear-gradient(#4a5568,#2d3748); border-radius:0 0 1.5rem 1.5rem; }
+.avatar-feet { position:relative; width:140px; height:70px; margin-top:-10px; display:grid; place-items:end center; }
+.avatar-garment { max-width:100%; max-height:100%; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(0,0,0,.18)); }
+.avatar-garment-top { position:absolute; inset:0; margin:auto; }
+.avatar-garment-shoes { width:120px; }
+.avatar-swatch { width:34px; height:34px; border:2px solid transparent; border-radius:50%; cursor:pointer; }
+.avatar-swatch.active { border-color:#a34b3c; box-shadow:0 0 0 2px #fffdfa; }
+.tryon-thumb { display:grid; gap:.35rem; width:100%; padding:.35rem; color:#4a3a31; background:#fffdfa; border:1px solid #e4d9ce; border-radius:.75rem; text-align:left; font-size:.68rem; }
+.tryon-thumb img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:.55rem; background:#eadfd4; }
+.tryon-thumb.active { border-color:#a34b3c; box-shadow:0 0 0 2px rgba(163,75,60,.15); }
+.outfit-product-tile { height:100%; overflow:hidden; background:#fffdfa; border:1px solid #e4d9ce; border-radius:.85rem; }
+.outfit-product-tile img { width:100%; aspect-ratio:1; object-fit:cover; background:#eadfd4; }

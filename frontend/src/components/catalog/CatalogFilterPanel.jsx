@@ -10,18 +10,13 @@ function CatalogFilterPanel({ filters, params, onChange, onClear }) {
   const { pushToast } = useNotifications()
   const selectedColors = useMemo(() => (params.get('colors') ? params.get('colors').split(',') : []), [params])
   const selectedBrands = useMemo(() => (params.get('brands') ? params.get('brands').split(',') : []), [params])
-  const gender = params.get('gender') || ''
-  const categories = useMemo(() => {
-    if (gender === 'men') return filters.men_categories || []
-    if (gender === 'women') return filters.women_categories || []
-    return [...(filters.women_categories || []), ...(filters.men_categories || [])]
-  }, [filters.men_categories, filters.women_categories, gender])
+  const categories = filters.men_categories || []
   const minPrice = params.get('min_price') || filters.price_range?.min || 0
   const maxPrice = params.get('max_price') || filters.price_range?.max || 500
 
   const savePreset = () => {
     const preset = {
-      name: `Saved edit ${new Date().toLocaleDateString()}`,
+      name: `Saved sport edit ${new Date().toLocaleDateString()}`,
       query: Object.fromEntries(params.entries()),
     }
     saveFilterPreset(preset)
@@ -37,23 +32,20 @@ function CatalogFilterPanel({ filters, params, onChange, onClear }) {
 
       <label className="form-label" htmlFor="catalog-category">Category</label>
       <select id="catalog-category" className="form-select velora-input mb-3" value={params.get('category') || ''} onChange={(e) => onChange('category', e.target.value)}>
-        <option value="">{gender === 'men' ? 'All men\'s categories' : gender === 'women' ? 'All women\'s categories' : 'All categories'}</option>
-        {gender === '' && filters.women_categories?.length > 0 && (
-          <optgroup label="Women">
-            {filters.women_categories.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}
-          </optgroup>
-        )}
-        {gender === '' && filters.men_categories?.length > 0 && (
-          <optgroup label="Men">
-            {filters.men_categories.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}
-          </optgroup>
-        )}
-        {gender !== '' && categories.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}
+        <option value="">All sport categories</option>
+        {categories.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}
+      </select>
+
+      <label className="form-label" htmlFor="catalog-line">Product line</label>
+      <select id="catalog-line" className="form-select velora-input mb-3" value={params.get('line') || ''} onChange={(e) => onChange('line', e.target.value)}>
+        <option value="">All lines</option>
+        <option value="apparel">Apparel</option>
+        <option value="footwear">Sneakers &amp; kicks</option>
       </select>
 
       <label className="form-label" htmlFor="catalog-sort">Sort by</label>
       <select id="catalog-sort" className="form-select velora-input mb-3" value={params.get('sort') || 'newest'} onChange={(e) => onChange('sort', e.target.value)}>
-        <option value="newest">Newest</option>
+        <option value="newest">Newest drops</option>
         <option value="price_asc">Price: low to high</option>
         <option value="price_desc">Price: high to low</option>
         <option value="popular">Most viewed</option>
@@ -97,21 +89,9 @@ function CatalogFilterPanel({ filters, params, onChange, onClear }) {
         {filters.materials?.map((material) => <option key={material} value={material}>{material}</option>)}
       </select>
 
-      <label className="form-label" htmlFor="catalog-fabric">Fabric</label>
-      <select id="catalog-fabric" className="form-select velora-input mb-3" value={params.get('fabric') || ''} onChange={(e) => onChange('fabric', e.target.value)}>
-        <option value="">All fabrics</option>
-        {filters.fabrics?.map((fabric) => <option key={fabric} value={fabric}>{fabric}</option>)}
-      </select>
-
-      <label className="form-label" htmlFor="catalog-coverage">Coverage</label>
-      <select id="catalog-coverage" className="form-select velora-input mb-3" value={params.get('coverage_level') || ''} onChange={(e) => onChange('coverage_level', e.target.value)}>
-        <option value="">All coverage</option>
-        {filters.coverage_levels?.map((level) => <option key={level} value={level}>{level}</option>)}
-      </select>
-
-      <label className="form-label" htmlFor="catalog-occasion">Occasion</label>
+      <label className="form-label" htmlFor="catalog-occasion">Activity</label>
       <select id="catalog-occasion" className="form-select velora-input mb-3" value={params.get('season') || ''} onChange={(e) => onChange('season', e.target.value)}>
-        <option value="">All occasions</option>
+        <option value="">All activities</option>
         {filters.occasions?.map((occasion) => <option key={occasion} value={occasion}>{occasion}</option>)}
       </select>
 

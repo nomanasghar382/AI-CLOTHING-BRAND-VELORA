@@ -12,11 +12,12 @@ const fallbackReply = (message, profile = {}) => ({
 
 const normaliseRecommendation = (recommendation, brief) => ({
   id: recommendation.id,
-  title: `${brief.occasion || recommendation.kind || 'Personal'} edit`,
-  occasion: brief.occasion || 'Personal styling',
-  budget: brief.budget ? `$${brief.budget}` : 'Considered',
+  title: `${brief.occasion || recommendation.kind || 'Sport'} fit`,
+  occasion: brief.occasion || 'Sport styling',
+  budget: brief.budget ? `$${brief.budget}` : 'Gen Z drop',
   description: recommendation.reply,
   pieces: (recommendation.items || []).map((item) => item.name),
+  products: recommendation.items || [],
   productIds: (recommendation.items || []).map((item) => item.product_id),
   fallback: recommendation.provider === 'catalog_fallback',
   createdAt: recommendation.generated_at,
