@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
+import FeatureLaunchBar from '../components/layout/FeatureLaunchBar'
 import Footer from '../components/layout/Footer'
 import SkipLink from '../components/accessibility/SkipLink'
 import InstallPrompt from '../components/system/InstallPrompt'
@@ -15,6 +16,7 @@ export default function PublicLayout() {
     <div className="app-shell">
       <SkipLink />
       <Navbar />
+      <FeatureLaunchBar />
       <main id="main-content" className="flex-grow-1" tabIndex={-1}>
         <PageTransition key={location.pathname}>
           <Outlet />

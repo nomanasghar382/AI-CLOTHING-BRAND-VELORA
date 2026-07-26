@@ -64,6 +64,16 @@ export default function AppRoutes() {
           <Route path="wardrobe/:id" element={<WardrobeDetailPage />} />
           <Route path="visual-search" element={<VisualSearchPage />} />
           <Route path="avatar" element={<AvatarStudioPage />} />
+          <Route path="ai" element={<AiShell />}>
+            <Route index element={<AiWelcomePage />} />
+            <Route path="quiz" element={<StyleQuizPage />} />
+            <Route path="profile" element={<StyleProfilePage />} />
+            <Route path="chat" element={<StylistChatPage />} />
+            <Route path="occasion" element={<OccasionFormPage />} />
+            <Route path="budget" element={<BudgetFormPage />} />
+            <Route path="saved" element={<SavedOutfitsPage />} />
+            <Route path="history" element={<RecommendationHistoryPage />} />
+          </Route>
           <Route path="international" element={<InternationalPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="account" element={<StatusPage code="ACCOUNT" title="Account foundation ready." description="Future profile modules plug in here." />} />
@@ -80,16 +90,6 @@ export default function AppRoutes() {
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="orders" element={<OrdersPage />} />
             <Route path="orders/:id" element={<OrderDetailPage />} />
-            <Route path="ai" element={<AiShell />}>
-              <Route index element={<AiWelcomePage />} />
-              <Route path="quiz" element={<StyleQuizPage />} />
-              <Route path="profile" element={<StyleProfilePage />} />
-              <Route path="chat" element={<StylistChatPage />} />
-              <Route path="occasion" element={<OccasionFormPage />} />
-              <Route path="budget" element={<BudgetFormPage />} />
-              <Route path="saved" element={<SavedOutfitsPage />} />
-              <Route path="history" element={<RecommendationHistoryPage />} />
-            </Route>
             <Route path="creator/dashboard" element={<CreatorDashboardPage />} />
             <Route path="creator/analytics" element={<AnalyticsPage />} />
           </Route>

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { FiBookmark, FiCheck, FiExternalLink, FiX } from 'react-icons/fi'
 import Button from '../common/Button'
 import { formatCurrency } from '../../utils/format'
+import { resolveMediaUrl } from '../../utils/mediaUrl'
 
 export default function OutfitCard({ outfit, saved, onSave, onRemove }) {
   const products = outfit.products || []
@@ -21,7 +22,7 @@ export default function OutfitCard({ outfit, saved, onSave, onRemove }) {
           {products.map((product) => (
             <div className="col-6 col-md-3" key={product.product_id || product.name}>
               <div className="outfit-product-tile">
-                {product.image_url && <img src={product.image_url} alt={product.name} />}
+                {product.image_url && <img src={resolveMediaUrl(product.image_url)} alt={product.name} />}
                 <div className="p-2">
                   <p className="small mb-1">{product.catalog_line === 'footwear' ? 'Kicks' : 'Sport fit'}</p>
                   <strong className="small d-block">{product.name}</strong>

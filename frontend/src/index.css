@@ -169,3 +169,6 @@ html { font-size:100%; }
 .tryon-thumb.active { border-color:#a34b3c; box-shadow:0 0 0 2px rgba(163,75,60,.15); }
 .outfit-product-tile { height:100%; overflow:hidden; background:#fffdfa; border:1px solid #e4d9ce; border-radius:.85rem; }
 .outfit-product-tile img { width:100%; aspect-ratio:1; object-fit:cover; background:#eadfd4; }
+.feature-launch-bar { border-bottom:1px solid var(--line); background:#f8f1ea; }
+.feature-launch-link { display:inline-flex; align-items:center; gap:.35rem; padding:.35rem .75rem; color:#5f2e28; background:#fffdfa; border:1px solid #e4d9ce; border-radius:999px; font-size:.78rem; text-decoration:none; }
+.feature-launch-link:hover { color:#a34b3c; border-color:#d8b4a8; }

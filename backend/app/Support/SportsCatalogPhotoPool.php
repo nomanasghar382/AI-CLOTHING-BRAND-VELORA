@@ -44,7 +44,7 @@ final class SportsCatalogPhotoPool
     public static function urlFor(array $entry, int $width, int $variant = 0): string
     {
         if ($entry['type'] === 'local') {
-            return url($entry['path']);
+            return $entry['path'];
         }
 
         $quality = $width <= 480 ? 82 : 85;

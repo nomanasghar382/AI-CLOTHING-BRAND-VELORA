@@ -22,7 +22,8 @@ class SportsCatalogSeeder extends Seeder
     public function run(): void
     {
         $displayTotal = number_format($this->catalog['catalog_display_total']);
-        $this->command?->info("VELORA Sport — seeding {$this->pairs} apparel + {$this->pairs} matching shoes ({$displayTotal}+ SKU catalog).");
+        $this->command?->info("VELORA Sport — resetting legacy catalog and seeding {$this->pairs} apparel + {$this->pairs} shoes ({$displayTotal}+ SKU catalog).");
+        $this->purgeLegacyCatalog();
 
         $colors = collect($this->catalog['colorways'])->mapWithKeys(fn (array $row) => [
             $row[0] => Color::query()->updateOrCreate(
@@ -111,6 +112,31 @@ class SportsCatalogSeeder extends Seeder
         }
 
         $this->command?->info("Done — {$this->pairs} matched outfit + shoe pairs from {$brands->count()} top sports brands.");
+    }
+
+    private function purgeLegacyCatalog(): void
+    {
+        $legacyProductIds = Product::query()
+            ->where(fn ($query) => $query->whereNull('catalog_line')->orWhere('gender', '!=', 'men'))
+            ->pluck('id');
+
+        if ($legacyProductIds->isNotEmpty()) {
+            \Illuminate\Support\Facades\DB::table('product_images')->whereIn('product_id', $legacyProductIds)->delete();
+            \Illuminate\Support\Facades\DB::table('style_recommendation_items')->whereIn('product_id', $legacyProductIds)->delete();
+            Product::query()->whereIn('id', $legacyProductIds)->delete();
+            $this->command?->warn('Removed '.$legacyProductIds->count().' legacy modest/women products.');
+        }
+
+        Category::query()
+            ->where(function ($query) {
+                $query->where('slug', 'women')
+                    ->orWhere('slug', 'like', 'women-%')
+                    ->orWhere('slug', 'men')
+                    ->orWhere(function ($men) {
+                        $men->where('slug', 'like', 'men-%')->where('slug', 'not like', 'mens-sport%');
+                    });
+            })
+            ->update(['status' => 'inactive']);
     }
 
     private function productName(string $family, int $index, string $brandName): string

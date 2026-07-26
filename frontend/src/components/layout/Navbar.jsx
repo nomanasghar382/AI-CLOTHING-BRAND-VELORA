@@ -34,11 +34,11 @@ export default function Navbar() {
           <MarketSelector />
           <Link className="nav-link-velora" to="/visual-search">Image search</Link>
           <Link className="nav-link-velora" to="/avatar">Avatar</Link>
+          <Link className="nav-link-velora" to="/ai">AI designer</Link>
           <Link className="nav-icon-link" to="/wishlist" aria-label={`Wishlist, ${wishlistCount} items`}><FiHeart />{wishlistCount > 0 && <span className="nav-counter">{wishlistCount}</span>}</Link>
           <Link className="nav-icon-link" to="/cart" aria-label={`Shopping bag, ${cartCount} items`}><FiShoppingBag />{cartCount > 0 && <span className="nav-counter">{cartCount}</span>}</Link>
           {isAuthenticated ? (
             <>
-              <Link className="nav-link-velora" to="/ai">AI designer</Link>
               <Link className="nav-link-velora" to="/wardrobe">Wardrobe</Link>
               <NotificationCenter />
               <Link className="nav-link-velora" to="/rewards"><FiStar /> Rewards</Link>

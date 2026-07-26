@@ -31,7 +31,7 @@ export const aiStylistService = {
       quiz_answers: profile.priority ? { priority: profile.priority } : {},
     }
     try {
-      await apiClient.put('/style/profile', payload)
+      await apiClient.put('/style/profile', payload, { __skipAuthRedirect: true })
       return { fallback: false }
     } catch (error) {
       if (unavailable(error)) return { fallback: true }
@@ -42,7 +42,7 @@ export const aiStylistService = {
   async createRecommendation(preferences, type = 'general') {
     try {
       const endpoint = type === 'occasion' ? '/style/outfits/occasion' : '/style/recommendations'
-      const { data } = await apiClient.post(endpoint, preferences)
+      const { data } = await apiClient.post(endpoint, preferences, { __skipAuthRedirect: true })
       const recommendation = data.data || data
       return { fallback: recommendation.provider === 'catalog_fallback', recommendation: normaliseRecommendation(recommendation, preferences) }
     } catch (error) {
@@ -70,7 +70,7 @@ export const aiStylistService = {
 
   async sendMessage(message, profile) {
     try {
-      const { data } = await apiClient.post('/style/chat', { message })
+      const { data } = await apiClient.post('/style/chat', { message }, { __skipAuthRedirect: true })
       const recommendation = data.data?.recommendation || data.recommendation
       return { fallback: recommendation?.provider === 'catalog_fallback', message: recommendation?.reply || 'I have prepared a new edit for you.' }
     } catch (error) {

@@ -1,9 +1,11 @@
 import { memo } from 'react'
 import { buildCloudinarySrc, buildCloudinarySrcSet } from '../../utils/cloudinary'
+import { resolveMediaUrl } from '../../utils/mediaUrl'
 
 function CloudinaryImage({ src, alt, className, width = 640, sizes = '(max-width: 768px) 50vw, 25vw', fetchPriority }) {
-  const optimized = buildCloudinarySrc(src, width)
-  const srcSet = buildCloudinarySrcSet(src)
+  const resolved = resolveMediaUrl(src)
+  const optimized = buildCloudinarySrc(resolved, width)
+  const srcSet = buildCloudinarySrcSet(resolved)
 
   return (
     <img

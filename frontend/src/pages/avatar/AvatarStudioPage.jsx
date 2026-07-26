@@ -6,6 +6,7 @@ import Button from '../../components/common/Button'
 import Input from '../../components/common/Input'
 import Loader from '../../components/feedback/Loader'
 import useAuth from '../../hooks/useAuth'
+import { resolveMediaUrl } from '../../utils/mediaUrl'
 import { catalogService } from '../../services/catalogService'
 import { styleService } from '../../services/styleService'
 
@@ -98,11 +99,11 @@ export default function AvatarStudioPage() {
               <div className="avatar-stage" style={{ '--skin-tone': avatar.measurements?.skin_tone || skinTones[1] }}>
                 <div className="avatar-head" data-hair={avatar.measurements?.hair_style || 'fade'} />
                 <div className="avatar-torso">
-                  {selectedTop?.images?.[0]?.url && <img src={selectedTop.images[0].url} alt={selectedTop.name} className="avatar-garment avatar-garment-top" />}
+                  {selectedTop?.images?.[0]?.url && <img src={resolveMediaUrl(selectedTop.images[0].url)} alt={selectedTop.name} className="avatar-garment avatar-garment-top" />}
                 </div>
                 <div className="avatar-legs" />
                 <div className="avatar-feet">
-                  {selectedShoes?.images?.[0]?.url && <img src={selectedShoes.images[0].url} alt={selectedShoes.name} className="avatar-garment avatar-garment-shoes" />}
+                  {selectedShoes?.images?.[0]?.url && <img src={resolveMediaUrl(selectedShoes.images[0].url)} alt={selectedShoes.name} className="avatar-garment avatar-garment-shoes" />}
                 </div>
               </div>
               <p className="small text-slate-300 mt-3 mb-0 text-center">
@@ -158,7 +159,7 @@ export default function AvatarStudioPage() {
                 {apparel.map((product) => (
                   <div className="col-4 col-md-3" key={product.id}>
                     <button type="button" className={`tryon-thumb ${selectedTop?.id === product.id ? 'active' : ''}`} onClick={() => tryOnTop(product)}>
-                      <img src={product.images?.[0]?.url} alt={product.name} />
+                      <img src={resolveMediaUrl(product.images?.[0]?.url)} alt={product.name} />
                       <span>{product.brand?.name}</span>
                     </button>
                   </div>
@@ -172,7 +173,7 @@ export default function AvatarStudioPage() {
                 {footwear.map((product) => (
                   <div className="col-4 col-md-3" key={product.id}>
                     <button type="button" className={`tryon-thumb ${selectedShoes?.id === product.id ? 'active' : ''}`} onClick={() => setSelectedShoes(product)}>
-                      <img src={product.images?.[0]?.url} alt={product.name} />
+                      <img src={resolveMediaUrl(product.images?.[0]?.url)} alt={product.name} />
                       <span>{product.brand?.name}</span>
                     </button>
                   </div>

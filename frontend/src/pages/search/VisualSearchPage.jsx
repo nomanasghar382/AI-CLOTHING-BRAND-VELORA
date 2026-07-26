@@ -5,6 +5,7 @@ import Loader from '../../components/feedback/Loader'
 import ErrorState from '../../components/feedback/ErrorState'
 import { searchService } from '../../services/searchService'
 import { formatCurrency } from '../../utils/format'
+import { resolveMediaUrl } from '../../utils/mediaUrl'
 
 export default function VisualSearchPage() {
   const input = useRef(null)
@@ -75,7 +76,7 @@ export default function VisualSearchPage() {
               {results.map((item) => (
                 <div className="col-md-4" key={item.product_id}>
                   <article className="velora-card search-result overflow-hidden">
-                    <img src={item.image_url} alt={item.name} />
+                    <img src={resolveMediaUrl(item.image_url)} alt={item.name} />
                     <div className="p-3">
                       <p className="eyebrow mb-1">{item.brand} · {Math.round((item.score || 0) * 100)}% match</p>
                       <h3 className="h6">{item.name}</h3>

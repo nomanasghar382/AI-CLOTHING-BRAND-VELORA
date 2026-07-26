@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
       return apiClient(config)
     }
 
-    if (status === 401 && !window.location.pathname.includes('/login')) window.location.assign('/unauthorized')
+    if (status === 401 && !config?.__skipAuthRedirect && !window.location.pathname.includes('/login')) window.location.assign('/unauthorized')
     if (status === 419) window.location.assign('/session-expired')
     if (status === 429) window.location.assign('/rate-limited')
     if (status === 503) window.location.assign('/maintenance')

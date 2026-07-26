@@ -44,6 +44,7 @@ final class CatalogController extends Controller
         if ($request->filled('fabric')) $query->where('fabric', $request->string('fabric'));
         if ($request->filled('coverage_level')) $query->where('coverage_level', $request->string('coverage_level'));
         if ($request->filled('gender')) $query->where('gender', $request->string('gender'));
+        else $query->where('gender', 'men');
         if ($request->filled('line')) $query->where('catalog_line', $request->string('line'));
         if ($request->filled('season')) $query->where('season', $request->string('season'));
         if ($request->filled('min_price')) $query->where('price', '>=', $request->float('min_price'));
@@ -57,7 +58,19 @@ final class CatalogController extends Controller
     }
 
     public function show(Product $product): JsonResponse { abort_unless($product->status === 'published', 404); $product->increment('views_count'); return $this->success(new ProductResource($product->load(['brand', 'category', 'images', 'colors', 'sizes', 'variants.color', 'variants.size', 'matchedProduct.brand', 'matchedProduct.images']))); }
-    public function categories(): JsonResponse { return $this->success(CategoryResource::collection(Category::query()->whereNull('parent_id')->where('status', 'active')->with('children')->get())); }
+    public function categories(): JsonResponse
+    {
+        $sportParentId = Category::query()->where('slug', 'mens-sport')->value('id');
+
+        return $this->success(CategoryResource::collection(
+            Category::query()
+                ->where(fn ($query) => $query->where('id', $sportParentId)->orWhere('parent_id', $sportParentId))
+                ->where('status', 'active')
+                ->with('children')
+                ->orderBy('name')
+                ->get()
+        ));
+    }
     public function filters(): JsonResponse
     {
         $published = Product::query()->where('status', 'published')->where('gender', 'men');

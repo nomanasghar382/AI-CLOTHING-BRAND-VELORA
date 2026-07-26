@@ -28,6 +28,12 @@ final class SearchService
       ])
       ->where('status', 'published');
 
+    if (!empty($filters['gender'])) {
+      $builder->where('gender', $filters['gender']);
+    } else {
+      $builder->where('gender', 'men');
+    }
+
     if ($query !== '') {
       $terms = $this->expandTerms($query);
       $builder->where(function ($q) use ($terms): void {
