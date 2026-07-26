@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Support\NikeCatalogMapper;
 use App\Support\SportsCatalogPhotoPool;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class NikeCatalogSeeder extends Seeder
@@ -36,7 +37,20 @@ class NikeCatalogSeeder extends Seeder
         /** @var list<array<string, mixed>> $rows */
         $rows = json_decode((string) file_get_contents($this->dataPath), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->command?->info('Importing '.count($rows).' Nike catalog products from dataset…');
+        $this->purgeNonMensProducts();
+
+        $mensRows = array_values(array_filter(
+            $rows,
+            fn (array $row) => NikeCatalogMapper::isMensCatalogRow(
+                (string) ($row['sub_title'] ?? ''),
+                (string) ($row['url'] ?? ''),
+            )
+        ));
+
+        $skipped = count($rows) - count($mensRows);
+        $this->command?->info('Importing '.count($mensRows).' men\'s Nike products ('.$skipped.' women\'s/kids/unisex skipped)…');
+
+        $this->purgeStaleNikeImports($mensRows);
 
         $parent = Category::query()->firstOrCreate(
             ['slug' => 'mens-sport'],
@@ -46,11 +60,11 @@ class NikeCatalogSeeder extends Seeder
         $supplierId = User::query()->where('email', 'supplier@velora.test')->value('id');
         $imported = 0;
 
-        foreach ($rows as $index => $row) {
+        foreach ($mensRows as $index => $row) {
             $subtitle = (string) ($row['sub_title'] ?? '');
             $name = trim((string) ($row['name'] ?? 'Nike Product'));
             $fullName = $subtitle !== '' ? "{$name} — {$subtitle}" : $name;
-            $gender = NikeCatalogMapper::genderFromSubtitle($subtitle);
+            $gender = 'men';
             $line = NikeCatalogMapper::catalogLineFromSubtitle($subtitle, $name);
             $family = NikeCatalogMapper::familyFromSubtitle($subtitle, $name);
             $slug = NikeCatalogMapper::slugFromUrl((string) ($row['url'] ?? ''));
@@ -180,6 +194,49 @@ class NikeCatalogSeeder extends Seeder
             $imported++;
         }
 
-        $this->command?->info("Nike dataset import complete — {$imported} products with real names, prices, and descriptions.");
+        $this->command?->info("Nike men's import complete — {$imported} products with real names, prices, and descriptions.");
+    }
+
+    private function purgeNonMensProducts(): void
+    {
+        $legacyIds = Product::query()
+            ->where(fn ($query) => $query->where('gender', '!=', 'men')->orWhereNull('gender'))
+            ->pluck('id');
+
+        if ($legacyIds->isEmpty()) {
+            return;
+        }
+
+        DB::table('product_images')->whereIn('product_id', $legacyIds)->delete();
+        DB::table('product_variants')->whereIn('product_id', $legacyIds)->delete();
+        DB::table('inventories')->whereIn('product_id', $legacyIds)->delete();
+        Product::query()->whereIn('id', $legacyIds)->delete();
+
+        $this->command?->warn('Removed '.$legacyIds->count().' non-men\'s products (women\'s, kids, legacy).');
+    }
+
+    /** @param list<array<string, mixed>> $mensRows */
+    private function purgeStaleNikeImports(array $mensRows): void
+    {
+        $keepSkus = array_map(
+            fn (array $row) => NikeCatalogMapper::skuFromUniqId((string) ($row['uniq_id'] ?? '')),
+            $mensRows,
+        );
+
+        $staleIds = Product::query()
+            ->where('sku', 'like', 'NK-%')
+            ->when($keepSkus !== [], fn ($query) => $query->whereNotIn('sku', $keepSkus))
+            ->pluck('id');
+
+        if ($staleIds->isEmpty()) {
+            return;
+        }
+
+        DB::table('product_images')->whereIn('product_id', $staleIds)->delete();
+        DB::table('product_variants')->whereIn('product_id', $staleIds)->delete();
+        DB::table('inventories')->whereIn('product_id', $staleIds)->delete();
+        Product::query()->whereIn('id', $staleIds)->delete();
+
+        $this->command?->warn('Removed '.$staleIds->count().' Nike products outside the men\'s dataset slice.');
     }
 }

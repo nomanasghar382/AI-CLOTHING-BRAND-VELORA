@@ -55,19 +55,38 @@ final class NikeCatalogMapper
 
     public static function genderFromSubtitle(string $subtitle): string
     {
-        $text = strtolower($subtitle);
+        $text = self::normalizeText($subtitle);
 
-        if (preg_match("/men'?s|mens\b/", $text)) {
-            return 'men';
-        }
         if (preg_match("/women'?s|womens\b/", $text)) {
             return 'women';
         }
-        if (preg_match('/big kids|little kids|toddler|boys|girls/', $text)) {
+        if (preg_match('/big kids|little kids|toddler|\bboys\b|\bgirls\b/', $text)) {
             return 'kids';
+        }
+        if (preg_match("/men'?s|mens\b/", $text)) {
+            return 'men';
         }
 
         return 'unisex';
+    }
+
+    /** Men's Gen Z sport only — excludes women's, kids, and unisex listings. */
+    public static function isMensCatalogRow(string $subtitle, string $url): bool
+    {
+        $text = self::normalizeText($subtitle.' '.$url);
+
+        if (preg_match('/women|womens|big-kids|little-kids|toddler|\/boys-|girls-|-girls-|-boys-|-kids-|-kid-/', $text)) {
+            return false;
+        }
+
+        return preg_match("/men'?s|mens\b|-mens-/", $text) === 1;
+    }
+
+    private static function normalizeText(string $text): string
+    {
+        $normalized = str_replace(["\u{2019}", "\u{2018}", '`'], "'", $text);
+
+        return strtolower($normalized);
     }
 
     public static function catalogLineFromSubtitle(string $subtitle, string $name): string
