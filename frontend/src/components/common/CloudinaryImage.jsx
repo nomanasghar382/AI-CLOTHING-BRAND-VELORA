@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { buildCloudinarySrc, buildCloudinarySrcSet } from '../../utils/cloudinary'
 
-function CloudinaryImage({ src, alt, className, width = 640, sizes = '(max-width: 768px) 50vw, 25vw' }) {
+function CloudinaryImage({ src, alt, className, width = 640, sizes = '(max-width: 768px) 50vw, 25vw', fetchPriority }) {
   const optimized = buildCloudinarySrc(src, width)
   const srcSet = buildCloudinarySrcSet(src)
 
@@ -11,8 +11,9 @@ function CloudinaryImage({ src, alt, className, width = 640, sizes = '(max-width
       srcSet={srcSet}
       sizes={srcSet ? sizes : undefined}
       alt={alt}
-      loading="lazy"
+      loading={fetchPriority === 'high' ? 'eager' : 'lazy'}
       decoding="async"
+      fetchPriority={fetchPriority}
       className={className}
     />
   )

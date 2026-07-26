@@ -1,16 +1,17 @@
 import { useRef, useState } from 'react'
 import { FiCamera, FiChevronRight, FiPlus, FiZap } from 'react-icons/fi'
+import { menModestImage, womenModestImage } from '../../constants/modestFashionImages'
 
 const initialPieces = [
-  { id: 1, name: 'Ink wool coat', category: 'Outerwear', image: 'https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?auto=format&fit=crop&w=550&q=80' },
-  { id: 2, name: 'Cloud poplin shirt', category: 'Shirts', image: 'https://images.unsplash.com/photo-1605763240000-7e93b172d754?auto=format&fit=crop&w=550&q=80' },
-  { id: 3, name: 'Cocoa leather loafer', category: 'Shoes', image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=550&q=80' },
-  { id: 4, name: 'Olive relaxed trouser', category: 'Trousers', image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=550&q=80' },
+  { id: 1, name: 'Black flowing abaya', category: 'Abayas', image: womenModestImage(4, 550) },
+  { id: 2, name: 'Silk hijab & niqab set', category: 'Hijabs', image: womenModestImage(0, 550) },
+  { id: 3, name: 'Premium white thobe', category: 'Thobes', image: menModestImage(1, 550) },
+  { id: 4, name: 'Brown kandura', category: 'Kandura', image: menModestImage(2, 550) },
 ]
 
 export function WardrobeDetailPage() {
   const piece = initialPieces[0]
-  return <section className="container py-5 feature-page"><button className="back-link" onClick={() => window.history.back()}>← Back to wardrobe</button><div className="row g-4 mt-1"><div className="col-md-6"><img className="wardrobe-detail-image" src={piece.image} alt={piece.name} /></div><div className="col-md-6"><p className="eyebrow">YOUR WARDROBE / {piece.category}</p><h1>{piece.name}</h1><p className="text-slate-300">Added May 2026 · Worn 7 times</p><div className="velora-card p-4 mt-4"><p className="eyebrow">AI STYLING NOTES</p><p className="mb-0">Pair with your cloud poplin shirt for polished contrast, or layer over soft knits for a tonal silhouette.</p></div></div></div></section>
+  return <section className="container py-5 feature-page"><button className="back-link" onClick={() => window.history.back()}>← Back to wardrobe</button><div className="row g-4 mt-1"><div className="col-md-6"><img className="wardrobe-detail-image" src={piece.image} alt={piece.name} /></div><div className="col-md-6"><p className="eyebrow">YOUR WARDROBE / {piece.category}</p><h1>{piece.name}</h1><p className="text-slate-300">Added May 2026 · Worn 7 times</p><div className="velora-card p-4 mt-4"><p className="eyebrow">AI STYLING NOTES</p><p className="mb-0">Pair with your silk hijab & niqab set for complete coverage, or layer under a flowing abaya for a tonal silhouette.</p></div></div></div></section>
 }
 
 export function WardrobeUploadPage() {

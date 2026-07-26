@@ -20,7 +20,13 @@ final class CatalogController extends Controller
 
     public function products(Request $request): JsonResponse
     {
-        $query = Product::query()->with(['brand', 'category', 'images', 'colors', 'sizes'])->where('status', 'published');
+        $query = Product::query()->with([
+            'brand',
+            'category',
+            'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
+            'colors',
+            'sizes',
+        ])->where('status', 'published');
         if ($request->filled('q')) { $term = $request->string('q')->toString(); $query->where(fn ($q) => $q->where('name', 'like', "%{$term}%")->orWhere('fabric', 'like', "%{$term}%")->orWhere('material', 'like', "%{$term}%")); }
         if ($request->filled('category')) $query->whereHas('category', fn ($q) => $q->where('slug', $request->string('category')));
         if ($request->filled('brand')) $query->whereHas('brand', fn ($q) => $q->where('slug', $request->string('brand')));
@@ -37,6 +43,7 @@ final class CatalogController extends Controller
         if ($request->filled('material')) $query->where('material', $request->string('material'));
         if ($request->filled('fabric')) $query->where('fabric', $request->string('fabric'));
         if ($request->filled('coverage_level')) $query->where('coverage_level', $request->string('coverage_level'));
+        if ($request->filled('gender')) $query->where('gender', $request->string('gender'));
         if ($request->filled('season')) $query->where('season', $request->string('season'));
         if ($request->filled('min_price')) $query->where('price', '>=', $request->float('min_price'));
         if ($request->filled('max_price')) $query->where('price', '<=', $request->float('max_price'));
@@ -54,13 +61,19 @@ final class CatalogController extends Controller
     {
         $published = Product::query()->where('status', 'published');
 
+        $womenParentId = Category::query()->where('slug', 'women')->value('id');
+        $menParentId = Category::query()->where('slug', 'men')->value('id');
+
         return $this->success([
             'brands' => Brand::query()->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
             'colors' => Color::query()->where('status', 'active')->get(['name', 'slug', 'hex_code']),
             'sizes' => Size::query()->where('status', 'active')->orderBy('sort_order')->get(['name', 'slug', 'international_size']),
+            'women_categories' => Category::query()->where('parent_id', $womenParentId)->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
+            'men_categories' => Category::query()->where('parent_id', $menParentId)->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
             'materials' => (clone $published)->whereNotNull('material')->distinct()->orderBy('material')->pluck('material'),
             'fabrics' => (clone $published)->whereNotNull('fabric')->distinct()->orderBy('fabric')->pluck('fabric'),
             'coverage_levels' => (clone $published)->whereNotNull('coverage_level')->distinct()->orderBy('coverage_level')->pluck('coverage_level'),
+            'genders' => (clone $published)->whereNotNull('gender')->distinct()->orderBy('gender')->pluck('gender'),
             'occasions' => (clone $published)->whereNotNull('season')->distinct()->orderBy('season')->pluck('season'),
             'price_range' => [
                 'min' => (float) ((clone $published)->min('price') ?? 0),

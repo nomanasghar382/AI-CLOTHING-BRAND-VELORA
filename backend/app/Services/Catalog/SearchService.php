@@ -21,7 +21,11 @@ final class SearchService
     }
 
     $builder = Product::query()
-      ->with(['brand', 'category', 'images'])
+      ->with([
+        'brand',
+        'category',
+        'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
+      ])
       ->where('status', 'published');
 
     if ($query !== '') {
@@ -36,7 +40,7 @@ final class SearchService
       });
     }
 
-    foreach (['category', 'brand', 'fabric', 'material', 'coverage_level'] as $field) {
+    foreach (['category', 'brand', 'fabric', 'material', 'coverage_level', 'gender'] as $field) {
       if (!empty($filters[$field])) {
         if (in_array($field, ['category', 'brand'], true)) {
           $relation = $field;

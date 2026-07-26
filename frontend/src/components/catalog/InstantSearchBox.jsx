@@ -34,7 +34,7 @@ function InstantSearchBox({ initial = '', onSubmit }) {
           value={query}
           onChange={(event) => { setQuery(event.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
-          placeholder="Search abayas, scarves, linen..."
+          placeholder="Search niqab, hijab, thobe, kurta, shalwar kameez..."
           aria-label="Search catalog"
           aria-expanded={open}
           aria-controls="instant-search-panel"

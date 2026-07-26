@@ -22,6 +22,7 @@ class ProductResource extends JsonResource
             'discount_percent' => $this->sale_price ? (int) round((1 - $this->sale_price / $this->price) * 100) : 0,
             'fabric' => $this->fabric, 'material' => $this->material, 'fit_type' => $this->fit_type, 'coverage_level' => $this->coverage_level,
             'gender' => $this->gender, 'season' => $this->season, 'stock_quantity' => $this->stock_quantity,
+            'keywords' => $this->keywords, 'meta_description' => $this->meta_description,
             'is_featured' => $this->is_featured, 'is_trending' => $this->is_trending, 'is_new_arrival' => $this->is_new_arrival,
             'brand' => $this->whenLoaded('brand', fn () => ['name' => $this->brand?->name, 'slug' => $this->brand?->slug]),
             'category' => $this->whenLoaded('category', fn () => ['name' => $this->category?->name, 'slug' => $this->category?->slug]),

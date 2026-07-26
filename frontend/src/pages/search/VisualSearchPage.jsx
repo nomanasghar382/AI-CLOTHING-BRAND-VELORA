@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { FiCamera, FiExternalLink, FiSearch, FiUpload } from 'react-icons/fi'
+import { menModestImage, womenModestImage } from '../../constants/modestFashionImages'
 
 const results = [
-  { name: 'Draped twill blouse', provider: 'Morrow', price: '$84', image: 'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=600&q=80' },
-  { name: 'Fluid tailored trouser', provider: 'Aster', price: '$92', image: 'https://images.unsplash.com/photo-1506629905607-d405b7a30db6?auto=format&fit=crop&w=600&q=80' },
-  { name: 'Soft leather shoulder bag', provider: 'Nomi', price: '$76', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80' },
+  { name: 'Silk hijab & niqab set', provider: 'Velora Studio', price: '$84', image: womenModestImage(0, 600) },
+  { name: 'Premium white thobe', provider: 'Velora Studio', price: '$92', image: menModestImage(1, 600) },
+  { name: 'Flowing black abaya', provider: 'Velora Studio', price: '$76', image: womenModestImage(4, 600) },
 ]
 
 export default function VisualSearchPage() {
