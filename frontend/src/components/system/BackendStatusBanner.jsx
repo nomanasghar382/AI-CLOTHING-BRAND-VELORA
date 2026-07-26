@@ -1,37 +1,30 @@
 import { useEffect, useState } from 'react'
-import { API_BASE_URL } from '../../config/api'
+import { getCatalogMode } from '../../services/catalogMode'
+import { catalogService } from '../../services/catalogService'
 
 export default function BackendStatusBanner() {
-  const [status, setStatus] = useState('checking')
+  const [mode, setMode] = useState(getCatalogMode())
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/products?per_page=1`)
-      .then((response) => {
-        if (!response.ok) throw new Error('bad response')
-        return response.json()
-      })
-      .then((data) => {
-        const count = data?.data?.meta?.total ?? 0
-        setStatus(count > 0 ? 'ok' : 'empty')
-      })
-      .catch(() => setStatus('down'))
+    catalogService.products({ per_page: 1, gender: 'men' }).catch(() => {})
+    const sync = () => setMode(getCatalogMode())
+    window.addEventListener('velora:catalog-mode', sync)
+    const timer = window.setInterval(sync, 1500)
+    return () => {
+      window.removeEventListener('velora:catalog-mode', sync)
+      window.clearInterval(timer)
+    }
   }, [])
 
-  if (status === 'checking' || status === 'ok') return null
+  if (mode === 'checking' || mode === 'live') return null
 
   return (
-    <div className="backend-status-banner" role="alert">
-      <div className="container py-3">
-        {status === 'down' ? (
-          <>
-            <strong>Backend is not running.</strong> Product photos and shop will not work until you start PHP 8.2+.
-            <span className="d-block small mt-1">Windows: right-click <code>START-VELORA.ps1</code> → Run with PowerShell. Or fix PHP — you need 8.2+, not XAMPP 8.0.</span>
-          </>
-        ) : (
-          <>
-            <strong>Catalog is empty.</strong> Run <code>php artisan velora:reset-sport-catalog</code> in the backend folder.
-          </>
-        )}
+    <div className="backend-status-banner demo-mode-banner" role="status">
+      <div className="container py-2">
+        <strong>Demo catalog active.</strong> Products and photos load from the frontend so you can browse now.
+        <span className="d-block small mt-1">
+          For the full store (bag, checkout, 2,000 SKUs): run <code>START-VELORA.ps1</code> with PHP 8.2+ — not XAMPP 8.0.
+        </span>
       </div>
     </div>
   )

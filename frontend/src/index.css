@@ -173,6 +173,8 @@ html { font-size:100%; }
 .feature-launch-link { display:inline-flex; align-items:center; gap:.35rem; padding:.35rem .75rem; color:#5f2e28; background:#fffdfa; border:1px solid #e4d9ce; border-radius:999px; font-size:.78rem; text-decoration:none; }
 .feature-launch-link:hover { color:#a34b3c; border-color:#d8b4a8; }
 .backend-status-banner { background:#5f2e28; color:#fff9f2; font-size:.9rem; border-bottom:1px solid #7c3d33; }
+.demo-mode-banner { background:#3d3428; border-color:#6b5a3a; color:#f5ead8; }
+.demo-mode-banner code { color:#f0ce95; }
 .backend-status-banner code { color:#f0ce95; }
 .simple-hero .display-hero { margin-left:auto; margin-right:auto; }
 .catalog-gender-tabs.justify-content-center { display:flex; flex-wrap:wrap; justify-content:center; }
