@@ -87,13 +87,13 @@ export default function AvatarStudioPage() {
 
   return (
     <>
-      <Seo title="Avatar & Virtual Try-On" description="Create your sport avatar and virtually try on Nike, Adidas, Puma and more." />
+      <Seo title="Gym-to-Street Avatar" description="Build your body profile and preview training fits with matching street kicks before you buy." />
       <section className="container py-5 feature-page">
         <div className="row g-4 align-items-start">
           <div className="col-lg-5">
             <p className="eyebrow">AVATAR STUDIO</p>
-            <h1 className="h2">Your sport avatar.<br />Virtual try-on.</h1>
-            <p className="text-slate-300">Build a body profile, pick a fit, and preview men&apos;s sportswear + matching kicks — built for Gen Z athletes 16–35.</p>
+            <h1 className="h2">See your gym-to-street fit<br />before you buy.</h1>
+            <p className="text-slate-300">Set your size once. Preview training layers and street kicks on your avatar — built for guys who train hard and dress clean after.</p>
 
             <div className="velora-card p-4 avatar-preview mt-4">
               <div className="avatar-stage" style={{ '--skin-tone': avatar.measurements?.skin_tone || skinTones[1] }}>

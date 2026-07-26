@@ -5,13 +5,13 @@ import { AiStylistContext } from './aiStylistContext'
 const storageKey = 'velora_ai_stylist'
 const initialState = { profile: {}, savedOutfits: [], history: [] }
 
-const createFallbackOutfit = ({ occasion = 'Everyday', budget = 'Considered', profile = {} }) => ({
+const createFallbackOutfit = ({ occasion = 'Leg day', budget = '$120', profile = {} }) => ({
   id: crypto.randomUUID(),
-  title: `${occasion} edit`,
+  title: `${occasion} gym-to-street fit`,
   occasion,
   budget,
-  description: `A ${profile.style || 'refined'} look with a composed silhouette, tactile layer, and a deliberate finishing detail.`,
-  pieces: ['Structured foundation', 'Texture-led layer', 'Refined accessory'],
+  description: `Built for ${profile.style || 'athletic'} training → street. Compression or tee base, post-gym layer, matching kicks under ${budget}.`,
+  pieces: ['Training base layer', 'Post-gym hoodie or joggers', 'Matching street sneakers'],
   fallback: true,
   createdAt: new Date().toISOString(),
 })

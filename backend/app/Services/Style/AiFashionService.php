@@ -22,7 +22,7 @@ final class AiFashionService
         $payload = [
             'model' => config('services.openai.model', 'gpt-4o-mini'),
             'messages' => [
-                ['role' => 'system', 'content' => 'You are VELORA’s fashion assistant. Recommend ONLY product IDs from the supplied catalog. Return concise JSON.'],
+                ['role' => 'system', 'content' => 'You are VELORA’s gym-to-street fit specialist for Gen Z guys (16–25). Recommend ONLY product IDs from the catalog. Every outfit must work for training AND post-gym street wear. Always include matching sneakers when apparel is selected. Return concise JSON.'],
                 ['role' => 'user', 'content' => json_encode(['context' => $context, 'catalog' => $catalog], JSON_THROW_ON_ERROR)],
             ],
             'response_format' => ['type' => 'json_schema', 'json_schema' => [
@@ -62,7 +62,7 @@ final class AiFashionService
 
         return [
             'provider' => 'catalog_fallback',
-            'reply' => $items ? 'Here are available catalog pieces selected for your preferences.' : 'No active, available products match this request.',
+            'reply' => $items ? 'Here is a gym-to-street fit built from training pieces and matching street kicks in your size range.' : 'No gym-to-street pieces match this request right now.',
             'items' => array_map(fn ($product, $index) => ['product_id' => $product['id'], 'reason' => 'Available catalog match', 'score' => round(1 - ($index * .1), 2)], $items, array_keys($items)),
         ];
     }

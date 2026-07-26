@@ -7,7 +7,7 @@ const unavailable = (error) => {
 
 const fallbackReply = (message, profile = {}) => ({
   fallback: true,
-  message: `The AI stylist is not configured on this server yet. Based on your ${profile.style || 'personal'} style, start with a considered silhouette, one focal texture, and a polished finishing layer for “${message}”.`,
+  message: `The gym-to-street designer is warming up. For “${message}”, start with a compression or training tee, layer a hoodie for post-gym, and finish with matching lifestyle sneakers.`,
 })
 
 const normaliseRecommendation = (recommendation, brief) => ({

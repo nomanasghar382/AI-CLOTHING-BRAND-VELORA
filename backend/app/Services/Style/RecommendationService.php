@@ -4,6 +4,7 @@ namespace App\Services\Style;
 
 use App\Models\Product;
 use App\Models\User;
+use App\Support\GymToStreetCatalog;
 use Illuminate\Support\Facades\DB;
 
 final class RecommendationService
@@ -12,9 +13,9 @@ final class RecommendationService
 
     public function create(User $user, array $context, string $kind = 'general', ?int $conversationId = null): array
     {
-        $products = Product::query()->with(['category', 'images', 'matchedProduct.images'])
+        $products = GymToStreetCatalog::applyScope(Product::query()->with(['category', 'images', 'matchedProduct.images'])
             ->where('status', 'published')->where('stock_quantity', '>', 0)
-            ->where(fn ($query) => $query->where('gender', 'men')->orWhereNull('gender'))
+            ->where(fn ($query) => $query->where('gender', 'men')->orWhereNull('gender')))
             ->when(isset($context['budget']), fn ($query) => $query->whereRaw('COALESCE(sale_price, price) <= ?', [(float) $context['budget']]))
             ->orderByDesc('is_featured')->orderByDesc('is_trending')->limit(40)->get();
         $catalog = $products->map(fn (Product $product) => [

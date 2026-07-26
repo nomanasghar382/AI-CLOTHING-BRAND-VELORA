@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api\V1\Style;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,7 +18,8 @@ final class StyleEngineTest extends TestCase
     {
         config(['services.openai.key' => '', 'services.weather.key' => '']);
         $user = User::factory()->create();
-        $available = Product::factory()->create(['status' => 'published', 'stock_quantity' => 3, 'price' => 75, 'gender' => 'men']);
+        $category = Category::query()->create(['name' => 'Hoodie', 'slug' => 'mens-sport-hoodie', 'status' => 'active']);
+        $available = Product::factory()->create(['status' => 'published', 'stock_quantity' => 3, 'price' => 75, 'gender' => 'men', 'category_id' => $category->id, 'catalog_line' => 'apparel']);
         Product::factory()->create(['status' => 'draft', 'stock_quantity' => 9, 'price' => 20]);
         Product::factory()->create(['status' => 'published', 'stock_quantity' => 0, 'price' => 20]);
 
@@ -38,7 +40,8 @@ final class StyleEngineTest extends TestCase
         config(['services.openai.key' => '']);
         $user = User::factory()->create();
         $other = User::factory()->create();
-        $product = Product::factory()->create(['status' => 'published', 'stock_quantity' => 2, 'price' => 50, 'gender' => 'men']);
+        $category = Category::query()->create(['name' => 'Training Shoes', 'slug' => 'mens-sport-training-shoes', 'status' => 'active']);
+        $product = Product::factory()->create(['status' => 'published', 'stock_quantity' => 2, 'price' => 50, 'gender' => 'men', 'category_id' => $category->id, 'catalog_line' => 'footwear']);
         Sanctum::actingAs($user);
 
         $chat = $this->postJson('/api/v1/style/chat', ['message' => 'I need a dinner outfit', 'budget' => 80])->assertCreated();

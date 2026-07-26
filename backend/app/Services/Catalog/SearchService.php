@@ -4,6 +4,7 @@ namespace App\Services\Catalog;
 
 use App\Models\Product;
 use App\Models\SearchAnalytics;
+use App\Support\GymToStreetCatalog;
 use App\Models\SearchHistory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
@@ -28,6 +29,8 @@ final class SearchService
       ])
       ->where('status', 'published');
 
+    GymToStreetCatalog::applyScope($builder);
+
     if (!empty($filters['gender'])) {
       $builder->where('gender', $filters['gender']);
     } else {
@@ -46,13 +49,23 @@ final class SearchService
       });
     }
 
-    foreach (['category', 'brand', 'fabric', 'material', 'gender', 'line'] as $field) {
+    foreach (['category', 'brand', 'fabric', 'material', 'gender', 'line', 'moment'] as $field) {
       if (!empty($filters[$field])) {
         if (in_array($field, ['category', 'brand'], true)) {
           $relation = $field;
           $builder->whereHas($relation, fn ($q) => $q->where('slug', $filters[$field]));
         } elseif ($field === 'line') {
           $builder->where('catalog_line', $filters[$field]);
+        } elseif ($field === 'moment') {
+          $slugs = match ($filters[$field]) {
+            'leg-day' => ['mens-sport-training-shorts', 'mens-sport-compression-top', 'mens-sport-training-shoes'],
+            'post-gym' => ['mens-sport-hoodie', 'mens-sport-joggers', 'mens-sport-lifestyle-sneakers'],
+            'training' => GymToStreetCatalog::apparelSlugs(),
+            default => [],
+          };
+          if ($slugs !== []) {
+            $builder->whereHas('category', fn ($q) => $q->whereIn('slug', $slugs));
+          }
         } else {
           $builder->where($field, $filters[$field]);
         }

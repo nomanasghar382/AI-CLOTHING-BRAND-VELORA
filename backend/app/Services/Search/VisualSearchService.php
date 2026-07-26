@@ -4,6 +4,7 @@ namespace App\Services\Search;
 
 use App\Models\Product;
 use App\Models\VisualSearch;
+use App\Support\GymToStreetCatalog;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -49,7 +50,7 @@ final class VisualSearchService
             }
         }
 
-        return Product::query()->where('status', 'published')->where('stock_quantity', '>', 0)->where('gender', 'men')
+        return GymToStreetCatalog::applyScope(Product::query()->where('status', 'published')->where('stock_quantity', '>', 0)->where('gender', 'men'))
             ->with(['images', 'brand'])->inRandomOrder()->limit(12)->get()
             ->map(fn (Product $p) => [
                 'product_id' => $p->id,

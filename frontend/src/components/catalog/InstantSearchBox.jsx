@@ -65,7 +65,7 @@ function InstantSearchBox({ initial = '', onSubmit }) {
           value={query}
           onChange={(event) => { setQuery(event.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
-          placeholder="Search Nike hoodies, Jordan 1, gym shorts, running shoes..."
+          placeholder="Search gymshark hoodie, nike joggers, training shoes..."
           aria-label="Search sportswear catalog"
           aria-expanded={open}
           aria-controls="instant-search-panel"

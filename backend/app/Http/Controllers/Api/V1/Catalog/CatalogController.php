@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
 use App\Models\Size;
+use App\Support\GymToStreetCatalog;
 use App\Traits\RespondsWithApi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,8 +28,21 @@ final class CatalogController extends Controller
             'colors',
             'sizes',
         ])->where('status', 'published');
+        GymToStreetCatalog::applyScope($query);
         if ($request->filled('q')) { $term = $request->string('q')->toString(); $query->where(fn ($q) => $q->where('name', 'like', "%{$term}%")->orWhere('fabric', 'like', "%{$term}%")->orWhere('material', 'like', "%{$term}%")); }
         if ($request->filled('category')) $query->whereHas('category', fn ($q) => $q->where('slug', $request->string('category')));
+        if ($request->filled('moment')) {
+            $moment = $request->string('moment')->toString();
+            $slugs = match ($moment) {
+                'leg-day' => ['mens-sport-training-shorts', 'mens-sport-compression-top', 'mens-sport-training-shoes'],
+                'post-gym' => ['mens-sport-hoodie', 'mens-sport-joggers', 'mens-sport-lifestyle-sneakers'],
+                'training' => GymToStreetCatalog::apparelSlugs(),
+                default => [],
+            };
+            if ($slugs !== []) {
+                $query->whereHas('category', fn ($q) => $q->whereIn('slug', $slugs));
+            }
+        }
         if ($request->filled('brand')) $query->whereHas('brand', fn ($q) => $q->where('slug', $request->string('brand')));
         if ($request->filled('brands')) {
             $brands = explode(',', (string) $request->string('brands'));
@@ -73,14 +87,13 @@ final class CatalogController extends Controller
     }
     public function filters(): JsonResponse
     {
-        $published = Product::query()->where('status', 'published')->where('gender', 'men');
-        $sportParentId = Category::query()->where('slug', 'mens-sport')->value('id');
+        $published = GymToStreetCatalog::applyScope(Product::query()->where('status', 'published')->where('gender', 'men'));
 
         return $this->success([
             'brands' => Brand::query()->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
             'colors' => Color::query()->where('status', 'active')->get(['name', 'slug', 'hex_code']),
             'sizes' => Size::query()->where('status', 'active')->orderBy('sort_order')->get(['name', 'slug', 'international_size']),
-            'men_categories' => Category::query()->where('parent_id', $sportParentId)->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
+            'men_categories' => Category::query()->whereIn('slug', GymToStreetCatalog::categorySlugs())->where('status', 'active')->orderBy('name')->get(['name', 'slug']),
             'catalog_lines' => (clone $published)->whereNotNull('catalog_line')->distinct()->orderBy('catalog_line')->pluck('catalog_line'),
             'materials' => (clone $published)->whereNotNull('material')->distinct()->orderBy('material')->pluck('material'),
             'fabrics' => (clone $published)->whereNotNull('fabric')->distinct()->orderBy('fabric')->pluck('fabric'),
