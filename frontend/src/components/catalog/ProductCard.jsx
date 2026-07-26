@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import Card from '../common/Card'
 import CloudinaryImage from '../common/CloudinaryImage'
+import { placeholderForLine } from '../../utils/productPlaceholder'
 
 function ProductCard({ product }) {
   const image = product.images?.find((item) => item.is_primary)?.thumbnail_url || product.images?.[0]?.thumbnail_url
@@ -10,7 +11,18 @@ function ProductCard({ product }) {
   return (
     <Card className="product-card h-100 overflow-hidden">
       <Link to={`/catalog/${product.slug}`} className={`product-image-wrap ${isFootwear ? 'is-footwear' : ''}`}>
-        {image ? <CloudinaryImage src={image} alt={product.name} className="product-image" width={540} sizes="(max-width: 768px) 50vw, 25vw" /> : <div className="product-image product-image-fallback" aria-hidden="true" />}
+        {image ? (
+          <CloudinaryImage
+            src={image}
+            alt={product.name}
+            className="product-image"
+            width={540}
+            sizes="(max-width: 768px) 50vw, 25vw"
+            fallback={placeholderForLine(product.catalog_line)}
+          />
+        ) : (
+          <div className="product-image product-image-fallback" aria-hidden="true" />
+        )}
         {isSport && <span className="badge icon-badge">{isFootwear ? 'Street kicks' : 'Training'}</span>}
         {product.discount_percent > 0 && <span className="badge product-badge">-{product.discount_percent}%</span>}
       </Link>
