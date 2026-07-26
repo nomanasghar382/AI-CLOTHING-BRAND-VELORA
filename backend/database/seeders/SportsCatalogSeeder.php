@@ -180,11 +180,28 @@ class SportsCatalogSeeder extends Seeder
             ? ' Includes AI-matched kicks in the same colorway.'
             : ($isFootwear ? ' Pairs with matching Gen Z sport top.' : '');
 
+        $colorName = $color->name;
+        $fabric = $isFootwear ? 'Synthetic upper' : ['Dri-FIT', 'Polyester', 'Mesh', 'Cotton blend'][$i % 4];
+        $activity = $isFootwear
+            ? match (true) {
+                str_contains(strtolower($family), 'running') => 'Road runs and daily miles.',
+                str_contains(strtolower($family), 'basketball') => 'Court grip and ankle support.',
+                str_contains(strtolower($family), 'training') => 'Gym sessions and HIIT.',
+                default => 'Street and post-gym wear.',
+            }
+            : match (true) {
+                str_contains(strtolower($family), 'hoodie') || str_contains(strtolower($family), 'jogger') => 'Post-gym and casual street.',
+                str_contains(strtolower($family), 'short') => 'Leg day and summer training.',
+                str_contains(strtolower($family), 'jersey') => 'Court and team practice.',
+                str_contains(strtolower($family), 'compression') => 'Base layers under your kit.',
+                default => 'Training floor and warm-ups.',
+            };
+
         $product = Product::query()->updateOrCreate(['sku' => $sku], [
             'slug' => Str::slug($name.'-'.$sku),
             'name' => $name,
-            'short_description' => "Men's {$family} — {$brand->name} Gen Z sport edit.",
-            'description' => "Built for ages 16–35. {$brand->name} {$family} engineered for gym, court, and street.{$matchNote}",
+            'short_description' => "{$brand->name} {$family} — {$colorName} colorway.",
+            'description' => "{$name}. {$brand->name} men's {$family} in {$colorName}. {$fabric}. {$activity}{$matchNote}",
             'barcode' => strtoupper(str_replace('-', '', $sku)),
             'brand_id' => $brand->id,
             'category_id' => $category->id,
@@ -199,7 +216,7 @@ class SportsCatalogSeeder extends Seeder
             'is_featured' => $i <= 48,
             'is_trending' => $i % 11 === 0,
             'is_new_arrival' => $i <= 120,
-            'fabric' => $isFootwear ? 'Synthetic upper' : ['Dri-FIT', 'Polyester', 'Mesh', 'Cotton blend'][$i % 4],
+            'fabric' => $fabric,
             'material' => $isFootwear ? 'Rubber outsole' : 'Performance polyester',
             'fit_type' => ['Athletic', 'Relaxed', 'Compression', 'Oversized'][$i % 4],
             'coverage_level' => 'Sport',
@@ -225,7 +242,7 @@ class SportsCatalogSeeder extends Seeder
             $thumb = SportsCatalogPhotoPool::urlFor($entry, 540);
             ProductImage::query()->updateOrCreate(
                 ['product_id' => $product->id, 'sort_order' => $j],
-                ['url' => $url, 'thumbnail_url' => $thumb, 'alt_text' => $name, 'is_primary' => $j === 0]
+                ['url' => $url, 'thumbnail_url' => $thumb, 'alt_text' => "{$brand->name} {$family} — {$name} (view ".($j + 1).')', 'is_primary' => $j === 0]
             );
             $sizeForVariant = $sizes[($i + $j) % $sizes->count()];
             $variant = ProductVariant::query()->updateOrCreate(

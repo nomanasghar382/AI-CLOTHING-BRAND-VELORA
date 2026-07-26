@@ -60,7 +60,9 @@ final class SportsCatalogPhotoPool
         $local = self::familyFolderPhotos($familyKey);
 
         if ($local !== []) {
-            return ['type' => 'local', 'path' => $local[($ordinal + $galleryIndex) % count($local)]];
+            $index = (($ordinal * 7) + ($galleryIndex * 11)) % count($local);
+
+            return ['type' => 'local', 'path' => $local[$index]];
         }
 
         $catalog = self::catalog();
