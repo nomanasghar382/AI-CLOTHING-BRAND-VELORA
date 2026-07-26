@@ -213,11 +213,13 @@ class SportsCatalogSeeder extends Seeder
             'published_at' => now()->subDays($i % 90),
         ]);
 
-        $selectedSizes = $sizes->slice($i % 3, 3)->values();
         $product->colors()->sync([$color->id]);
-        $product->sizes()->sync($selectedSizes->pluck('id'));
+        $product->sizes()->sync($sizes->pluck('id'));
 
-        foreach (range(0, 3) as $j) {
+        ProductImage::query()->where('product_id', $product->id)->delete();
+        ProductVariant::query()->where('product_id', $product->id)->delete();
+
+        foreach (range(0, 2) as $j) {
             $entry = SportsCatalogPhotoPool::entryFor($family, $ordinal, $j);
             $url = SportsCatalogPhotoPool::urlFor($entry, 1080);
             $thumb = SportsCatalogPhotoPool::urlFor($entry, 540);
@@ -225,9 +227,10 @@ class SportsCatalogSeeder extends Seeder
                 ['product_id' => $product->id, 'sort_order' => $j],
                 ['url' => $url, 'thumbnail_url' => $thumb, 'alt_text' => $name, 'is_primary' => $j === 0]
             );
+            $sizeForVariant = $sizes[($i + $j) % $sizes->count()];
             $variant = ProductVariant::query()->updateOrCreate(
                 ['sku' => "{$sku}-{$j}"],
-                ['product_id' => $product->id, 'color_id' => $color->id, 'size_id' => $selectedSizes[$j % $selectedSizes->count()]->id, 'stock_quantity' => 8 + $i % 25, 'status' => 'active']
+                ['product_id' => $product->id, 'color_id' => $color->id, 'size_id' => $sizeForVariant->id, 'stock_quantity' => 8 + $i % 25, 'status' => 'active']
             );
             Inventory::query()->updateOrCreate(
                 ['product_id' => $product->id, 'product_variant_id' => $variant->id, 'location' => 'primary'],
