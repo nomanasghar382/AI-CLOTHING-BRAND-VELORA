@@ -57,16 +57,10 @@ class CatalogSeeder extends Seeder
     public function run(): void
     {
         $counts = FreeCatalogPhotoPool::counts();
-        $this->command?->info("Free photos: {$counts['women_local']} women + {$counts['men_local']} men from your phone. Pool totals: {$counts['women_total']} women, {$counts['men_total']} men.");
+        $this->command?->info("Garment-matched photos: {$counts['women_local']} women + {$counts['men_local']} men in family folders.");
+        $this->command?->info('Each product uses ONLY images from its garment folder (trouser → trousers photo, thobe → thobe photo).');
         if ($counts['men_brand_model']) {
-            $this->command?->info('Men brand model detected — your photo will be used on ALL men\'s products.');
-        } else {
-            $this->command?->warn('Tip: save your photo as backend/public/free-catalog/men/brand-model.jpg for all men\'s products.');
-        }
-        if ($counts['women_catalog_photos']) {
-            $this->command?->info("Women catalog photos: {$counts['women_local']} looks — used on ALL women's products.");
-        } else {
-            $this->command?->warn('Tip: add your niqab/abaya photos to backend/public/free-catalog/women/');
+            $this->command?->info('Kurta products use your brand-model photo in free-catalog/men/kurta/ only.');
         }
 
         $colors = collect(['Black'=>'#111827','Ivory'=>'#FFFFF0','Emerald'=>'#047857','Plum'=>'#7E2253','Navy'=>'#1E3A8A','Sand'=>'#D6C5A2','Rose'=>'#E9A0B5','Olive'=>'#556B2F','Taupe'=>'#8B7D6B','Cocoa'=>'#6F4E37','Sky'=>'#87CEEB','Lilac'=>'#C8A2C8','Stone'=>'#78716C','Sage'=>'#9CAF88','Burgundy'=>'#800020','Teal'=>'#0F766E','Mocha'=>'#967969','Coral'=>'#FF7F50','Silver'=>'#C0C0C0','Gold'=>'#D4AF37'])->map(fn ($hex, $name) => Color::query()->updateOrCreate(['slug'=>Str::slug($name)], ['name'=>$name,'hex_code'=>$hex,'status'=>'active']))->values();
@@ -121,22 +115,23 @@ class CatalogSeeder extends Seeder
             $coverage = $gender === 'women' ? 'Full' : ['Full', 'Modest', 'Layered'][$i % 3];
 
             $modeledBy = $gender === 'men' && FreeCatalogPhotoPool::familyUsesBrandModel($familyName)
-                ? ' Modeled by Noman Asghar.'
+                ? ' Photo shows our kurta brand model wearing this kurta style.'
                 : '';
-            $womenLook = $gender === 'women' && FreeCatalogPhotoPool::usesWomenCatalogPhotos() && $this->isFaceCoverFamily($familyName)
-                ? ' Velora niqab & abaya edit.'
-                : '';
+            $genderLabel = $gender === 'men' ? "Men's" : "Women's";
+            $photoNote = $gender === 'women' && $this->isFaceCoverFamily($familyName)
+                ? " Photo shows a young model wearing {$familyName} — same garment as the title."
+                : ($this->isBottomFamily($familyName)
+                    ? " Product photo shows {$familyName} only (flat-lay / mannequin)."
+                    : " Photo matches {$familyName} — Gen Z modest edit.");
             $product = Product::query()->updateOrCreate(['sku' => "VLR-{$i}"], [
                 'slug' => Str::slug($name.'-'.$i),
                 'name' => $name,
                 'short_description' => $gender === 'men' && FreeCatalogPhotoPool::familyUsesBrandModel($familyName)
-                    ? "Worn by Noman Asghar — {$familyName} edit."
-                    : ($gender === 'women' && FreeCatalogPhotoPool::usesWomenCatalogPhotos() && $this->isFaceCoverFamily($familyName)
-                        ? "Your niqab & abaya look — {$familyName} drop."
-                        : ($this->isBottomFamily($familyName)
-                            ? "Gen Z {$familyName} — product flat-lay, ages 16–35."
-                            : "Gen Z {$familyName} — modest edit for ages 16–35.")),
-                'description' => "Built for ages 16–35. The {$name} is styled for campus, Jummah, and weekend fits.{$modeledBy}{$womenLook}",
+                    ? "{$genderLabel} {$familyName} — model wearing {$familyName} in photo."
+                    : ($this->isBottomFamily($familyName)
+                        ? "{$genderLabel} {$familyName} — product shot matches {$familyName}."
+                        : "{$genderLabel} {$familyName} — image shows {$familyName}, ages 16–35."),
+                'description' => "Gen Z {$familyName} for ages 16–35.{$modeledBy}{$photoNote}",
                 'barcode' => '890'.str_pad((string) $i, 9, '0', STR_PAD_LEFT),
                 'brand_id' => $brands[$i % 100]->id,
                 'category_id' => $categoryPool[$familyIndex]->id,

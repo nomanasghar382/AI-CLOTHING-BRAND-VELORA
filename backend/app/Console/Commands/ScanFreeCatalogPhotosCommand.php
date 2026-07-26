@@ -23,9 +23,8 @@ class ScanFreeCatalogPhotosCommand extends Command
         ]);
 
         $this->newLine();
-        $this->line('Images are matched by garment type (trousers get trouser shots, not kurta models).');
-        $this->line('WOMEN: copy niqab/abaya photos to backend/public/free-catalog/women/');
-        $this->line('MEN: brand-model.jpg is used ONLY on outfit categories (kurta, shalwar, thobe) — not trousers.');
+        $this->line('Garment folders: free-catalog/{men|women}/{kurta|thobe|bottoms|niqab|abaya|...}/');
+        $this->line('Each product uses ONLY its garment folder — image matches title.');
         $this->line('Then: php artisan db:seed --class=CatalogSeeder');
 
         return self::SUCCESS;
