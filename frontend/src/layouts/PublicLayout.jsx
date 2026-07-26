@@ -12,7 +12,7 @@ export default function PublicLayout() {
   useOfflineSync()
 
   return (
-    <div className="app-shell genz-sport">
+    <div className="app-shell nike-retail">
       <SkipLink />
       <BackendStatusBanner />
       <Navbar />

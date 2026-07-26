@@ -15,10 +15,10 @@ export default function CampaignCarousel() {
 
   return (
     <section className="retail-campaign" aria-label="Featured campaigns">
-      <div
-        className="retail-campaign-bg"
-        style={{ backgroundImage: `linear-gradient(90deg, rgba(0,0,0,.72) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.15) 100%), url(${slide.image})` }}
-      />
+      <div className="retail-campaign-bg">
+        <img src={slide.image} alt="" referrerPolicy="no-referrer" />
+        <div className="retail-campaign-overlay" />
+      </div>
       <div className="container retail-campaign-inner">
         <p className="retail-campaign-eyebrow">{slide.eyebrow}</p>
         <h1 className="retail-campaign-title">{slide.title.split('\n').map((line) => <span key={line}>{line}<br /></span>)}</h1>

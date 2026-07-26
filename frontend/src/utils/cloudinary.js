@@ -22,6 +22,7 @@ function pexelsUrl(url, width, quality) {
 
 export function buildCloudinarySrc(url, width = 720) {
   if (!url) return url
+  if (url.startsWith('/catalog/') || url.startsWith('/assets/')) return url
 
   if (url.includes('res.cloudinary.com')) {
     return url.replace('/upload/', `/upload/f_auto,q_auto:good,w_${width},c_fill,dpr_2.0/`)

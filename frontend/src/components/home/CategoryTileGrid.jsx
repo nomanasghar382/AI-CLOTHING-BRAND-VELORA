@@ -14,11 +14,11 @@ export default function CategoryTileGrid() {
       <div className="retail-category-grid">
         {RETAIL_CATEGORIES.map((category) => (
           <Link
-            key={category.slug}
+            key={category.slug || 'all'}
             className="retail-category-tile"
-            to={`/catalog?category=${category.slug}`}
-            style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.05) 40%, rgba(0,0,0,.75) 100%), url(${category.image})` }}
+            to={category.slug ? `/catalog?category=${category.slug}` : '/catalog?gender=men'}
           >
+            <img src={category.image} alt="" referrerPolicy="no-referrer" />
             <span>{category.label}</span>
           </Link>
         ))}

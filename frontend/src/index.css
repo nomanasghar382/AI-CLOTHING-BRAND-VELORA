@@ -181,102 +181,108 @@ html { font-size:100%; }
 .niche-nav-tag { letter-spacing:.08em; text-transform:uppercase; font-size:.68rem; }
 .niche-step-card { border-color:#e8d5ca; }
 
-/* Gen Z gym-to-street — dark energy (customer shell only; admin/portal keep atelier) */
-.app-shell.genz-sport {
-  --velora-void: #06080f;
-  --velora-card: #0f1420;
-  --velora-violet: #c8ff00;
-  --velora-cyan: #00e5ff;
-  --velora-white: #f3f6fb;
-  --velora-muted: #8b95a8;
-  --ink: #f3f6fb;
-  --paper: #06080f;
-  --line: rgba(255, 255, 255, .1);
-  color: var(--velora-white);
-  background: var(--velora-void);
+/* Nike.com-style retail — white, black, clean (customer shell) */
+.app-shell.nike-retail {
+  --velora-void: #ffffff;
+  --velora-card: #ffffff;
+  --velora-violet: #111111;
+  --velora-cyan: #111111;
+  --velora-white: #111111;
+  --velora-muted: #757575;
+  --ink: #111111;
+  --paper: #ffffff;
+  --line: #e5e5e5;
+  color: #111;
+  background: #fff;
 }
-.app-shell.genz-sport body,
-.app-shell.genz-sport { color: var(--velora-white); background: var(--velora-void); }
-.app-shell.genz-sport a { color: var(--velora-cyan); }
-.app-shell.genz-sport a:hover { color: #7df9ff; }
-.app-shell.genz-sport .site-header {
-  background: rgba(6, 8, 15, .88);
-  border-bottom: 1px solid rgba(255, 255, 255, .08);
-  backdrop-filter: blur(18px) saturate(140%);
+.app-shell.nike-retail { color: #111; background: #fff; }
+.app-shell.nike-retail a { color: #111; }
+.app-shell.nike-retail a:hover { color: #757575; }
+.app-shell.nike-retail .site-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  backdrop-filter: none;
 }
-.app-shell.genz-sport .brand-mark {
+.app-shell.nike-retail .brand-mark {
+  color: #111;
+  font-family: Inter, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: .2em;
+}
+.app-shell.nike-retail .nav-link-velora,
+.app-shell.nike-retail .nav-icon-link { color: #111; font-weight: 500; font-size: .92rem; }
+.app-shell.nike-retail .nav-link-velora:hover,
+.app-shell.nike-retail .nav-link-velora.active,
+.app-shell.nike-retail .nav-icon-link:hover { color: #757575; }
+.app-shell.nike-retail .nav-counter { background: #111; color: #fff; }
+.app-shell.nike-retail .btn-icon { color: #111; border-color: #e5e5e5; background: #fff; }
+.app-shell.nike-retail .site-footer { background: #f5f5f5; border-color: #e5e5e5; color: #111; }
+.app-shell.nike-retail .velora-card,
+.app-shell.nike-retail .auth-panel,
+.app-shell.nike-retail .state-panel {
+  background: #fff;
+  border-color: #e5e5e5;
+  box-shadow: none;
+}
+.app-shell.nike-retail .product-image-wrap,
+.app-shell.nike-retail .detail-image-wrap,
+.app-shell.nike-retail .retail-product-image,
+.app-shell.nike-retail .pdp-gallery-stage { background: #f5f5f5; }
+.app-shell.nike-retail .product-image-wrap.is-footwear,
+.app-shell.nike-retail .retail-product-image.is-footwear,
+.app-shell.nike-retail .pdp-gallery-stage.is-footwear { background: #f5f5f5; }
+.app-shell.nike-retail .product-name,
+.app-shell.nike-retail .product-price,
+.app-shell.nike-retail .retail-heading,
+.app-shell.nike-retail .retail-product-meta strong,
+.app-shell.nike-retail .retail-product-meta em { color: #111; }
+.app-shell.nike-retail .product-name:hover { color: #757575; }
+.app-shell.nike-retail .product-badge { background: #111; color: #fff; }
+.app-shell.nike-retail .text-slate-300 { color: #757575 !important; }
+.app-shell.nike-retail .btn-velora-primary,
+.app-shell.nike-retail .btn-retail-primary {
+  background: #111;
+  border-color: #111;
   color: #fff;
-  font-family: "Space Grotesk", Inter, sans-serif;
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: .22em;
+  box-shadow: none;
+  border-radius: 999px;
 }
-.app-shell.genz-sport .brand-mark span { color: var(--velora-violet); }
-.app-shell.genz-sport .nav-link-velora,
-.app-shell.genz-sport .nav-icon-link { color: var(--velora-muted); font-weight: 600; font-size: .88rem; }
-.app-shell.genz-sport .nav-link-velora:hover,
-.app-shell.genz-sport .nav-link-velora.active,
-.app-shell.genz-sport .nav-icon-link:hover { color: #fff; }
-.app-shell.genz-sport .nav-counter { background: var(--velora-violet); color: #0a0c12; }
-.app-shell.genz-sport .btn-icon { color: #fff; border-color: rgba(255, 255, 255, .18); background: transparent; }
-.app-shell.genz-sport .site-footer {
-  background: #0a0d15;
-  border-color: rgba(255, 255, 255, .08);
+.app-shell.nike-retail .btn-velora-primary:hover,
+.app-shell.nike-retail .btn-retail-primary:hover { background: #333; color: #fff; }
+.app-shell.nike-retail .btn-velora-secondary,
+.app-shell.nike-retail .btn-retail-secondary {
+  color: #111;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 999px;
 }
-.app-shell.genz-sport .velora-card,
-.app-shell.genz-sport .auth-panel,
-.app-shell.genz-sport .state-panel {
-  background: linear-gradient(145deg, rgba(15, 20, 32, .98), rgba(10, 14, 24, .98));
-  border-color: rgba(255, 255, 255, .1);
-  box-shadow: 0 22px 55px rgba(0, 0, 0, .35);
+.app-shell.nike-retail .catalog-gender-tabs button { border-color: #e5e5e5; color: #111; background: #fff; }
+.app-shell.nike-retail .catalog-gender-tabs button.active { background: #111; border-color: #111; color: #fff; }
+.app-shell.nike-retail .velora-input,
+.app-shell.nike-retail .form-control,
+.app-shell.nike-retail .form-select {
+  color: #111 !important;
+  background: #fff !important;
+  border-color: #e5e5e5 !important;
 }
-.app-shell.genz-sport .product-image-wrap,
-.app-shell.genz-sport .detail-image-wrap,
-.app-shell.genz-sport .look-card,
-.app-shell.genz-sport .wardrobe-piece { background: #111827; }
-.app-shell.genz-sport .product-name,
-.app-shell.genz-sport .product-price,
-.app-shell.genz-sport .summary-total,
-.app-shell.genz-sport .summary-total strong,
-.app-shell.genz-sport .spec-grid strong,
-.app-shell.genz-sport .stat-row strong { color: #fff; }
-.app-shell.genz-sport .product-name:hover { color: var(--velora-violet); }
-.app-shell.genz-sport .product-badge { background: var(--velora-violet); color: #0a0c12; }
-.app-shell.genz-sport .text-slate-300 { color: var(--velora-muted) !important; }
-.app-shell.genz-sport .btn-velora-primary {
-  background: linear-gradient(135deg, #c8ff00, #9dcc00);
-  border-color: #c8ff00;
-  color: #0a0c12;
-  box-shadow: 0 14px 30px rgba(200, 255, 0, .18);
+.app-shell.nike-retail .retail-nav-dropdown-menu { background: #fff; border-color: #e5e5e5; }
+.app-shell.nike-retail .retail-nav-dropdown-menu a { color: #111; }
+.app-shell.nike-retail .retail-nav-dropdown-menu a:hover { background: #f5f5f5; }
+.app-shell.nike-retail .retail-eyebrow { color: #757575; }
+.app-shell.nike-retail .retail-link { color: #111; text-decoration: underline; }
+.app-shell.nike-retail .retail-brand-chip {
+  color: #111;
+  background: #fff;
+  border-color: #e5e5e5;
 }
-.app-shell.genz-sport .btn-velora-primary:hover,
-.app-shell.genz-sport .btn-velora-primary:focus { background: #d4ff33; color: #0a0c12; }
-.app-shell.genz-sport .btn-velora-secondary {
-  color: #fff;
-  background: rgba(255, 255, 255, .06);
-  border-color: rgba(255, 255, 255, .18);
-}
-.app-shell.genz-sport .catalog-gender-tabs button { border-color: rgba(255, 255, 255, .16); color: #cbd5e1; }
-.app-shell.genz-sport .catalog-gender-tabs button.active {
-  background: var(--velora-violet);
-  border-color: var(--velora-violet);
-  color: #0a0c12;
-}
-.app-shell.genz-sport .velora-input,
-.app-shell.genz-sport .form-control,
-.app-shell.genz-sport .form-select {
-  color: #fff !important;
-  background: #0b1222 !important;
-  border-color: rgba(255, 255, 255, .14) !important;
-}
-.app-shell.genz-sport .instant-search-panel,
-.app-shell.genz-sport .notification-panel {
-  background: #111622;
-  border-color: rgba(255, 255, 255, .12);
-}
-.app-shell.genz-sport .instant-search-item { color: #e2e8f0; }
-.app-shell.genz-sport .instant-search-item:hover,
-.app-shell.genz-sport .instant-search-item:focus { background: rgba(200, 255, 0, .08); }
+.app-shell.nike-retail .retail-brand-chip:hover { background: #f5f5f5; }
+.app-shell.nike-retail .retail-tabs button { color: #757575; border-color: #e5e5e5; }
+.app-shell.nike-retail .retail-tabs button.active { background: #111; border-color: #111; color: #fff; }
+.app-shell.nike-retail .retail-trending { background: #fff; }
+.app-shell.nike-retail .retail-product-card { color: #111; }
+.app-shell.nike-retail .retail-product-meta span { color: #757575; }
+.app-shell.nike-retail .demo-mode-banner { background: #f5f5f5; border-color: #e5e5e5; color: #111; }
 
 .genz-hero {
   position: relative;
@@ -533,18 +539,27 @@ html { font-size:100%; }
 
 .retail-campaign {
   position: relative;
-  min-height: min(82vh, 760px);
+  min-height: min(70vh, 640px);
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  background: #000;
+  background: #111;
 }
 .retail-campaign-bg {
   position: absolute;
   inset: 0;
   background-position: center;
   background-size: cover;
-  transition: background-image .4s ease;
+}
+.retail-campaign-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.retail-campaign-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.2) 60%, transparent 100%);
 }
 .retail-campaign-inner {
   position: relative;
@@ -562,11 +577,11 @@ html { font-size:100%; }
   margin: 0;
   max-width: 12ch;
   color: #fff;
-  font-family: "Space Grotesk", Inter, sans-serif;
-  font-size: clamp(2.4rem, 8vw, 4.8rem);
-  font-weight: 700;
+  font-family: Inter, sans-serif;
+  font-size: clamp(2.2rem, 7vw, 4rem);
+  font-weight: 800;
   line-height: .95;
-  letter-spacing: -.03em;
+  letter-spacing: -.02em;
   text-transform: uppercase;
 }
 .retail-campaign-copy {
@@ -601,22 +616,39 @@ html { font-size:100%; }
   gap: .75rem;
 }
 .retail-category-tile {
+  position: relative;
   display: flex;
   align-items: flex-end;
   min-height: 220px;
   padding: 1rem;
   color: #fff;
-  background-position: center;
-  background-size: cover;
-  border-radius: .35rem;
-  font-family: "Space Grotesk", Inter, sans-serif;
-  font-size: 1.15rem;
+  border-radius: 0;
+  overflow: hidden;
+  font-family: Inter, sans-serif;
+  font-size: 1.1rem;
   font-weight: 700;
-  transition: transform .2s ease;
 }
-.retail-category-tile:hover { color: #fff; transform: translateY(-2px); }
+.retail-category-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.retail-category-tile span {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 8px rgba(0,0,0,.5);
+}
+.retail-category-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,.65) 100%);
+}
+.retail-category-tile:hover { color: #fff; }
 
-.retail-trending { padding: 1rem 0 2rem; background: #0a0d15; }
+.retail-trending { padding: 2.5rem 0; background: #fff; }
 .retail-tabs { display: flex; flex-wrap: wrap; gap: .35rem; }
 .retail-tabs button {
   padding: .45rem .85rem;
@@ -638,12 +670,11 @@ html { font-size:100%; }
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: .75rem;
 }
-.retail-product-card { color: #fff; }
-.retail-product-card:hover { color: #fff; }
+.retail-product-card { color: #111; }
 .retail-product-image {
   aspect-ratio: 1;
-  background: #1a1f2b;
-  border-radius: .35rem;
+  background: #f5f5f5;
+  border-radius: 0;
   overflow: hidden;
 }
 .retail-product-image img { width: 100%; height: 100%; object-fit: cover; }

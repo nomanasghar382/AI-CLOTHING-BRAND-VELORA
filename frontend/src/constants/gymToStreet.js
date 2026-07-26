@@ -1,33 +1,30 @@
-/** VELORA — men's sport retail (Nike-style IA for Gen Z). */
+/** VELORA — men's sport retail. Nike-style: white, black, clean. */
 
-export const NICHE_TAGLINE = 'Just Train It.'
-export const NICHE_PROMISE = 'Training fits + matching street kicks from Nike, Adidas, Gymshark & more.'
+export const NICHE_TAGLINE = 'Just Do It.'
+export const NICHE_PROMISE = 'Men\'s training + streetwear from Nike, Adidas, Jordan & more.'
 export const CURATED_FIT_COUNT = '2,000+'
 
 export const PRIORITY_BRANDS = ['Nike', 'Adidas', 'Jordan', 'Gymshark', 'Puma', 'Under Armour', 'New Balance']
 
-const unsplash = (id, width = 1600) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&h=${Math.round(width * 0.65)}&q=88&dpr=2`
-
-/** Nike-style full-bleed campaign slides */
+/** Local images in /public/catalog — always load */
 export const RETAIL_CAMPAIGNS = [
   {
     id: 'training-heat',
     eyebrow: 'NEW SEASON',
     title: 'TRAIN HARD.\nDRESS CLEAN.',
-    copy: 'Full training fits + matching sneakers. Built for gym, court, and street.',
-    image: unsplash('photo-1571019614242-c5c5dee9f50b'),
+    copy: 'Full training fits + matching sneakers.',
+    image: '/catalog/hero-gym.jpg',
     cta: 'Shop Men',
     to: '/catalog?gender=men',
-    secondaryCta: 'Build my fit',
-    secondaryTo: '/ai/occasion',
+    secondaryCta: 'Shop Shoes',
+    secondaryTo: '/catalog?line=footwear',
   },
   {
     id: 'street-kicks',
     eyebrow: 'FOOTWEAR',
     title: 'STREET-READY\nKICKS',
-    copy: 'Running, basketball, lifestyle — every outfit gets the right shoe.',
-    image: unsplash('photo-1542291026-7eec264c27ff'),
+    copy: 'Running, basketball, lifestyle sneakers.',
+    image: '/catalog/shoe-nike.jpg',
     cta: 'Shop Shoes',
     to: '/catalog?line=footwear',
     secondaryCta: 'Shop Nike',
@@ -35,36 +32,24 @@ export const RETAIL_CAMPAIGNS = [
   },
   {
     id: 'post-gym',
-    eyebrow: 'POST-GYM',
+    eyebrow: 'CLOTHING',
     title: 'HOODIE.\nJOGGERS.\nHEAT.',
-    copy: 'Leave the gym looking like you meant to be seen.',
-    image: unsplash('photo-1556821840-3a63f95609a7'),
+    copy: 'Post-gym fits that look intentional.',
+    image: '/catalog/apparel-hoodie.jpg',
     cta: 'Shop Clothing',
     to: '/catalog?line=apparel',
-    secondaryCta: 'Leg day fits',
-    secondaryTo: '/catalog?moment=leg-day',
-  },
-  {
-    id: 'sale',
-    eyebrow: 'MEMBER DROP',
-    title: 'UP TO 25% OFF\nSELECT STYLES',
-    copy: 'Training tees, hoodies, and kicks — limited time.',
-    image: unsplash('photo-1534438327276-14e5300c3a48'),
-    cta: 'Shop Sale',
-    to: '/catalog?sale=1',
-    secondaryCta: 'View all brands',
-    secondaryTo: '/catalog?gender=men',
+    secondaryCta: 'New arrivals',
+    secondaryTo: '/catalog?new=1',
   },
 ]
 
-/** Nike-style category discovery tiles */
 export const RETAIL_CATEGORIES = [
-  { label: 'Running Shoes', slug: 'mens-sport-running-shoes', image: unsplash('photo-1542291026-7eec264c27ff', 900) },
-  { label: 'Lifestyle Sneakers', slug: 'mens-sport-lifestyle-sneakers', image: unsplash('photo-1460353589841-049ca37d260b', 900) },
-  { label: 'Hoodies', slug: 'mens-sport-hoodie', image: unsplash('photo-1556821840-3a63f95609a7', 900) },
-  { label: 'Joggers', slug: 'mens-sport-joggers', image: unsplash('photo-1518611012118-696072aa579a', 900) },
-  { label: 'Training Tees', slug: 'mens-sport-training-tee', image: unsplash('photo-1571019614242-c5c5dee9f50b', 900) },
-  { label: 'Shorts', slug: 'mens-sport-training-shorts', image: unsplash('photo-1620799139839-3bcdc4bf0a35', 900) },
+  { label: 'Sneakers', slug: 'mens-sport-lifestyle-sneakers', image: '/catalog/shoe-nike.jpg' },
+  { label: 'Running Shoes', slug: 'mens-sport-running-shoes', image: '/catalog/shoe-runner.jpg' },
+  { label: 'Hoodies', slug: 'mens-sport-hoodie', image: '/catalog/apparel-hoodie.jpg' },
+  { label: 'Joggers', slug: 'mens-sport-joggers', image: '/catalog/apparel-joggers.jpg' },
+  { label: 'Training Tees', slug: 'mens-sport-training-tee', image: '/catalog/apparel-train.jpg' },
+  { label: 'Shop All', slug: '', image: '/catalog/hero-gym.jpg' },
 ]
 
 export const RETAIL_NAV = [

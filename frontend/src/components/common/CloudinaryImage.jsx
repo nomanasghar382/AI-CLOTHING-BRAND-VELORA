@@ -16,7 +16,14 @@ function CloudinaryImage({ src, alt, className, width = 640, sizes = '(max-width
       loading={fetchPriority === 'high' ? 'eager' : 'lazy'}
       decoding="async"
       fetchPriority={fetchPriority}
+      referrerPolicy="no-referrer"
       className={className}
+      onError={(event) => {
+        if (resolved && event.currentTarget.src !== resolved) {
+          event.currentTarget.src = resolved
+          event.currentTarget.removeAttribute('srcset')
+        }
+      }}
     />
   )
 }
