@@ -13,8 +13,9 @@ final class ResetSportCatalogCommand extends Command
     public function handle(): int
     {
         $this->call('db:seed', ['--class' => 'Database\\Seeders\\SportsCatalogSeeder', '--force' => true]);
+        $this->call('db:seed', ['--class' => 'Database\\Seeders\\NikeCatalogSeeder', '--force' => true]);
         $this->call('db:seed', ['--class' => 'Database\\Seeders\\SearchSynonymSeeder', '--force' => true]);
-        $this->info('VELORA Sport catalog reset complete.');
+        $this->info('VELORA Sport catalog reset complete (synthetic + Nike dataset).');
 
         return self::SUCCESS;
     }
