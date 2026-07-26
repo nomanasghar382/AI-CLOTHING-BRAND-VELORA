@@ -15,6 +15,31 @@ final class FreeCatalogPhotoPool
         'noman-asghar.png',
     ];
 
+    /** @var array<string, mixed>|null */
+    private static ?array $catalog = null;
+
+    /** @return array<string, mixed> */
+    private static function catalog(): array
+    {
+        return self::$catalog ??= require database_path('data/GenZCuratedCatalog.php');
+    }
+
+    public static function familyKey(string $gender, string $familyName): string
+    {
+        $catalog = self::catalog();
+
+        return $catalog['family_keys'][$gender][$familyName] ?? 'default';
+    }
+
+    public static function familyUsesBrandModel(string $familyName): bool
+    {
+        if (! self::usesMenBrandModel()) {
+            return false;
+        }
+
+        return in_array($familyName, self::catalog()['men_brand_model_families'], true);
+    }
+
     public static function menBrandModelPath(): ?string
     {
         foreach (self::MEN_BRAND_MODEL_NAMES as $name) {
@@ -36,44 +61,60 @@ final class FreeCatalogPhotoPool
         return count(self::womenCatalogPhotos()) > 0;
     }
 
-    /** Your uploaded women looks — niqab, abaya, khimar, jilbab (excludes README). */
     /** @return list<string> */
     public static function womenCatalogPhotos(): array
     {
         return self::localPhotos('women');
     }
 
-    /** @return list<array{type: string, id?: string, path?: string}> */
+    /** Local women photos that match this garment family (niqab photo never on trousers). */
+    /** @return list<string> */
+    public static function localPhotosForFamily(string $gender, string $familyKey): array
+    {
+        if ($gender !== 'women') {
+            return [];
+        }
+
+        $catalog = self::catalog();
+        $tags = $catalog['women_local_family_tags'] ?? [];
+        $matched = [];
+
+        foreach (self::localPhotos('women') as $path) {
+            $basename = pathinfo($path, PATHINFO_FILENAME);
+            foreach ($tags as $prefix => $familyKeys) {
+                if (! str_starts_with($basename, $prefix)) {
+                    continue;
+                }
+                if (in_array($familyKey, $familyKeys, true)) {
+                    $matched[] = $path;
+                }
+            }
+        }
+
+        return $matched;
+    }
+
+    /** @return list<array{type: string, id?: string, path?: string}>} */
     public static function forGender(string $gender): array
     {
-        $catalog = require database_path('data/GenZCuratedCatalog.php');
+        $catalog = self::catalog();
+        $pools = $catalog["{$gender}_pools"] ?? [];
         $blacklist = array_flip($catalog['blacklist']);
-        $editorial = $gender === 'men' ? $catalog['men_editorial'] : $catalog['women_editorial'];
-        $product = $gender === 'men' ? $catalog['men_product'] : $catalog['women_product'];
-
-        $pool = [];
+        $entries = [];
 
         foreach (self::localPhotos($gender) as $path) {
-            $pool[] = ['type' => 'local', 'path' => $path];
+            $entries[] = ['type' => 'local', 'path' => $path];
         }
 
-        if ($gender === 'women' && self::usesWomenCatalogPhotos()) {
-            return $pool;
-        }
-
-        foreach ($editorial as $id) {
-            if (! isset($blacklist[$id])) {
-                $pool[] = ['type' => 'unsplash', 'id' => $id];
+        foreach ($pools as $pool) {
+            foreach ($pool as $id) {
+                if (! isset($blacklist[$id])) {
+                    $entries[] = ['type' => 'unsplash', 'id' => $id];
+                }
             }
         }
 
-        foreach ($product as $id) {
-            if (! isset($blacklist[$id])) {
-                $pool[] = ['type' => 'unsplash', 'id' => $id];
-            }
-        }
-
-        return $pool;
+        return $entries;
     }
 
     /** @return list<string> Public URL paths e.g. /free-catalog/women/01.jpg */
@@ -108,52 +149,53 @@ final class FreeCatalogPhotoPool
 
         $quality = $width <= 480 ? 82 : 85;
         $photoId = $entry['id'];
-        $catalog = require database_path('data/GenZCuratedCatalog.php');
+        $catalog = self::catalog();
         $crop = $catalog['crop_variants'][$variant] ?? '';
         $host = str_starts_with($photoId, 'premium_photo') ? 'plus.unsplash.com' : 'images.unsplash.com';
 
         return "https://{$host}/{$photoId}?auto=format&fit=crop&w={$width}&h=".($width <= 540 ? 900 : 1350)."&q={$quality}&dpr=2{$crop}";
     }
 
-    public static function menGarmentPhoto(int $ordinal, int $galleryIndex): string
+    /** @return list<string> */
+    private static function unsplashPool(string $gender, string $familyKey, bool $productShot): array
     {
-        $catalog = require database_path('data/GenZCuratedCatalog.php');
-        $pool = array_merge($catalog['men_editorial'], $catalog['men_product']);
-        $index = $ordinal + ($galleryIndex * 13);
+        $catalog = self::catalog();
+        $poolKey = $productShot ? "{$gender}_product_pools" : "{$gender}_pools";
+        $pool = $catalog[$poolKey][$familyKey] ?? $catalog[$poolKey]['bottoms'] ?? [];
 
-        return $pool[$index % count($pool)];
-    }
-
-    public static function womenGarmentPhoto(int $ordinal, int $galleryIndex): string
-    {
-        $catalog = require database_path('data/GenZCuratedCatalog.php');
-        $pool = array_merge($catalog['women_editorial'], $catalog['women_product']);
-        $index = $ordinal + ($galleryIndex * 11);
-
-        return $pool[$index % count($pool)];
+        return array_values(array_filter($pool, fn (string $id) => ! in_array($id, $catalog['blacklist'], true)));
     }
 
     /** @return array{type: string, id?: string, path?: string} */
-    public static function entryFor(string $gender, int $ordinal, int $galleryIndex, array $fallbackPool): array
+    public static function entryFor(string $gender, string $familyName, int $ordinal, int $galleryIndex, array $fallbackPool): array
     {
-        if ($gender === 'men' && $galleryIndex === 0 && ($brand = self::menBrandModelPath())) {
+        $familyKey = self::familyKey($gender, $familyName);
+
+        if ($gender === 'men' && $galleryIndex === 0 && self::familyUsesBrandModel($familyName) && ($brand = self::menBrandModelPath())) {
             return ['type' => 'local', 'path' => $brand];
         }
 
-        if ($gender === 'men' && $galleryIndex > 0 && self::usesMenBrandModel()) {
-            return ['type' => 'unsplash', 'id' => self::menGarmentPhoto($ordinal, $galleryIndex)];
+        if ($gender === 'women') {
+            $local = self::localPhotosForFamily('women', $familyKey);
+            if ($local !== []) {
+                $path = $local[($ordinal + $galleryIndex) % count($local)];
+
+                return ['type' => 'local', 'path' => $path];
+            }
         }
 
-        $womenPhotos = self::womenCatalogPhotos();
-        if ($gender === 'women' && $womenPhotos !== []) {
-            $path = $womenPhotos[($ordinal + $galleryIndex) % count($womenPhotos)];
+        $productShot = $galleryIndex > 0 || $familyKey === 'bottoms' || $familyKey === 'accessory';
+        $pool = self::unsplashPool($gender, $familyKey, $productShot);
 
-            return ['type' => 'local', 'path' => $path];
+        if ($pool === []) {
+            $index = $ordinal + ($galleryIndex * 97);
+
+            return $fallbackPool[$index % max(1, count($fallbackPool))];
         }
 
-        $index = $ordinal + ($galleryIndex * 97);
+        $id = $pool[($ordinal + ($galleryIndex * 11)) % count($pool)];
 
-        return $fallbackPool[$index % count($fallbackPool)];
+        return ['type' => 'unsplash', 'id' => $id];
     }
 
     public static function counts(): array

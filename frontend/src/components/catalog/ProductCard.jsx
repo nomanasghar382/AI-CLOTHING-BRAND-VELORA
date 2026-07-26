@@ -5,8 +5,11 @@ import CloudinaryImage from '../common/CloudinaryImage'
 
 function ProductCard({ product }) {
   const image = product.images?.find((item) => item.is_primary)?.thumbnail_url || product.images?.[0]?.thumbnail_url
-  const isBrandModel = product.gender === 'men' && image?.includes('/free-catalog/men/brand-model')
-  const isWomenLook = product.gender === 'women' && image?.includes('/free-catalog/women/')
+  const family = product.category?.name || product.name || ''
+  const isBottom = /trouser|pant|skirt|chino/i.test(family)
+  const isFaceCover = /niqab|abaya|jilbab|burqa|khimar|hijab/i.test(family)
+  const isBrandModel = product.gender === 'men' && image?.includes('/free-catalog/men/brand-model') && !isBottom
+  const isWomenLook = product.gender === 'women' && image?.includes('/free-catalog/women/') && isFaceCover
   return (
     <Card className="product-card h-100 overflow-hidden">
       <Link to={`/catalog/${product.slug}`} className="product-image-wrap">

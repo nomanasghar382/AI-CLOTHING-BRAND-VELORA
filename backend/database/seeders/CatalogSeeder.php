@@ -26,11 +26,21 @@ class CatalogSeeder extends Seeder
     }
 
     /** @return array{type: string, id?: string, path?: string} */
-    private function entryFor(string $gender, int $ordinal, int $galleryIndex): array
+    private function entryFor(string $gender, string $familyName, int $ordinal, int $galleryIndex): array
     {
         $pool = $gender === 'men' ? $this->menPool : $this->womenPool;
 
-        return FreeCatalogPhotoPool::entryFor($gender, $ordinal, $galleryIndex, $pool);
+        return FreeCatalogPhotoPool::entryFor($gender, $familyName, $ordinal, $galleryIndex, $pool);
+    }
+
+    private function isBottomFamily(string $familyName): bool
+    {
+        return in_array($familyName, ['Islamic Trouser', 'Wide Leg Pant', 'Modest Skirt', 'Chino Pant'], true);
+    }
+
+    private function isFaceCoverFamily(string $familyName): bool
+    {
+        return in_array($familyName, ['Niqab', 'Burqa', 'Abaya', 'Jilbab', 'Khimar', 'Hijab'], true);
     }
 
     private function genZProductName(string $familyName, int $productIndex, string $gender): string
@@ -110,16 +120,22 @@ class CatalogSeeder extends Seeder
             $categoryPool = $isMen ? $menCategories : $womenCategories;
             $coverage = $gender === 'women' ? 'Full' : ['Full', 'Modest', 'Layered'][$i % 3];
 
-            $modeledBy = $gender === 'men' && FreeCatalogPhotoPool::usesMenBrandModel() ? ' Modeled by Noman Asghar.' : '';
-            $womenLook = $gender === 'women' && FreeCatalogPhotoPool::usesWomenCatalogPhotos() ? ' Velora niqab & abaya edit.' : '';
+            $modeledBy = $gender === 'men' && FreeCatalogPhotoPool::familyUsesBrandModel($familyName)
+                ? ' Modeled by Noman Asghar.'
+                : '';
+            $womenLook = $gender === 'women' && FreeCatalogPhotoPool::usesWomenCatalogPhotos() && $this->isFaceCoverFamily($familyName)
+                ? ' Velora niqab & abaya edit.'
+                : '';
             $product = Product::query()->updateOrCreate(['sku' => "VLR-{$i}"], [
                 'slug' => Str::slug($name.'-'.$i),
                 'name' => $name,
-                'short_description' => $gender === 'men' && FreeCatalogPhotoPool::usesMenBrandModel()
+                'short_description' => $gender === 'men' && FreeCatalogPhotoPool::familyUsesBrandModel($familyName)
                     ? "Worn by Noman Asghar — {$familyName} edit."
-                    : ($gender === 'women' && FreeCatalogPhotoPool::usesWomenCatalogPhotos()
+                    : ($gender === 'women' && FreeCatalogPhotoPool::usesWomenCatalogPhotos() && $this->isFaceCoverFamily($familyName)
                         ? "Your niqab & abaya look — {$familyName} drop."
-                        : '100% free photos — your pics or Unsplash stock.'),
+                        : ($this->isBottomFamily($familyName)
+                            ? "Gen Z {$familyName} — product flat-lay, ages 16–35."
+                            : "Gen Z {$familyName} — modest edit for ages 16–35.")),
                 'description' => "Built for ages 16–35. The {$name} is styled for campus, Jummah, and weekend fits.{$modeledBy}{$womenLook}",
                 'barcode' => '890'.str_pad((string) $i, 9, '0', STR_PAD_LEFT),
                 'brand_id' => $brands[$i % 100]->id,
@@ -153,7 +169,7 @@ class CatalogSeeder extends Seeder
             $product->sizes()->sync($selectedSizes->pluck('id'));
 
             foreach (range(0, 4) as $j) {
-                $entry = $this->entryFor($gender, $ordinal, $j);
+                $entry = $this->entryFor($gender, $familyName, $ordinal, $j);
                 $variant = $entry['type'] === 'local' ? 0 : $j;
                 $url = FreeCatalogPhotoPool::urlFor($entry, 1080, $variant);
                 $thumbnailUrl = FreeCatalogPhotoPool::urlFor($entry, 540, $variant);
