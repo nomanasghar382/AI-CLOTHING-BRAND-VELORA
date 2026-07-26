@@ -1,9 +1,8 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
-import FeatureLaunchBar from '../components/layout/FeatureLaunchBar'
+import BackendStatusBanner from '../components/system/BackendStatusBanner'
 import Footer from '../components/layout/Footer'
 import SkipLink from '../components/accessibility/SkipLink'
-import InstallPrompt from '../components/system/InstallPrompt'
 import PageTransition from '../components/system/PageTransition'
 import ToastStack from '../components/notifications/ToastStack'
 import useOfflineSync from '../hooks/useOfflineSync'
@@ -15,15 +14,14 @@ export default function PublicLayout() {
   return (
     <div className="app-shell">
       <SkipLink />
+      <BackendStatusBanner />
       <Navbar />
-      <FeatureLaunchBar />
       <main id="main-content" className="flex-grow-1" tabIndex={-1}>
         <PageTransition key={location.pathname}>
           <Outlet />
         </PageTransition>
       </main>
       <Footer />
-      <InstallPrompt />
       <ToastStack />
     </div>
   )

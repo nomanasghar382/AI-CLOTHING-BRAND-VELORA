@@ -1,51 +1,37 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { FiHeart, FiMenu, FiShoppingBag, FiUser, FiX } from 'react-icons/fi'
-import { NICHE_TAGLINE } from '../../constants/gymToStreet'
-import useAuth from '../../hooks/useAuth'
+import { FiMenu, FiShoppingBag, FiX } from 'react-icons/fi'
 import useCart from '../../hooks/useCart'
-import useWishlist from '../../hooks/useWishlist'
 
 const navItems = [
   { label: 'Shop', to: '/catalog?gender=men' },
   { label: 'Build my fit', to: '/ai/occasion' },
-  { label: 'Try on', to: '/avatar' },
 ]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const { isAuthenticated, user, signOut } = useAuth()
   const { itemCount: cartCount } = useCart()
-  const { itemCount: wishlistCount } = useWishlist()
 
   return (
     <header className="site-header">
       <nav className="container py-3 d-flex align-items-center justify-content-between" aria-label="Main navigation">
         <Link className="brand-mark" to="/">VELORA<span>.</span></Link>
-        <p className="d-none d-xl-block small text-slate-300 mb-0 niche-nav-tag">{NICHE_TAGLINE}</p>
-        <div className="d-none d-lg-flex align-items-center gap-4">
+        <div className="d-none d-md-flex align-items-center gap-4">
           {navItems.map((item) => <NavLink key={item.to} className="nav-link-velora" to={item.to}>{item.label}</NavLink>)}
+          <Link className="nav-icon-link" to="/cart" aria-label={`Bag, ${cartCount} items`}>
+            <FiShoppingBag />{cartCount > 0 && <span className="nav-counter">{cartCount}</span>}
+          </Link>
         </div>
-        <div className="d-none d-lg-flex align-items-center gap-3">
-          <Link className="nav-icon-link" to="/wishlist" aria-label={`Wishlist, ${wishlistCount} items`}><FiHeart />{wishlistCount > 0 && <span className="nav-counter">{wishlistCount}</span>}</Link>
-          <Link className="nav-icon-link" to="/cart" aria-label={`Shopping bag, ${cartCount} items`}><FiShoppingBag />{cartCount > 0 && <span className="nav-counter">{cartCount}</span>}</Link>
-          {isAuthenticated ? (
-            <>
-              <span className="small text-slate-300">Hello, {user?.first_name || user?.name}</span>
-              <button type="button" className="btn btn-link nav-link-velora p-0" onClick={signOut} aria-label="Sign out">Sign out</button>
-            </>
-          ) : <Link className="nav-link-velora d-flex gap-2 align-items-center" to="/login"><FiUser /> Sign in</Link>}
-        </div>
-        <button type="button" className="btn btn-icon d-lg-none" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <button type="button" className="btn btn-icon d-md-none" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? <FiX /> : <FiMenu />}
         </button>
       </nav>
-      {open && <div className="container pb-3 d-lg-none mobile-nav">
-        {navItems.map((item) => <NavLink key={item.to} className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={item.to}>{item.label}</NavLink>)}
-        <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/wishlist">Wishlist{wishlistCount ? ` (${wishlistCount})` : ''}</NavLink>
-        <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/cart">Bag{cartCount ? ` (${cartCount})` : ''}</NavLink>
-        <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={isAuthenticated ? '/account' : '/login'}>{isAuthenticated ? 'Account' : 'Sign in'}</NavLink>
-      </div>}
+      {open && (
+        <div className="container pb-3 d-md-none mobile-nav">
+          {navItems.map((item) => <NavLink key={item.to} className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to={item.to}>{item.label}</NavLink>)}
+          <NavLink className="nav-link-velora d-block py-2" onClick={() => setOpen(false)} to="/cart">Bag{cartCount ? ` (${cartCount})` : ''}</NavLink>
+        </div>
+      )}
     </header>
   )
 }
