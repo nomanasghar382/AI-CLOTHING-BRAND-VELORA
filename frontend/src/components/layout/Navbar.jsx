@@ -4,8 +4,9 @@ import { FiMenu, FiShoppingBag, FiX } from 'react-icons/fi'
 import useCart from '../../hooks/useCart'
 
 const navItems = [
-  { label: 'Shop', to: '/catalog?gender=men' },
+  { label: 'Shop fits', to: '/catalog?gender=men' },
   { label: 'Build my fit', to: '/ai/occasion' },
+  { label: 'Try on', to: '/avatar' },
 ]
 
 export default function Navbar() {
