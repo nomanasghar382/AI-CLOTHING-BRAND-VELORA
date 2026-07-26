@@ -48,12 +48,25 @@ class SportsCatalogSeeder extends Seeder
         );
 
         $allFamilies = array_merge($this->catalog['apparel_families'], $this->catalog['footwear_families']);
-        $categories = collect($allFamilies)->mapWithKeys(fn (string $name, int $index) => [
-            $name => Category::query()->updateOrCreate(
-                ['slug' => 'mens-sport-'.Str::slug($name)],
-                ['parent_id' => $parent->id, 'name' => $name, 'description' => "Men's {$name} — Gen Z sport drop.", 'status' => 'active', 'is_featured' => $index < 8, 'is_trending' => $index < 10]
-            ),
-        ]);
+        $categories = collect($allFamilies)->mapWithKeys(function (string $name, int $index) use ($parent) {
+            $bannerEntry = SportsCatalogPhotoPool::entryFor($name, $index + 1, 0);
+            $banner = SportsCatalogPhotoPool::urlFor($bannerEntry, 1400);
+
+            return [
+                $name => Category::query()->updateOrCreate(
+                    ['slug' => 'mens-sport-'.Str::slug($name)],
+                    [
+                        'parent_id' => $parent->id,
+                        'name' => $name,
+                        'description' => "Men's {$name} — Gen Z sport drop.",
+                        'banner_image_url' => $banner,
+                        'status' => 'active',
+                        'is_featured' => $index < 8,
+                        'is_trending' => $index < 10,
+                    ]
+                ),
+            ];
+        });
 
         $brands = collect($this->catalog['sport_brands'])->map(fn (string $name, int $i) => Brand::query()->updateOrCreate(
             ['slug' => Str::slug($name)],
@@ -204,7 +217,7 @@ class SportsCatalogSeeder extends Seeder
         $product->colors()->sync([$color->id]);
         $product->sizes()->sync($selectedSizes->pluck('id'));
 
-        foreach (range(0, 2) as $j) {
+        foreach (range(0, 3) as $j) {
             $entry = SportsCatalogPhotoPool::entryFor($family, $ordinal, $j);
             $url = SportsCatalogPhotoPool::urlFor($entry, 1080);
             $thumb = SportsCatalogPhotoPool::urlFor($entry, 540);

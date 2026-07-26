@@ -3,6 +3,7 @@ import { FiAlertCircle, FiFeather, FiHeart, FiShoppingBag } from 'react-icons/fi
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Breadcrumb from '../../components/common/Breadcrumb'
 import CloudinaryImage from '../../components/common/CloudinaryImage'
+import ProductImageGallery from '../../components/catalog/ProductImageGallery'
 import Loader from '../../components/feedback/Loader'
 import ErrorState from '../../components/feedback/ErrorState'
 import Seo from '../../components/system/Seo'
@@ -58,6 +59,7 @@ export default function ProductDetailPage() {
   if (!product) return <section className="container py-5"><Loader label="Opening the collection..." /></section>
 
   const primary = product.images?.find((image) => image.is_primary) || product.images?.[0]
+  const isFootwear = product.catalog_line === 'footwear'
   const perform = async (action) => {
     if (!isAuthenticated) {
       navigate('/login', { state: { from: { pathname: `/catalog/${slug}` } } })
@@ -78,8 +80,7 @@ export default function ProductDetailPage() {
       <Breadcrumb items={[{ label: 'Catalog', to: '/catalog' }, { label: product.name }]} />
       <div className="row g-4">
         <div className="col-lg-7">
-          <div className="detail-image-wrap">{primary && <CloudinaryImage src={primary.url} alt={product.name} className="detail-image" width={720} sizes="(max-width: 992px) 100vw, 60vw" fetchPriority="high" />}</div>
-          <div className="d-flex gap-2 mt-3">{product.images?.slice(0, 5).map((image, index) => <CloudinaryImage key={index} className="detail-thumbnail" src={image.thumbnail_url || image.url} alt={image.alt_text || `${product.name} view ${index + 1}`} width={120} sizes="80px" />)}</div>
+          <ProductImageGallery images={product.images || []} productName={product.name} isFootwear={isFootwear} />
         </div>
         <div className="col-lg-5">
           <p className="eyebrow">{product.brand?.name} / Men&apos;s sport · {product.category?.name}</p>

@@ -12,16 +12,7 @@ final class GymToStreetCatalog
     /** @return list<string> */
     public static function categorySlugs(): array
     {
-        return [
-            'mens-sport-training-tee',
-            'mens-sport-compression-top',
-            'mens-sport-hoodie',
-            'mens-sport-joggers',
-            'mens-sport-training-shorts',
-            'mens-sport-track-jacket',
-            'mens-sport-training-shoes',
-            'mens-sport-lifestyle-sneakers',
-        ];
+        return array_merge(self::apparelSlugs(), self::footwearSlugs());
     }
 
     /** @return list<string> */
@@ -31,9 +22,13 @@ final class GymToStreetCatalog
             'mens-sport-training-tee',
             'mens-sport-compression-top',
             'mens-sport-hoodie',
+            'mens-sport-track-jacket',
             'mens-sport-joggers',
             'mens-sport-training-shorts',
-            'mens-sport-track-jacket',
+            'mens-sport-basketball-jersey',
+            'mens-sport-football-jersey',
+            'mens-sport-running-tank',
+            'mens-sport-windbreaker',
         ];
     }
 
@@ -41,8 +36,11 @@ final class GymToStreetCatalog
     public static function footwearSlugs(): array
     {
         return [
-            'mens-sport-training-shoes',
+            'mens-sport-running-shoes',
+            'mens-sport-basketball-shoes',
             'mens-sport-lifestyle-sneakers',
+            'mens-sport-training-shoes',
+            'mens-sport-sport-slides',
         ];
     }
 

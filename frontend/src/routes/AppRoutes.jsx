@@ -8,6 +8,7 @@ import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
 import StatusPage from '../pages/errors/StatusPage'
 import OfflinePage from '../pages/errors/OfflinePage'
+import BrandShopPage from '../pages/catalog/BrandShopPage'
 import CatalogPage from '../pages/catalog/CatalogPage'
 import ProductDetailPage from '../pages/catalog/ProductDetailPage'
 import ProtectedRoute from './ProtectedRoute'
@@ -53,6 +54,7 @@ export default function AppRoutes() {
           <Route path="about" element={<AboutPage />} />
           <Route path="catalog" element={<CatalogPage />} />
           <Route path="catalog/:slug" element={<ProductDetailPage />} />
+          <Route path="brands/:slug" element={<BrandShopPage />} />
           <Route path="marketplace" element={<MarketplacePage />} />
           <Route path="creators/:handle" element={<CreatorProfilePage />} />
           <Route path="community" element={<CommunityPage />} />

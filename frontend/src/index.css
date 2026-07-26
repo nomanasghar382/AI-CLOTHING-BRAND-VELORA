@@ -496,3 +496,303 @@ html { font-size:100%; }
   .btn-genz-primary,
   .btn-genz-ghost { width: 100%; justify-content: center; }
 }
+
+/* Nike-style retail surfaces */
+.retail-eyebrow {
+  margin: 0;
+  color: var(--velora-muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+.retail-heading {
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: #fff;
+}
+.retail-link { color: #fff; font-size: .9rem; font-weight: 700; }
+.retail-link:hover { color: var(--velora-cyan); }
+.btn-retail-primary,
+.btn-retail-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  border-radius: 999px;
+  font-weight: 800;
+  padding: .75rem 1.35rem;
+  transition: transform .2s ease, background .2s ease;
+}
+.btn-retail-primary { color: #111; background: #fff; border: 1px solid #fff; }
+.btn-retail-primary:hover { color: #111; background: #f2f2f2; transform: translateY(-1px); }
+.btn-retail-secondary { color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.55); }
+.btn-retail-secondary:hover { color: #fff; background: rgba(255,255,255,.08); }
+
+.retail-campaign {
+  position: relative;
+  min-height: min(82vh, 760px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: #000;
+}
+.retail-campaign-bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  transition: background-image .4s ease;
+}
+.retail-campaign-inner {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 4.5rem;
+}
+.retail-campaign-eyebrow {
+  margin: 0 0 .75rem;
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+.retail-campaign-title {
+  margin: 0;
+  max-width: 12ch;
+  color: #fff;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: clamp(2.4rem, 8vw, 4.8rem);
+  font-weight: 700;
+  line-height: .95;
+  letter-spacing: -.03em;
+  text-transform: uppercase;
+}
+.retail-campaign-copy {
+  max-width: 28rem;
+  margin: 1rem 0 0;
+  color: rgba(255,255,255,.82);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+.retail-campaign-dots {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 2;
+  display: flex;
+  gap: .45rem;
+}
+.retail-campaign-dots button {
+  width: .55rem;
+  height: .55rem;
+  padding: 0;
+  background: rgba(255,255,255,.35);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.retail-campaign-dots button.active { background: #fff; transform: scale(1.15); }
+
+.retail-category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .75rem;
+}
+.retail-category-tile {
+  display: flex;
+  align-items: flex-end;
+  min-height: 220px;
+  padding: 1rem;
+  color: #fff;
+  background-position: center;
+  background-size: cover;
+  border-radius: .35rem;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  transition: transform .2s ease;
+}
+.retail-category-tile:hover { color: #fff; transform: translateY(-2px); }
+
+.retail-trending { padding: 1rem 0 2rem; background: #0a0d15; }
+.retail-tabs { display: flex; flex-wrap: wrap; gap: .35rem; }
+.retail-tabs button {
+  padding: .45rem .85rem;
+  color: var(--velora-muted);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.retail-tabs button.active {
+  color: #111;
+  background: #fff;
+  border-color: #fff;
+}
+.retail-product-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: .75rem;
+}
+.retail-product-card { color: #fff; }
+.retail-product-card:hover { color: #fff; }
+.retail-product-image {
+  aspect-ratio: 1;
+  background: #1a1f2b;
+  border-radius: .35rem;
+  overflow: hidden;
+}
+.retail-product-image img { width: 100%; height: 100%; object-fit: cover; }
+.retail-product-image.is-footwear {
+  background: #f4f4f4;
+}
+.retail-product-image.is-footwear img { object-fit: contain; padding: .75rem; }
+.retail-product-meta {
+  display: grid;
+  gap: .2rem;
+  padding: .65rem .15rem 0;
+}
+.retail-product-meta span {
+  color: var(--velora-muted);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.retail-product-meta strong {
+  font-size: .82rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.retail-product-meta em { color: #fff; font-style: normal; font-weight: 700; font-size: .88rem; }
+
+.retail-brand-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .55rem;
+}
+.retail-brand-chip {
+  padding: .55rem 1rem;
+  color: #fff;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.retail-brand-chip:hover { color: #111; background: #fff; }
+
+.retail-header .brand-mark { letter-spacing: .28em; font-size: 1.1rem; }
+.retail-nav-dropdown { position: relative; }
+.retail-nav-dropdown-trigger {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.retail-nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + .65rem);
+  left: 0;
+  min-width: 180px;
+  padding: .5rem;
+  background: #111622;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: .65rem;
+  box-shadow: 0 18px 40px rgba(0,0,0,.35);
+}
+.retail-nav-dropdown-menu a {
+  display: block;
+  padding: .5rem .65rem;
+  color: #e2e8f0;
+  border-radius: .45rem;
+  font-size: .85rem;
+  font-weight: 600;
+}
+.retail-nav-dropdown-menu a:hover { color: #fff; background: rgba(255,255,255,.06); }
+
+.retail-plp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.retail-plp-tools {
+  display: flex;
+  gap: .65rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.retail-sort { width: auto; min-width: 170px; }
+
+.retail-brand-hero {
+  min-height: 320px;
+  background: #111622 center/cover no-repeat;
+}
+.retail-brand-copy { max-width: 36rem; color: rgba(255,255,255,.8); }
+
+.product-image-wrap.is-footwear { background: #f4f4f4; }
+.product-image-wrap.is-footwear .product-image { object-fit: contain; padding: .65rem; }
+.retail-product-brand {
+  color: var(--velora-muted);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pdp-gallery-stage {
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+  background: #1a1f2b;
+  border-radius: .5rem;
+  overflow: hidden;
+}
+.pdp-gallery-stage.is-footwear { background: #f4f4f4; }
+.pdp-gallery-main { width: 100%; max-height: 520px; object-fit: cover; }
+.pdp-gallery-stage.is-footwear .pdp-gallery-main { object-fit: contain; padding: 1.5rem; }
+.pdp-gallery-thumbs {
+  display: flex;
+  gap: .5rem;
+  margin-top: .75rem;
+  overflow-x: auto;
+}
+.pdp-gallery-thumbs button {
+  flex: 0 0 72px;
+  height: 72px;
+  padding: 0;
+  background: #111622;
+  border: 2px solid transparent;
+  border-radius: .45rem;
+  overflow: hidden;
+  cursor: pointer;
+}
+.pdp-gallery-thumbs button.active { border-color: #fff; }
+.pdp-gallery-thumbs img { width: 100%; height: 100%; object-fit: cover; }
+.pdp-gallery-stage.is-footwear + .pdp-gallery-thumbs button { background: #f4f4f4; }
+.pdp-gallery-stage.is-footwear + .pdp-gallery-thumbs img { object-fit: contain; }
+
+@media (max-width: 1199px) {
+  .retail-product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 991px) {
+  .retail-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .retail-product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 575px) {
+  .retail-campaign-inner { padding-bottom: 3.5rem; }
+  .retail-campaign-title { max-width: none; }
+  .retail-category-grid { grid-template-columns: 1fr 1fr; }
+  .retail-category-tile { min-height: 160px; font-size: .95rem; }
+  .retail-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .btn-retail-primary, .btn-retail-secondary { width: 100%; }
+}
