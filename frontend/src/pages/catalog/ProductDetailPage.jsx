@@ -104,9 +104,41 @@ export default function ProductDetailPage() {
             <button className="btn btn-velora-primary flex-grow-1" type="button" disabled={busy} onClick={() => perform(() => addToCart(item))}><FiShoppingBag /> Add to bag</button>
             <button className="btn btn-velora-secondary" type="button" disabled={busy} onClick={() => perform(() => addToWishlist(item))} aria-label="Add to wishlist"><FiHeart /></button>
           </div>
-          <Link className="btn btn-velora-ghost mt-3" to="/catalog">Continue exploring</Link>
+          <Link className="btn btn-velora-ghost mt-3" to="/catalog?gender=men">Continue exploring</Link>
         </div>
       </div>
+      {product.matched_product && (
+        <article className="product-passport mt-5">
+          <div>
+            <p className="eyebrow">MATCHING KICKS</p>
+            <h2 className="h4">Complete the fit — same brand, same colorway.</h2>
+            <p className="text-slate-300 mb-0">
+              {product.catalog_line === 'footwear'
+                ? 'This shoe pairs with the matching sport top below.'
+                : 'Add the matching sport shoes built for this outfit.'}
+            </p>
+          </div>
+          <div className="row g-3 align-items-center mt-3">
+            <div className="col-md-3">
+              <CloudinaryImage
+                src={product.matched_product.images?.find((img) => img.is_primary)?.thumbnail_url || product.matched_product.images?.[0]?.thumbnail_url}
+                alt={product.matched_product.name}
+                className="detail-thumbnail w-100"
+                width={240}
+                sizes="240px"
+              />
+            </div>
+            <div className="col-md-6">
+              <p className="eyebrow mb-1">{product.matched_product.brand?.name}</p>
+              <h3 className="h5 mb-2">{product.matched_product.name}</h3>
+              <span className="product-price">{formatMoney(product.matched_product.sale_price || product.matched_product.price)}</span>
+            </div>
+            <div className="col-md-3">
+              <Link className="btn btn-velora-primary w-100" to={`/catalog/${product.matched_product.slug}`}>View match</Link>
+            </div>
+          </div>
+        </article>
+      )}
       <article className="product-passport mt-5">
         <div><p className="eyebrow">DIGITAL PRODUCT PASSPORT</p><h2><FiFeather /> Made to be known.</h2><p>Trace the materials, care and afterlife of this piece in one transparent record.</p></div>
         <div className="passport-grid"><span>Materials<strong>{product.fabric || 'Details forthcoming'}</strong></span><span>Origin<strong>{product.origin || product.country_of_origin || 'Verified at fulfillment'}</strong></span><span>Care<strong>{product.care_instructions || 'Follow garment label'}</strong></span><span>End of life<strong>{product.recycling_guidance || 'Repair, resell or recycle responsibly'}</strong></span></div>

@@ -48,6 +48,11 @@ class Product extends Model
         return $this->belongsTo(User::class, 'supplier_id');
     }
 
+    public function matchedProduct(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'matched_product_id');
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
